@@ -1,0 +1,99 @@
+// Plus besoin d'importer variables, tout est dans les classes globales !
+@use "../../../../styles";
+
+.login-container {
+  @extend .container;
+  @extend .container--md;
+
+  .header {
+    @extend .app-header;
+    flex-direction: column;
+  }
+
+  .main-card {
+    @extend .card;
+    width: 100%;
+    max-width: 800px;
+
+    .login-form {
+      @extend .form;
+      margin-top: 1rem;
+
+      .form-row {
+        margin-top: -1.5rem; // Ajustement spécifique pour le login
+
+        &.actions {
+          @extend .form-actions;
+          margin: 0 0 1rem;
+
+          .btn-group {
+            justify-content: space-between;
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+
+  .express-login {
+    @extend .card;
+    @extend .card--compact;
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 0;
+
+    .form-row {
+      @extend .flex;
+      @extend .gap--md;
+      margin-top: 1rem;
+    }
+  }
+}
+
+// Styles spécifiques qui ne peuvent pas être généralisés
+.login-container {
+  .chip-actions {
+    .chip-btn {
+      // Utilise déjà les styles de .chip-actions du fichier components
+      &.active {
+        // Les styles sont déjà définis dans components
+      }
+    }
+  }
+
+  .main-card {
+    .login-form {
+      .form-row {
+        mat-checkbox {
+          // Style déjà défini dans le fichier principal
+        }
+
+        a {
+          @extend .link;
+        }
+
+        &.actions {
+          button {
+            @extend .btn;
+            @extend .btn--primary;
+          }
+
+          a {
+            @extend .btn;
+            @extend .btn--link;
+          }
+        }
+      }
+    }
+  }
+
+  .express-login {
+    .form-row {
+      button {
+        @extend .btn;
+        @extend .btn--outline;
+        @extend .btn--full-width;
+      }
+    }
+  }
+}

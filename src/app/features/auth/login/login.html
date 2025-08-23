@@ -1,0 +1,78 @@
+<div class="login-container">
+
+  <!-- Header avec logo et navigation -->
+  <header class="header">
+    <a href="#" class="logo">
+      <i class='fas fa-seedling'></i>
+      <span class="brand">Sip<span class="highlight">Agri</span></span>
+    </a>
+    <div class="chip-actions">
+      <button class="chip-btn active">Connexion</button>
+      <button class="chip-btn">Créer un compte</button>
+    </div>
+  </header>
+
+  <!-- Card principale de connexion -->
+  <div class="card main-card">
+    <div class="card-header">
+      <h1 class="card-title">Bienvenue</h1>
+      <p class="card-subtitle">
+        Connectez-vous pour accéder à votre tableau de bord et gérer vos activités agricoles.
+      </p>
+    </div>
+
+    <div class="card-content">
+      <form class="form login-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" name="email" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Mot de passe</mat-label>
+          <input matInput type="password" name="password" required>
+        </mat-form-field>
+
+        <div class="form-row">
+          <mat-checkbox>Se souvenir de moi</mat-checkbox>
+          <a href="#" class="link">Mot de passe oublié ?</a>
+        </div>
+
+        <div class="form-row actions">
+          <div class="btn-group">
+            <a href="#" class="btn btn--link">Créer un compte</a>
+            <button type="submit" class="btn btn--primary">
+              <mat-icon>login</mat-icon>
+              Se connecter
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="card-footer">
+      <small>Besoin d'aide ? <a href="#" class="link link--muted">Contacter le support</a></small>
+    </div>
+  </div>
+
+  <!-- Connexion rapide -->
+  <div class="card express-login">
+    <div class="card-header">
+      <h2 class="card-title">Connexion rapide</h2>
+    </div>
+    <div class="card-content">
+      <div class="form-row">
+        <button class="btn btn--outline btn--full-width">
+          <mat-icon>sms</mat-icon>
+          Code par SMS
+        </button>
+        <button class="btn btn--outline btn--full-width">
+          <mat-icon>mail</mat-icon>
+          Lien magique
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
