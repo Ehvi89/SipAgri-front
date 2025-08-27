@@ -2,13 +2,13 @@
 
   <!-- Header avec logo et navigation -->
   <header class="header">
-    <a href="#" class="logo">
+    <a routerLink="#" class="logo">
       <i class='fas fa-seedling'></i>
       <span class="brand">Sip<span class="highlight">Agri</span></span>
     </a>
     <div class="chip-actions">
       <button class="chip-btn active">Connexion</button>
-      <button class="chip-btn">Créer un compte</button>
+      <button class="chip-btn" (click)="goToRegister()">Créer un compte</button>
     </div>
   </header>
 
@@ -37,12 +37,12 @@
 
         <div class="form-row">
           <mat-checkbox>Se souvenir de moi</mat-checkbox>
-          <a href="#" class="link">Mot de passe oublié ?</a>
+          <a routerLink="#" class="link">Mot de passe oublié ?</a>
         </div>
 
         <div class="form-row actions">
           <div class="btn-group">
-            <a href="#" class="btn btn--link">Créer un compte</a>
+            <a routerLink="#" class="btn btn--link" (click)="goToRegister()">Créer un compte</a>
             <button type="submit" class="btn btn--primary" (click)="login()"
                     [disabled]="loginForm.invalid || (loading$ | async)">
               <mat-icon>login</mat-icon>
@@ -56,7 +56,7 @@
     <mat-divider></mat-divider>
 
     <div class="card-footer">
-      <small>Besoin d'aide ? <a href="#" class="link link--muted">Contacter le support</a></small>
+      <small>Besoin d'aide ? <a routerLink="#" class="link link--muted">Contacter le support</a></small>
     </div>
     <mat-progress-bar *ngIf="loading$ | async" mode="indeterminate"></mat-progress-bar>
   </div>

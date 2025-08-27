@@ -1,0 +1,165 @@
+// Plus besoin d'importer variables, tout est dans les classes globales !
+@use "../../../../../styles";
+
+.register-container {
+  @extend .container;
+  @extend .container--md;
+
+  .header {
+    @extend .app-header;
+    flex-direction: column;
+  }
+
+  .main-card {
+    @extend .card;
+    width: 100%;
+    max-width: 800px;
+
+    .register-form {
+      @extend .form;
+      margin-top: 1rem;
+
+      .mat-form-field-suffix {
+        .mat-icon {
+          &[class*="check"] {
+            color: var(--success-color);
+          }
+        }
+      }
+
+      .form-error {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        color: var(--color-warn);
+      }
+
+      .full-width {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .form-row {
+        margin-top: -1.5rem; // Ajustement spécifique pour le register
+
+        &.actions {
+          @extend .form-actions;
+          margin: 0 0 1rem;
+
+          .btn-group {
+            justify-content: space-between;
+            width: 100%;
+          }
+        }
+      }
+    }
+
+    .password-strength {
+      margin: 1rem 0 1.5rem;
+
+      .password-strength-label {
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+        color: var(--text-secondary);
+
+        .strength-red { color: var(--color-error); }
+        .strength-orange { color: var(--color-warn); }
+        .strength-blue { color: var(--info-color); }
+        .strength-green { color: var(--success-color); }
+      }
+
+      .password-strength-bar {
+        width: 100%;
+        height: 4px;
+        background: var(--background-secondary);
+        border-radius: 2px;
+        overflow: hidden;
+
+        .strength-indicator {
+          height: 100%;
+          transition: all 0.3s ease;
+          border-radius: 2px;
+
+          &.strength-red { background: var(--color-error); }
+          &.strength-orange { background: var(--color-warn); }
+          &.strength-blue { background: var(--info-color); }
+          &.strength-green { background: var(--success-color); }
+        }
+      }
+    }
+  }
+
+  .express-register {
+    @extend .card;
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 0;
+
+    .form-row {
+      @extend .flex;
+      @extend .gap--md;
+      margin-top: 1rem;
+    }
+  }
+}
+
+// Styles spécifiques qui ne peuvent pas être généralisés
+.register-container {
+  .chip-actions {
+    .chip-btn {
+      // Utilise déjà les styles de .chip-actions du fichier components
+      &.active {
+        // Les styles sont déjà définis dans components
+      }
+    }
+  }
+
+  .main-card {
+    .register-form {
+      .form-row {
+        mat-checkbox {
+          // Style déjà défini dans le fichier principal
+        }
+
+        a {
+          @extend .link;
+        }
+
+        &.actions {
+          button {
+            @extend .btn;
+            @extend .btn--primary;
+          }
+
+          a {
+            @extend .btn;
+            @extend .btn--link;
+          }
+        }
+      }
+    }
+  }
+
+  .express-register {
+    .form-row {
+      button {
+        @extend .btn;
+        @extend .btn--outline;
+      }
+    }
+
+    .quick-buttons {
+      justify-content: center;
+    }
+
+    .card-content {
+      background-color: var(--color-background);
+      padding: 1.5rem;
+      border-radius: var(--radius-md);
+
+      .quick-action-info {
+        text-align: center;
+      }
+    }
+  }
+}
