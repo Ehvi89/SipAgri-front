@@ -22,15 +22,17 @@
     </div>
 
     <div class="card-content">
-      <form class="form login-form">
+      <form class="form login-form" [formGroup]="loginForm">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Email</mat-label>
-          <input matInput type="email" name="email" required>
+          <input matInput type="email" name="email" [formControl]="emailCtrl" required>
+          <mat-error>Ce champ est requis</mat-error>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" class="full-width" >
           <mat-label>Mot de passe</mat-label>
-          <input matInput type="password" name="password" required>
+          <input matInput type="password" name="password" [formControl]="passwordCtrl" required>
+          <mat-error>Ce champ est requis</mat-error>
         </mat-form-field>
 
         <div class="form-row">
@@ -41,7 +43,8 @@
         <div class="form-row actions">
           <div class="btn-group">
             <a href="#" class="btn btn--link">Créer un compte</a>
-            <button type="submit" class="btn btn--primary">
+            <button type="submit" class="btn btn--primary" (click)="login()"
+                    [disabled]="loginForm.invalid || (loading$ | async)">
               <mat-icon>login</mat-icon>
               Se connecter
             </button>
@@ -55,6 +58,7 @@
     <div class="card-footer">
       <small>Besoin d'aide ? <a href="#" class="link link--muted">Contacter le support</a></small>
     </div>
+    <mat-progress-bar *ngIf="loading$ | async" mode="indeterminate"></mat-progress-bar>
   </div>
 
   <!-- Connexion rapide -->

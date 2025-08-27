@@ -1,6 +1,6 @@
-import { Injectable } from "@angular/core";
 import {Router} from '@angular/router';
 import { tap, of, Observable } from 'rxjs';
+import {Injectable} from '@angular/core';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {

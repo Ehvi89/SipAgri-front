@@ -25,6 +25,8 @@ $my-theme: mat.define-theme((
   --color-accent: #{$color-accent};
   --color-warn: #{$color-warning};
   --color-error: #{$color-error};
+  --success-color: #4caf50;
+  --info-color: #2196f3;
   --font-family-base: #{$font-family-base};
   --font-primary-color: #{$text-primary};
   --radius-sm: #{$radius-sm};
