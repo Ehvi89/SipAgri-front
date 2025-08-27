@@ -48,6 +48,10 @@ export class NotificationService {
     this.showNotification(message, 'info', duration);
   }
 
+  comingSoon(message?: string) {
+    this.showInfo(message ?? "Fonctionnalité à venir, restez à l'affût");
+  }
+
   private showNotification(message: string, type: 'success' | 'error' | 'warning' | 'info', duration: number): void {
     const id = this.notificationId++;
     const notification: Notification = { id, message, type, duration };

@@ -82,8 +82,8 @@ export class ErrorService {
 
       case 404:
         return this.createError(
-          ErrorType.SERVER,
-          'Service de connexion indisponible',
+          ErrorType.UNKNOWN,
+          'Ressource demandée introuvable',
           error,
           404
         );

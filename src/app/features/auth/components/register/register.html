@@ -118,7 +118,7 @@
           <div class="password-strength-bar">
             <div
               class="strength-indicator"
-              [style.width.%]="(passwordStrength.score || 0) * 20"
+              [style.width.%]="(passwordStrength.score || 0) * 16.66"
               [class]="'strength-' + passwordStrength.color">
             </div>
           </div>
@@ -173,24 +173,22 @@
       <h2 class="card-title">Et ensuite ?</h2>
     </div>
 
-    <div class="card-content">
-      <div class="quick-action-info">
-        <mat-icon class="rocket-icon">rocket_launch</mat-icon>
-        <p>
-          Votre compte sera créé automatiquement. Vous pourrez ensuite compléter
-          votre profil et accéder directement au tableau de bord.
-        </p>
-      </div>
+    <div class="card-content flex flex--column flex--center">
+      <mat-icon class="rocket-icon">rocket_launch</mat-icon>
+      <p class="text--center">
+        Votre compte sera créé automatiquement. Vous pourrez ensuite compléter
+        votre profil et accéder directement au tableau de bord.
+      </p>
 
       <div class="form-row quick-buttons">
-        <button>
+        <button class="btn--sm">
           <mat-icon>person</mat-icon>
-          <span class="btn-title">Compléter le profil</span>
+          <span class="btn-title" (click)="comingSoon()">Compléter le profil</span>
         </button>
 
         <button>
           <mat-icon>dashboard</mat-icon>
-          <span class="btn-title">Aller au tableau de bord</span>
+          <span class="btn-title" (click)="comingSoon()">Aller au tableau de bord</span>
         </button>
       </div>
     </div>

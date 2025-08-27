@@ -1,5 +1,5 @@
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {catchError, map, Observable, of, throwError} from 'rxjs';
+import {catchError, map, Observable, throwError} from 'rxjs';
 import {environment} from '../../../environments/environment';
 // import {environment} from '../../../environments/environment-prod';
 import { Injectable } from '@angular/core';
@@ -61,7 +61,7 @@ export class RegisterRepository {
         map((response) => response),
         catchError((error: HttpErrorResponse) => {
           if (!environment.prod) {
-            console.error('An error occurred during login: ', error.message);
+            console.error('An error occurred during registry: ', error.message);
           }
           return throwError(() => error);
         })
@@ -79,6 +79,21 @@ export class RegisterRepository {
   }
 }
 
+@Injectable({providedIn: "root"})
 export class AuthRepository {
+  constructor(private http: HttpClient) {}
 
+  resetPassword(value: { field: string | number; method: string }): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/auth/forgot-password`, value.field).pipe(
+      map((response) => response),
+      catchError(err => throwError(err))
+    )
+  }
+
+  changePassword(request: { newPassword: string; token: any; method: any }) {
+    return this.http.post<any>(`${environment.apiUrl}/auth/reset-password`, request).pipe(
+      map((response) => response),
+      catchError(err => throwError(err))
+    )
+  }
 }

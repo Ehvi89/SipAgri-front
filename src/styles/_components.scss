@@ -48,7 +48,7 @@
     color: inherit;
 
     i {
-      background: color.adjust($color-background, $lightness: -7%);
+      background: $color-secondary;
       margin-right: 0.5rem;
       height: 1.5rem;
       width: 1.5rem;
@@ -345,11 +345,34 @@
 .mt-3 { margin-top: 1.5rem; }
 .mt-4 { margin-top: 2rem; }
 
-.p-0 { padding: 0; }
-.p-1 { padding: 0.5rem; }
-.p-2 { padding: 1rem; }
-.p-3 { padding: 1.5rem; }
-.p-4 { padding: 2rem; }
+// Padding {
+.padding {
+  &--sm-25 { padding: .25rem; }
+  &--sm-50 { padding: .5rem; }
+  &--sm-75 { padding: .75rem; }
+  &--md { padding: 1rem; }
+  &--md-2 { padding: 1.25rem; }
+  &--lg { padding: 1.5rem; }
+  &--lg-2 { padding: 1.75rem; }
+  &--xl { padding: 2rem; }
+  &--xl-2 { padding: 2.5rem; }
+  &--xxl { padding: 3rem; }
+  &--xxl { padding: 5rem; }
+}
+// Margins {
+.margin {
+  &--sm-25 { margin: .25rem; }
+  &--sm-50 { margin: .5rem; }
+  &--sm-75 { margin: .75rem; }
+  &--md { margin: 1rem; }
+  &--md-2 { margin: 1.25rem; }
+  &--lg { margin: 1.5rem; }
+  &--lg-2 { margin: 1.75rem; }
+  &--xl { margin: 2rem; }
+  &--xl-2 { margin: 2.5rem; }
+  &--xxl { margin: 3rem; }
+  &--xxl { margin: 5rem; }
+}
 
 // Layout utilitaires
 .flex {

@@ -1,9 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import {delay, Observable, Subject, takeUntil} from 'rxjs';
 import { FormBuilder, FormControl, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { RegisterService, RegisterCredential } from '../../services/register-service';
 import { Router } from '@angular/router';
 import {NotificationService} from '../../../../core/services/notification-service';
+import {SAError} from '../../../../core/services/error-service';
 
 @Component({
   selector: 'app-register',
@@ -224,8 +225,9 @@ export class Register implements OnInit, OnDestroy {
 
     this.registerService.register(credentials).subscribe({
       next: () => {
+        this.notifService.showSuccess("Votre compte a été créer avec success");
+        delay(1000);
         this.router.navigateByUrl('/auth/login');
-        this.notifService.showSuccess("Votre compte a été créer avec success")
       },
       error: (error) => {
         this.handleRegistrationError(error);
@@ -235,7 +237,7 @@ export class Register implements OnInit, OnDestroy {
   }
 
   goToLogin(): void {
-    this.router.navigate(['/auth/login']);
+    this.router.navigateByUrl('/auth/login');
   }
 
   // Méthodes utilitaires privées
@@ -248,12 +250,12 @@ export class Register implements OnInit, OnDestroy {
     });
   }
 
-  private handleRegistrationError(error: any): void {
+  private handleRegistrationError(error: SAError): void {
     // Logique de gestion des erreurs spécifique
     // Pourrait afficher un toast, un modal, etc.
-    if (error.status === 409) {
+    if (error.statusCode === 409) {
       this.emailCtrl.setErrors({ emailExists: true });
-    } else if (error.status === 400) {
+    } else if (error.statusCode === 400) {
       // Erreur de validation du serveur
     } else {
       // Erreur générique
@@ -263,5 +265,9 @@ export class Register implements OnInit, OnDestroy {
   // Getters pour le template
   get isFormValid(): boolean {
     return this.registerForm.valid;
+  }
+
+  comingSoon() {
+    this.notifService.comingSoon()
   }
 }

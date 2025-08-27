@@ -10,12 +10,16 @@ import {LoginService} from './services/login-service';
 import {RegisterService} from './services/register-service';
 import {ReactiveFormsModule} from '@angular/forms';
 import { Register } from './components/register/register';
+import { ForgotPassword } from './components/forgot-password/forgot-password';
+import { ResetPassword } from './components/reset-password/reset-password';
 
 
 @NgModule({
   declarations: [
     Login,
-    Register
+    Register,
+    ForgotPassword,
+    ResetPassword
   ],
   imports: [
     CommonModule,
@@ -26,10 +30,10 @@ import { Register } from './components/register/register';
   providers: [
     AuthService,
     LoginService,
+    RegisterService,
     LoginRepository,
     RegisterRepository,
     AuthRepository,
-    RegisterService
   ]
 })
 export class AuthModule { }

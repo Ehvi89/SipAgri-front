@@ -51,4 +51,8 @@ export class Login implements OnInit {
   goToRegister() {
     this.router.navigateByUrl('/auth/register');
   }
+
+  comingSoon() {
+    this.notifService.comingSoon()
+  }
 }
