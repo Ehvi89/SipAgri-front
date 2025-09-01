@@ -1,8 +1,9 @@
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {catchError, map, Observable, throwError} from 'rxjs';
-import {environment} from '../../../environments/environment';
-// import {environment} from '../../../environments/environment-prod';
+// import {environment} from '../../../environments/environment';
+import {environment} from '../../../environments/environment-prod';
 import { Injectable } from '@angular/core';
+import {Supervisor} from '../../../core/models/supervisor-model';
 
 export interface LoginCredential {
   email: string;
@@ -11,7 +12,7 @@ export interface LoginCredential {
 
 export interface LoginResponse {
   token: string;
-  supervisor: any /*Supervisor*/;
+  supervisor: Supervisor;
 }
 
 @Injectable()

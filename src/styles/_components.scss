@@ -22,6 +22,7 @@
   &--sm { max-width: 600px; }
   &--md { max-width: 800px; }
   &--lg { max-width: 1200px; }
+  &--without-top { padding-top: 0; }
 }
 
 // Header avec logo
@@ -319,9 +320,10 @@
   &--error { color: $color-error; }
 
   &--sm { font-size: 0.8rem; }
-  &--base { font-size: 0.9rem; }
-  &--lg { font-size: 1.1rem; }
-  &--xl { font-size: 1.3rem; }
+  &--base { font-size: 1rem; }
+  &--lg { font-size: 1.3rem; }
+  &--xl { font-size: 1.5rem; }
+  &--xxl { font-size: 2rem; }
 
   &--center { text-align: center; }
   &--left { text-align: left; }
@@ -395,3 +397,13 @@
 
 .w-full { width: 100%; }
 .h-full { height: 100%; }
+
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+
+  &--two { grid-template-columns: 1fr 1fr; @extend .gap--md}
+  &--two-fs { grid-template-columns: 1.2fr .8fr; @extend .gap--md }
+  &--three { grid-template-columns: 1fr 1fr 1fr; @extend .gap--md }
+}

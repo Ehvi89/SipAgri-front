@@ -1,0 +1,18 @@
+<div class="sidebar-container">
+  <app-logo navTo="/" margin="lg"></app-logo>
+  <mat-divider></mat-divider>
+
+  <!--menu-->
+  <nav>
+    <ul>
+      <li class="nav-link" *ngFor="let menu of menus"
+          routerLinkActive="active">
+        <a routerLink="{{ menu.link }}" class="nav-link-item">
+          @if (menu.fa) {<i class="fas {{menu.icon}} icon"></i>}
+          @else {<mat-icon class="icon">{{ menu.icon }}</mat-icon>}
+          <span>{{ menu.label }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>

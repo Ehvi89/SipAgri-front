@@ -4,6 +4,8 @@ import {Injectable} from '@angular/core';
 import {AuthRepository} from '../repositories/auth-repository';
 import {catchError} from 'rxjs/operators';
 import {ErrorService} from '../../../core/services/error-service';
+import {Supervisor} from '../../../core/models/supervisor-model';
+import {parseJsonSchemaToOptions} from '@angular/cli/src/command-builder/utilities/json-schema';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
@@ -21,6 +23,14 @@ export class AuthService {
   constructor(private router: Router,
               private authRepository: AuthRepository,
               private errorService: ErrorService) {}
+
+  /**
+   * Retourne l'utilisateur connecté
+   */
+  getCurrentUser(): Supervisor {
+    const userData = localStorage.getItem("user");
+    return JSON.parse(userData!) as Supervisor;
+  }
 
   /**
    * Retourne le token s'il existe

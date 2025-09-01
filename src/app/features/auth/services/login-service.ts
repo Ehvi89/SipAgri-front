@@ -2,6 +2,7 @@ import {BehaviorSubject, catchError, finalize, Observable, tap, throwError} from
 import { LoginRepository, LoginResponse } from '../repositories/auth-repository';
 import {ErrorService, ErrorType, SAError} from '../../../core/services/error-service';
 import { Injectable } from '@angular/core';
+import {Supervisor} from '../../../core/models/supervisor-model';
 
 @Injectable()
 export class LoginService {
@@ -24,7 +25,7 @@ export class LoginService {
     localStorage.setItem(this.TOKEN_KEY, token);
   }
 
-  private setUser(user: any): void {
+  private setUser(user: Supervisor): void {
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));
   }
 

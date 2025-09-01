@@ -208,21 +208,16 @@ mat-icon {
   flex: 1;
   min-height: 0;
 }
-
-.main-content {
+app-sidebar {
   flex: 1;
-  padding: 1.5rem;
-  //overflow-y: auto;
-  //height: calc(100vh - var(--header-height, 60px));
-  transition: margin-left 0.3s ease;
+}
+.main-content {
+  flex: 4;
+  padding: 1rem;
+}
 
-  .side-menu.fixed ~ & {
-    margin-left: var(--side-menu-width, 250px);
-  }
-
-  .side-menu:not(.fixed) ~ & {
-    margin-left: var(--side-menu-collapsed-width, 60px);
-  }
+app-header {
+  width: 100%;
 }
 
 .main-footer {
@@ -366,6 +361,17 @@ mat-icon {
 
 
 // Animation d'entrée
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes slideInRight {
   from {
     transform: translateX(100%);

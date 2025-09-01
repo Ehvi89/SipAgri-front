@@ -1,0 +1,62 @@
+@use "../../../../styles";
+
+.not-found-container {
+  @extend .flex;
+  @extend .flex--column;
+  @extend .flex--center;
+  @extend .text--center;
+
+  align-items: center;
+  min-height: 100vh;
+  animation: fadeIn 0.6s ease-out;
+
+  .error-icon {
+    font-size: 120px;
+    width: 120px;
+    height: 120px;
+    margin-bottom: 2rem;
+    filter: drop-shadow(0 4px 8px rgba(var(--color-primary), 0.2));
+  }
+
+  h1 {
+    @extend .mb-2;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  p {
+    max-width: 600px;
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+  }
+
+  button {
+    @extend .btn;
+    @extend .btn--outline;
+    @extend .btn--primary;
+  }
+}
+
+/* Animation d'apparition */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Version mobile */
+@media (max-width: 600px) {
+  .not-found-container {
+    padding: 1.5rem;
+
+    .error-icon {
+      font-size: 80px;
+      width: 80px;
+      height: 80px;
+    }
+  }
+}

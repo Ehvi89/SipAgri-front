@@ -1,8 +1,8 @@
 // core/repositories/base-repository.ts
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {environment} from '../../environments/environment';
-// import {environment} from '../../environments/environment-prod';
+// import {environment} from '../../environments/environment';
+import {environment} from '../../environments/environment-prod';
 
 export abstract class BaseRepository<T> {
   protected abstract endpoint: string;

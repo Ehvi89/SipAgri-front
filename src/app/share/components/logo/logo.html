@@ -1,0 +1,10 @@
+<header class="app-header" [ngClass]="[margin ? 'custom--mb-' + margin : '']">
+  <a routerLink="{{ navTo }}" class="logo"
+     [ngClass]="[size ? 'custom--' + size : '']">
+    <i class="fas fa-seedling"></i>
+    <span class="brand"
+          [style.color]="variant === 'unique' ? color : null">
+      Sip<span class="highlight" [style.color]="variant === 'unique' ? color : null">Agri</span>
+    </span>
+  </a>
+</header>

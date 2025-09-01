@@ -35,6 +35,9 @@ $my-theme: mat.define-theme((
   --radius-xl: #{$radius-xl};
   --shadow-card: #{$shadow-card};
   --shadow-button: #{$shadow-button};
+  --bg-sidebar: #{$color-sidebar};
+  --active-nav: #{$color-sidebar-primary};
+  --sidebar-text-color: #{$text-sidebar};
 
   // Override des couleurs Material avec vos couleurs custom
   --mdc-theme-primary: #{$color-primary};
