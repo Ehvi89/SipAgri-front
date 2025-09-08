@@ -1,0 +1,54 @@
+@use "../../../../../styles";
+@use "../../../../../styles/variables" as *;
+@use "sass:color";
+
+.planter-details-container {
+  @extend .container;
+  @extend .container--lg;
+
+  .content {
+    width: 100%;
+
+    .actions {
+      @extend .flex;
+      @extend .gap--sm;
+
+      button {
+        @extend .btn;
+      }
+    }
+
+    .title {
+      @extend .text--lg;
+      @extend .text--medium;
+    }
+
+    .section-title {
+      @extend .text--base;
+      @extend .text--bold;
+      @extend .mb-2;
+    }
+
+    .list-item {
+      @extend .row;
+
+      .muted {
+        color: $text-muted;
+        @extend .text--sm;
+        @extend .text--normal;
+      }
+
+      &:hover {
+        background-color: color.adjust($color-border, $lightness: 15%);
+        transition: ease-in-out 200ms;
+        @extend .padding--sm-50;
+        @extend .radius-sm;
+
+        .infos {
+          @extend .text--base;
+          @extend .text--bold;
+        }
+      }
+    }
+  }
+}

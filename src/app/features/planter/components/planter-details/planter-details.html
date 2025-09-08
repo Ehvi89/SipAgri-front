@@ -1,0 +1,73 @@
+<div class="planter-details-container">
+  <app-header placeholder="" [breadcrumb]="true"></app-header>
+
+  <div class="content">
+    <div class="row mb-2">
+      <div class="planter col">
+        <span class="title">{{ planter?.firstname }} {{ planter?.lastname }}</span>
+        <span>{{ planter?.village }}</span>
+      </div>
+      <div class="actions">
+        <button class="btn--outline" (click)="comingSoon()">
+          <mat-icon matIconPrefix>edit</mat-icon>
+          <span>Modifier</span>
+        </button>
+        <button class="btn--secondary" (click)="comingSoon()">
+          <mat-icon matIconPrefix>delete</mat-icon>
+          <span>Supprimer</span>
+        </button>
+      </div>
+    </div>
+    <div class="grid grid--two">
+      <div class="card">
+        <div class="section-title">Resumé</div>
+        <div class="list">
+          <div class="row flex--between">
+            <span>Plantations:</span>
+            <span>{{ planter?.plantations?.length }}</span>
+          </div>
+          <div class="row flex--between">
+            <span>Surface totale:</span>
+            <span>{{ getTotalSurface() }} ha</span>
+          </div>
+          <div class="row flex--between">
+            <span>Production annuelle:</span>
+            <span>{{ getAnnualProduction() }} kg</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title">Coordonnées</div>
+        <div class="list"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row flex--between">
+        <span class="title">Plantations</span>
+        <button class="btn btn--primary">
+          <mat-icon matIconPrefix>add</mat-icon>
+          <span>Ajouter une plantation</span>
+        </button>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="list">
+        @if (plantationsWithVillage.length == 0) {
+          <mat-spinner mode="indeterminate" diameter="30"></mat-spinner>
+        } @else {
+          @for (plantation of plantationsWithVillage; track plantation.id) {
+            <div class="list-item">
+              <div class="infos col">
+                <span>{{ plantation.village }}</span>
+                <span class="muted">{{ plantation.farmedArea }} ha •  </span>
+              </div>
+              <button class="btn btn--outline">
+                <mat-icon matIconPrefix>open_in_new</mat-icon>
+                <span>Ouvrir</span>
+              </button>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</div>
