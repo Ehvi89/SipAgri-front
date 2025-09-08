@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import {Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy, ChangeDetectorRef} from '@angular/core';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 
 import { DashboardService } from '../../services/dashboard-service';
-import {Observable} from 'rxjs';
+import {forkJoin, Observable} from 'rxjs';
 
 // Enregistrer les composants Chart.js
 Chart.register(...registerables);
@@ -55,7 +55,8 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
     { value: 'annee', label: 'Par année' }
   ];
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(private dashboardService: DashboardService,
+              private cdr: ChangeDetectorRef,) {}
 
   ngOnInit(): void {
     this.loadDashboardData();
@@ -78,32 +79,33 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
     this.resumes$ = this.dashboardService.getResumesData();
 
     // Charger les données de production par période
-    this.loadProductionByPeriod();
-
-    // Charger la répartition par culture
-    this.dashboardService.getCulturalDistribution().subscribe({
+    forkJoin({
+      production: this.dashboardService.getProductionByPeriod(this.selectedPeriodFilter),
+      cultural: this.dashboardService.getCulturalDistribution(),
+      trend: this.dashboardService.getProductionTrend()
+    }).subscribe({
       next: (data) => {
-        this.culturalDistribution = data;
-        this.updatePieChart();
+        this.culturalDistribution = data.cultural;
+        this.productionTrend = data.trend;
+        this.productionByPeriod = data.production;
+
+        this.updateAllCharts();
+
+        this.cdr.detectChanges();
       },
       error: (error) => {
-        console.error('Erreur lors du chargement de la répartition:', error);
-      }
-    });
-
-    // Charger la tendance de production
-    this.dashboardService.getProductionTrend().subscribe({
-      next: (data) => {
-        this.productionTrend = data;
-        this.updateLineChart();
-      },
-      error: (error) => {
-        console.error('Erreur lors du chargement de la tendance:', error);
+        console.error('Erreur lors du chargement des données:', error);
       }
     });
   }
 
-  private loadProductionByPeriod(): void {
+  private updateAllCharts(): void {
+    this.updatePieChart();
+    this.updateLineChart();
+    this.updateBarChart();
+  }
+
+  onPeriodFilterChange(): void {
     this.dashboardService.getProductionByPeriod(this.selectedPeriodFilter).subscribe({
       next: (data) => {
         this.productionByPeriod = data;
@@ -113,10 +115,6 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
         console.error('Erreur lors du chargement de la production:', error);
       }
     });
-  }
-
-  onPeriodFilterChange(): void {
-    this.loadProductionByPeriod();
   }
 
   private initializeCharts(): void {
@@ -178,9 +176,6 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
             ticks: {
               font: {
                 size: 12
-              },
-              callback: function(value) {
-                return value + 'T';
               }
             }
           },
@@ -315,9 +310,6 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
             ticks: {
               font: {
                 size: 12
-              },
-              callback: function(value) {
-                return value + 'T';
               }
             }
           },
@@ -377,17 +369,5 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
     if (this.lineChart) {
       this.lineChart.destroy();
     }
-  }
-
-  // Méthodes utilitaires pour le formatage
-  formatNumber(value: number): string {
-    return new Intl.NumberFormat('fr-FR').format(value);
-  }
-
-  formatCurrency(value: number): string {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR'
-    }).format(value);
   }
 }

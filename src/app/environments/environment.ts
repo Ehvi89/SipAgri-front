@@ -1,4 +1,6 @@
-export const environment = {
-  prod: false,
-  apiUrl: "http://localhost:9002/api/v1",
-}
+import { EnvironmentDev } from './environment-dev';
+import {EnvironmentProd} from './environment-prod';
+import {Injectable} from '@angular/core';
+
+@Injectable({ providedIn: 'root' })
+export class Environment extends EnvironmentProd {}

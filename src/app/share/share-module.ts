@@ -4,9 +4,10 @@ import {MaterialModule} from './material-module';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {RouterLink, RouterLinkActive} from '@angular/router';
 import {Logo} from './components/logo/logo';
-import {CoreModule} from '../core/core-module';
 import {Header} from './components/header/header';
 import {ReactiveFormsModule} from '@angular/forms';
+import {SupervisorService} from './services/supervisor-service';
+import {SupervisorRepository} from './repositories/supervisor-repository';
 
 
 
@@ -23,14 +24,19 @@ import {ReactiveFormsModule} from '@angular/forms';
     RouterLinkActive,
     ReactiveFormsModule,
   ],
+  providers: [
+    SupervisorService,
+    SupervisorRepository
+  ],
   exports: [
     CommonModule,
     MaterialModule,
     FontAwesomeModule,
     RouterLink,
     RouterLinkActive,
+    ReactiveFormsModule,
     Logo,
-    Header
+    Header,
   ]
 })
 export class ShareModule { }

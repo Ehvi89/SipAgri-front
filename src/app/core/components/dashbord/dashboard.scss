@@ -5,6 +5,7 @@
 .dashboard-container {
   @extend .container;
   @extend .container--lg;
+  @extend .container--without-top;
 }
 
 // Cards de résumé

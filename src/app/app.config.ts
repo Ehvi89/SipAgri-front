@@ -1,15 +1,17 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import { ApplicationConfig, LOCALE_ID, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
 import { routes } from './app.routes';
-import {AuthModule} from './features/auth/auth-module';
+import {AuthInterceptor} from './features/auth/interceptors/auth-interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes),
-    provideHttpClient(withInterceptorsFromDi())
-  ]
+    provideHttpClient(withInterceptorsFromDi()),
+    { provide: LOCALE_ID, useValue: 'fr-FR' },
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+  ],
 };

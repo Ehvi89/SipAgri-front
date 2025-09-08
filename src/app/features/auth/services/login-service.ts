@@ -29,7 +29,7 @@ export class LoginService {
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));
   }
 
-  login(email: string, password: string): Observable<LoginResponse> {
+  login(email: string, password: string, rememberUser: boolean): Observable<LoginResponse> {
     const validationError = this.validateCredentials(email, password);
     if (validationError) {
       return throwError(() => validationError);
@@ -41,6 +41,11 @@ export class LoginService {
       tap((response) => {
         this.setToken(response.token);
         this.setUser(response.supervisor);
+        if (rememberUser) {
+          this.setEmailToRemember(email);
+        } else if (!rememberUser && this.getEmailToRemember() != null) {
+          this.forgotRememberEmail();
+        }
       }),
       catchError((error) => {
         return throwError(() => this.errorService.handleError(error))
@@ -90,4 +95,16 @@ export class LoginService {
     return emailRegex.test(email);
   }
 
+
+  private setEmailToRemember(email: string) {
+    localStorage.setItem("user_email", email);
+  }
+
+  getEmailToRemember() {
+    return localStorage.getItem("user_email");
+  }
+
+  private forgotRememberEmail() {
+    localStorage.removeItem("user_email");
+  }
 }
