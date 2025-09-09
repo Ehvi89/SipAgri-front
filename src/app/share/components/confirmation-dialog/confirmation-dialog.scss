@@ -1,0 +1,14 @@
+@use "../../../../styles";
+
+mat-dialog-actions {
+  @extend .gap--md;
+}
+
+button {
+  @extend .btn;
+  @extend .btn--outline;
+
+  &.cancel {
+    color: var(--color-error);
+  }
+}

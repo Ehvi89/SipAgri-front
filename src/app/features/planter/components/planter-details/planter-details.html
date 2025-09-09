@@ -1,0 +1,223 @@
+<div class="planter-details-container">
+  <app-header placeholder="" [breadcrumb]="true"></app-header>
+
+  <div class="content" *ngIf="planter != null; else noContent">
+    <div class="row mb-2">
+      <div class="planter col">
+        <span class="title">{{ planter!.firstname }} {{ planter!.lastname }}</span>
+        <span>{{ planter!.village }}</span>
+      </div>
+      <div class="actions">
+        <button (click)="modifyPlanter()">
+          <mat-icon matIconPrefix>edit</mat-icon>
+          <span>Modifier</span>
+        </button>
+        <button class="delete" (click)="deletePlanter()">
+          <mat-icon matIconPrefix>delete</mat-icon>
+          <span>Supprimer</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid--two">
+      <div class="card">
+        <div class="section-title">Resumé</div>
+        <div class="list">
+          <div class="row flex--between">
+            <span>Plantations:</span>
+            <span>{{ planter!.plantations?.length }}</span>
+          </div>
+          <div class="row flex--between">
+            <span>Surface totale:</span>
+            <span>{{ getTotalSurface() }} ha</span>
+          </div>
+          <div class="row flex--between">
+            <span>Production annuelle:</span>
+            <span>{{ getAnnualProduction() }} kg</span>
+          </div>
+          <div class="row flex--between" *ngIf="planter?.supervisor">
+            <span>Encadreur:</span>
+            <span>{{ planter!.supervisor.firstname }} {{planter!.supervisor.lastname}}</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title">Informations personnelle</div>
+        <div class="list">
+          <div class="row flex--between">
+            <span>Date de naissance:</span>
+            <span>{{ planter!.birthday | date }}</span>
+          </div>
+          <div class="row flex--between">
+            <span>Genre:</span>
+            <span>{{ planter!.gender ? (planter!.gender == 'MALE' ? 'Homme' : 'Femme') : '' }}</span>
+          </div>
+          <div class="row flex--between">
+            <span>Status matrimonial:</span>
+            <span>{{ getMaritalStatusLabel(planter!.maritalStatus) }}</span>
+          </div>
+          <div class="row flex--between">
+            <span>Nombre d'enfant:</span>
+            <span>{{ planter!.childrenNumber }}</span>
+          </div>
+          <div class="row flex--between">
+            <span>Numéro de téléphone:</span>
+            <span>{{ planter!.phoneNumber }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row flex--between">
+        <span class="title">Plantations</span>
+        <button class="btn btn--primary">
+          <mat-icon matIconPrefix>add</mat-icon>
+          <span>Ajouter une plantation</span>
+        </button>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="list" [class]="{'no-content': planter!.plantations?.length == 0}">
+        @if (loading) {
+          <mat-spinner mode="indeterminate" diameter="30"></mat-spinner>
+        } @else if (plantationsWithVillage.length > 0) {
+          @for (plantation of plantationsWithVillage; track plantation.id) {
+            <div class="list-item">
+              <div class="infos col">
+                <span>{{ plantation.village }}</span>
+                <span class="muted">{{ plantation.farmedArea }} ha •  </span>
+              </div>
+              <button class="btn btn--outline">
+                <mat-icon matIconPrefix>open_in_new</mat-icon>
+                <span>Ouvrir</span>
+              </button>
+            </div>
+          }
+        } @else {
+          <span>Aucune plantation</span>
+        }
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noContent>
+    <app-no-content-error
+        title="Erreur de chargement"
+        description="Les informations du planteur n'ont pas été correctement récupérés"
+        link="/planters"
+    ></app-no-content-error>
+  </ng-template>
+
+  <ng-template #modificationDialog>
+    <h2 mat-dialog-title>Modifier un planteur</h2>
+
+    <mat-dialog-content>
+      <form class="form" [formGroup]="planterForm">
+        <div class="row">
+          <mat-form-field class="field" appearance="outline">
+            <mat-label>Nom</mat-label>
+            <input matInput formControlName="lastname" required />
+            <mat-error *ngIf="planterForm.get('lastname')?.hasError('required')">
+              Ce champ est requis
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="row">
+          <mat-form-field class="field" appearance="outline">
+            <mat-label>Prénoms</mat-label>
+            <input matInput formControlName="firstname" required />
+            <mat-error *ngIf="planterForm.get('firstname')?.hasError('required')">
+              Ce champ est requis
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="row">
+          <mat-form-field class="field" appearance="outline">
+            <mat-label>Genre</mat-label>
+            <mat-select formControlName="gender" required>
+              <mat-option [value]="gender.MALE">Masculin</mat-option>
+              <mat-option [value]="gender.FEMALE">Féminin</mat-option>
+            </mat-select>
+            <mat-error *ngIf="planterForm.get('gender')?.hasError('required')">
+              Ce champ est requis
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="field" appearance="outline">
+            <mat-label>Date de naissance</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="birthday" required />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error *ngIf="planterForm.get('birthday')?.hasError('required')">
+              Ce champ est requis
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="row">
+          <mat-form-field class="field" appearance="outline">
+            <mat-label>Statut Matrimonial</mat-label>
+            <mat-select formControlName="maritalStatus" required>
+              <mat-option *ngFor="let status of maritalStatusOptions" [value]="status.value">
+                {{ status.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="planterForm.get('maritalStatus')?.hasError('required')">
+              Ce champ est requis
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="field" appearance="outline">
+            <mat-label>Nombre d'enfants</mat-label>
+            <input matInput type="number" formControlName="childrenNumber" min="0" required />
+            <mat-error *ngIf="planterForm.get('childrenNumber')?.hasError('required')">
+              Ce champ est requis
+            </mat-error>
+            <mat-error *ngIf="planterForm.get('childrenNumber')?.hasError('min')">
+              Le nombre doit être positif
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="row">
+          <mat-form-field class="field" appearance="outline">
+            <mat-label>Village</mat-label>
+            <mat-select formControlName="village" required>
+              <mat-option *ngFor="let village of villages" [value]="village">
+                {{ village }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="planterForm.get('village')?.hasError('required')">
+              Ce champ est requis
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="field" appearance="outline">
+            <mat-label>Encadreur</mat-label>
+            <mat-select formControlName="supervisor" required>
+              <mat-option *ngFor="let supervisor of (supervisors$ | async)" [value]="supervisor">
+                {{ supervisor.firstname }} {{ supervisor.lastname }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="planterForm.get('supervisor')?.hasError('required')">
+              Ce champ est requis
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </form>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+      <button mat-button [mat-dialog-close]="false">Annuler</button>
+      <button mat-raised-button color="primary" [disabled]="planterForm.invalid" [mat-dialog-close]="true">
+        <mat-icon>save</mat-icon>
+        <span>Enregistrer</span>
+      </button>
+    </mat-dialog-actions>
+  </ng-template>
+</div>
+<!-- Overlay de chargement -->
+<div class="overlay" *ngIf="loadingUpdate | async">
+  <mat-spinner diameter="60"></mat-spinner>
+</div>

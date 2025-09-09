@@ -1,0 +1,62 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="17">
+            <item index="0" class="java.lang.String" itemvalue="routerLinkActive" />
+            <item index="1" class="java.lang.String" itemvalue="routerLink" />
+            <item index="2" class="java.lang.String" itemvalue="formControl" />
+            <item index="3" class="java.lang.String" itemvalue="appearence" />
+            <item index="4" class="java.lang.String" itemvalue="matInput" />
+            <item index="5" class="java.lang.String" itemvalue="formControlName" />
+            <item index="6" class="java.lang.String" itemvalue="appearance" />
+            <item index="7" class="java.lang.String" itemvalue="class" />
+            <item index="8" class="java.lang.String" itemvalue="mat-button" />
+            <item index="9" class="java.lang.String" itemvalue="color" />
+            <item index="10" class="java.lang.String" itemvalue="mat-raised-button" />
+            <item index="11" class="java.lang.String" itemvalue="aria-hidden" />
+            <item index="12" class="java.lang.String" itemvalue="matIconPrefix" />
+            <item index="13" class="java.lang.String" itemvalue="mat-dialog-title" />
+            <item index="14" class="java.lang.String" itemvalue="mode" />
+            <item index="15" class="java.lang.String" itemvalue="diameter" />
+            <item index="16" class="java.lang.String" itemvalue="mat-dialog-close" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+    <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="22">
+            <item index="0" class="java.lang.String" itemvalue="nobr" />
+            <item index="1" class="java.lang.String" itemvalue="noembed" />
+            <item index="2" class="java.lang.String" itemvalue="comment" />
+            <item index="3" class="java.lang.String" itemvalue="noscript" />
+            <item index="4" class="java.lang.String" itemvalue="embed" />
+            <item index="5" class="java.lang.String" itemvalue="script" />
+            <item index="6" class="java.lang.String" itemvalue="mat-divider" />
+            <item index="7" class="java.lang.String" itemvalue="app-logo" />
+            <item index="8" class="java.lang.String" itemvalue="mat-icon" />
+            <item index="9" class="java.lang.String" itemvalue="app-header" />
+            <item index="10" class="java.lang.String" itemvalue="mat-progress-bar" />
+            <item index="11" class="java.lang.String" itemvalue="mat-select" />
+            <item index="12" class="java.lang.String" itemvalue="mat-option" />
+            <item index="13" class="java.lang.String" itemvalue="mat-form-field" />
+            <item index="14" class="java.lang.String" itemvalue="mat-label" />
+            <item index="15" class="java.lang.String" itemvalue="mat-datepicker-toggle" />
+            <item index="16" class="java.lang.String" itemvalue="mat-datepicker" />
+            <item index="17" class="java.lang.String" itemvalue="mat-error" />
+            <item index="18" class="java.lang.String" itemvalue="mat-progress-spinner" />
+            <item index="19" class="java.lang.String" itemvalue="mat-spinner" />
+            <item index="20" class="java.lang.String" itemvalue="mat-dialog-content" />
+            <item index="21" class="java.lang.String" itemvalue="mat-dialog-actions" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+  </profile>
+</component>

@@ -216,7 +216,7 @@ app-sidebar {
   padding: 1rem;
 }
 
-app-header {
+app-header{
   width: 100%;
 }
 
@@ -261,10 +261,10 @@ app-header {
 .shadow-lg { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important; }
 .shadow-none { box-shadow: none !important; }
 
-// Columns
-.col { width: 100% !important; display: flex; }
-.col-2 { width: 50% !important; }
-.col-4 { width: 25% !important; }
+// Columns & row
+.col { width: 100%; @extend .flex; @extend .flex--column; gap: .5rem}
+.row { width: 100%; @extend .flex; @extend .flex--center;}
+.list { @extend .col; gap:.25rem}
 
 // Notifications styles
 .custom-notification-container {
@@ -354,7 +354,7 @@ app-header {
 }
 
 .custom-notification-info {
-  background: linear-gradient(135deg, $color-muted, #1e88e5);
+  background: linear-gradient(135deg, $color-muted, $color-accent);
   border-left: 4px solid color.adjust($color-muted, $lightness: -10%);
 }
 

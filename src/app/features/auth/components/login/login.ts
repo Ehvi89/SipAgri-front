@@ -17,6 +17,7 @@ export class Login implements OnInit {
   loginForm!: FormGroup;
   emailCtrl!: FormControl;
   passwordCtrl!: FormControl;
+  rememberCtrl!: FormControl;
 
   constructor(private loginService: LoginService,
               private formBuilder: FormBuilder,
@@ -26,8 +27,9 @@ export class Login implements OnInit {
   ngOnInit() {
     this.loading$ = this.loginService.loading$;
 
-    this.emailCtrl = this.formBuilder.control('', Validators.required);
+    this.emailCtrl = this.formBuilder.control(this.loginService.getEmailToRemember(), Validators.required);
     this.passwordCtrl = this.formBuilder.control('', Validators.required);
+    this.rememberCtrl = this.formBuilder.control(false);
 
     this.loginForm = this.formBuilder.group({
       email: this.emailCtrl,
@@ -36,10 +38,22 @@ export class Login implements OnInit {
   }
 
   login() {
-    this.loginService.login(this.emailCtrl.value, this.passwordCtrl.value).subscribe({
+    this.loginService.login(this.emailCtrl.value, this.passwordCtrl.value, this.rememberCtrl.value).subscribe({
       next: data => {
         if (data.token) {
-          this.router.navigateByUrl('/').then(r => this.notifService.showSuccess(`Content de vous revoir ${data.supervisor.firstname}`));
+          const urlParams = new URLSearchParams(window.location.search);
+          const redirectUrl = urlParams.get('redirectUrl') || localStorage.getItem('previousUrl');
+
+          if (urlParams.has('sessionExpired') && redirectUrl !== '/dashboard') {
+            // Nettoyer le localStorage et naviguer sans recharger
+            localStorage.removeItem('previousUrl');
+            this.router.navigateByUrl(redirectUrl!, { replaceUrl: true })
+              .then(() => this.notifService.showSuccess(`Content de vous revoir ${data.supervisor.firstname}`));
+          } else {
+            // Comportement normal
+            this.router.navigateByUrl('/dashboard')
+              .then(() => this.notifService.showSuccess(`Content de vous revoir ${data.supervisor.firstname}`));
+          }
         }
       },
       error: error => {

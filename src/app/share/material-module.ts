@@ -22,6 +22,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import {MatTableModule} from '@angular/material/table';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import {MatDialogModule} from '@angular/material/dialog';
 
 
 @NgModule({
@@ -50,7 +51,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     MatTooltipModule,
     MatTableModule,
     MatProgressBarModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    MatDialogModule,
   ]
 })
 export class MaterialModule {}

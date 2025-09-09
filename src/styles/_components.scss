@@ -14,15 +14,19 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
+  padding: 2rem 0;
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
 
+  @media (max-width: 1500px) {
+    padding: 1rem 0;
+  }
+
   &--sm { max-width: 600px; }
   &--md { max-width: 800px; }
   &--lg { max-width: 1200px; }
-  &--without-top { padding-top: 0; }
+  &--without-top { padding-top: 0 !important; }
 }
 
 // Header avec logo
@@ -386,6 +390,10 @@
   &--around { justify-content: space-around; }
   &--start { align-items: flex-start; }
   &--end { align-items: flex-end; }
+
+  &--1 { flex: 1; }
+  &--2 { flex: 2; }
+  &--3 { flex: 3; }
 }
 
 .gap {

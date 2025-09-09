@@ -65,7 +65,7 @@ export abstract class BaseService<T> {
    */
   update(id: number | string, payload: Partial<T>): Observable<T> {
     this.setLoading(true);
-    return this.repository.update(id, payload).pipe(
+    return this.repository.update(payload).pipe(
       tap(updatedItem => {
         if (this._data.value) {
           this._data.next(

@@ -33,7 +33,7 @@
         </mat-form-field>
 
         <div class="form-row">
-          <mat-checkbox>Se souvenir de moi</mat-checkbox>
+          <mat-checkbox [formControl]="rememberCtrl">Se souvenir de moi</mat-checkbox>
           <a routerLink="/auth/forgot-password" class="link">Mot de passe oublié ?</a>
         </div>
 
@@ -53,7 +53,7 @@
     <mat-divider></mat-divider>
 
     <div class="card-footer">
-      <small>Besoin d'aide ? <a routerLink="#" class="link link--muted">Contacter le support</a></small>
+      <small>Besoin d'aide ? <a (click)="comingSoon()" class="link link--muted">Contacter le support</a></small>
     </div>
     <mat-progress-bar *ngIf="loading$ | async" mode="indeterminate"></mat-progress-bar>
   </div>

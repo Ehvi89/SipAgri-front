@@ -15,6 +15,14 @@
     display: none !important;
   }
 
+  .breadcrumb {
+    @extend .flex;
+    @extend .flex--center;
+    @extend .gap--sm;
+    @extend .text--lg;
+    @extend .text--medium;
+  }
+
   .spacer { flex: 2; }
 
   .user {

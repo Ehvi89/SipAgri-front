@@ -1,0 +1,8 @@
+<div class="noContent">
+  <mat-icon>warning</mat-icon>
+  <div class="description">
+    <h2>{{ title ?? 'Erreur de chargement' }}</h2>
+    <span>{{ description ?? "Les informations n'ont pas été correctement récupérés" }}</span>
+  </div>
+  <button routerLink="{{ link ?? '/dashboard' }}">Revenir en arrière</button>
+</div>
