@@ -38,8 +38,8 @@ export abstract class BaseRepository<T> {
     return this.http.post<T>(`${this.apiUrl}/${this.endpoint}`, payload);
   }
 
-  update(id: number | string, payload: Partial<T>): Observable<T> {
-    return this.http.put<T>(`${this.apiUrl}/${this.endpoint}/${id}`, payload);
+  update(payload: Partial<T>): Observable<T> {
+    return this.http.put<T>(`${this.apiUrl}/${this.endpoint}`, payload);
   }
 
   delete(id: number | string): Observable<void> {

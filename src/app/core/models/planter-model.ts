@@ -10,7 +10,7 @@ export interface Planter {
   birthday: Date,
   gender: Gender,
   maritalStatus: MaritalStatus,
-  phone: number,
+  phoneNumber: number,
   childrenNumber: number,
   village: string,
   supervisor: Supervisor,

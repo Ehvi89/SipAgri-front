@@ -5,6 +5,7 @@
 .planter-details-container {
   @extend .container;
   @extend .container--lg;
+  @extend .container--without-top;
 
   .content {
     width: 100%;
@@ -15,6 +16,14 @@
 
       button {
         @extend .btn;
+        @extend .btn--outline;
+
+        &.delete {
+          color: var(--color-error);
+          &:hover {
+            background-color: color.adjust($color-error, $lightness: 45%)
+          }
+        }
       }
     }
 
@@ -51,4 +60,30 @@
       }
     }
   }
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+
+mat-dialog-content {
+  .form {
+    .row {
+      @extend .flex;
+      @extend .gap--md;
+    }
+  }
+}
+
+mat-dialog-actions > button {
+  @extend .btn;
+  @extend .btn--outline;
+  @extend .gap--md;
 }

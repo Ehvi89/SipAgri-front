@@ -8,13 +8,18 @@ import {Header} from './components/header/header';
 import {ReactiveFormsModule} from '@angular/forms';
 import {SupervisorService} from './services/supervisor-service';
 import {SupervisorRepository} from './repositories/supervisor-repository';
+import { ConfirmationDialog } from './components/confirmation-dialog/confirmation-dialog';
+import {DialogService} from './services/dialog-service';
+import { NoContentError } from './components/no-content-error/no-content-error';
 
 
 
 @NgModule({
   declarations: [
     Logo,
-    Header
+    Header,
+    ConfirmationDialog,
+    NoContentError,
   ],
   imports: [
     CommonModule,
@@ -26,7 +31,8 @@ import {SupervisorRepository} from './repositories/supervisor-repository';
   ],
   providers: [
     SupervisorService,
-    SupervisorRepository
+    SupervisorRepository,
+    DialogService
   ],
   exports: [
     CommonModule,
@@ -37,6 +43,7 @@ import {SupervisorRepository} from './repositories/supervisor-repository';
     ReactiveFormsModule,
     Logo,
     Header,
+    NoContentError,
   ]
 })
 export class ShareModule { }

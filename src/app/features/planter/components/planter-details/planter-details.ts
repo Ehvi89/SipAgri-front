@@ -1,9 +1,18 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {Planter} from '../../../../core/models/planter-model';
 import {GeocodingService} from '../../../../core/services/geocoding-service';
-import {forkJoin, map} from 'rxjs';
+import {finalize, forkJoin, map, Observable, take, tap} from 'rxjs';
 import {PlanterService} from '../../services/planter-service';
 import {NotificationService} from '../../../../core/services/notification-service';
+import {Router} from '@angular/router';
+import {DialogService} from '../../../../share/services/dialog-service';
+import {MaritalStatus} from '../../../../core/enums/marital-status-enum';
+import {Gender} from '../../../../core/enums/gender-enum';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {Supervisor} from '../../../../core/models/supervisor-model';
+import {SupervisorService} from '../../../../share/services/supervisor-service';
+import {MatDialog} from '@angular/material/dialog';
+import {SAError} from '../../../../core/services/error-service';
 
 @Component({
   selector: 'app-planter-details',
@@ -12,32 +21,96 @@ import {NotificationService} from '../../../../core/services/notification-servic
   styleUrl: './planter-details.scss'
 })
 export class PlanterDetails implements OnInit {
+  @ViewChild('modificationDialog') modificationDialog!: TemplateRef<any>;
+
   planter!: Planter | null;
   plantationsWithVillage: any[] = [];
+  loading = false;
+  loadingUpdate!: Observable<boolean>
+
+  planterForm!: FormGroup;
+  supervisors$!: Observable<Supervisor[]>;
+  villages: string[] = ["Bonoua", "Samo", "Anyama", "Kokondékro", "Nangassérégué"];
+  maritalStatusOptions = [
+    { value: MaritalStatus.SINGLE, label: 'Célibataire' },
+    { value: MaritalStatus.MARRIED, label: 'Marié(e)' },
+    { value: MaritalStatus.DIVORCED, label: 'Divorcé(e)' },
+    { value: MaritalStatus.WIDOWED, label: 'Veuf/Veuve' }
+  ];
+  gender = Gender;
 
   constructor(private geocodingService: GeocodingService,
               private planterService: PlanterService,
               private cdr: ChangeDetectorRef,
-              private notifService: NotificationService) {
+              private notifService: NotificationService,
+              private router: Router,
+              private dialogService: DialogService,
+              private supervisorService: SupervisorService,
+              private dialog: MatDialog,
+              private formBuilder: FormBuilder,) {
   }
 
   ngOnInit() {
     this.planter = this.planterService.selectedPlanter;
+    this.loadingUpdate = this.planterService.loading;
     if (this.planter?.plantations) {
+      this.loading = true;
       const villageRequests = this.planter.plantations.map(plantation =>
         this.geocodingService.getPlaceName(plantation.gpsLocation).pipe(
           map(village => ({
             ...plantation,
             village: village
-          }))
+          })) ?? []
         )
       );
 
-      forkJoin(villageRequests).subscribe(results => {
-        this.plantationsWithVillage = results;
-        this.cdr.detectChanges();
-      });
+      forkJoin(villageRequests).pipe(
+        take(1),
+        tap(results => {
+          this.plantationsWithVillage = results;
+          // console.log(this.plantationsWithVillage);
+        }),
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        })
+      ).subscribe();
     }
+  }
+
+  private initForm(): void {
+    this.planterForm = this.formBuilder.group({
+      firstname: [this.planter?.firstname, [Validators.required, Validators.minLength(2)]],
+      lastname: [this.planter?.lastname, [Validators.required, Validators.minLength(2)]],
+      birthday: [this.planter?.birthday, Validators.required],
+      gender: [this.planter?.gender, Validators.required],
+      maritalStatus: [this.planter?.maritalStatus, Validators.required],
+      childrenNumber: [this.planter?.childrenNumber, [Validators.required, Validators.min(0)]],
+      village: [this.planter?.village, Validators.required],
+      supervisor: [this.planter?.supervisor, Validators.required]
+    });
+  }
+
+  modifyPlanter(): void {
+    this.initForm();
+    this.supervisors$ = this.supervisorService.getAllSupervisors();
+    this.dialog.open(this.modificationDialog).afterClosed().subscribe((result: boolean) => {
+      if (result) {
+        const planter = {
+          id: this.planter?.id,
+          ...this.planterForm.value,
+        }
+        this.planterService.updatePlanter(planter).pipe(
+          tap((planter: Planter) => {
+            this.planter = planter;
+            this.cdr.detectChanges();
+          })
+        ).subscribe({
+          next: () => this.notifService.showSuccess("Planteur mis à jour"),
+          error: (error: SAError) => this.notifService.showError(error.message),
+        });
+      }
+    })
   }
 
   getTotalSurface(): number {
@@ -70,7 +143,36 @@ export class PlanterDetails implements OnInit {
     return annualProduction;
   }
 
-  comingSoon() {
-    this.notifService.comingSoon();
+  deletePlanter() {
+    this.dialogService.showDialog({
+      title: 'Confirmation',
+      message: 'Voulez-vous vraiment supprimer ce planteur ?',
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      deletion: true
+    }).subscribe((result: boolean) => {
+      if (result) {
+        this.planterService.deletePlanter(this.planter!.id!).subscribe({
+          next: () => this.router.navigateByUrl('/planters')
+        });
+      }
+    });
+  }
+
+
+
+  getMaritalStatusLabel(value: MaritalStatus | undefined): string {
+    switch (value) {
+      case MaritalStatus.MARRIED:
+        return 'Marié(e)';
+      case MaritalStatus.DIVORCED:
+        return 'Divorcé(e)';
+      case MaritalStatus.SINGLE:
+        return 'Célibataire';
+      case MaritalStatus.WIDOWED:
+        return 'Veuf/Veuve';
+      default:
+        return '';
+    }
   }
 }

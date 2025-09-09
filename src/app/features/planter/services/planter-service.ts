@@ -74,4 +74,20 @@ export class PlanterService {
       finalize(() => this.setLoading(false))
     );
   }
+
+  deletePlanter(id: number) {
+    this.setLoading(true);
+    return this.planterRepository.delete(id).pipe(
+      catchError(error => throwError(() => this.errorService.handleError(error))),
+      finalize(() => this.setLoading(false))
+    )
+  }
+
+  updatePlanter(planter: Planter): Observable<Planter> {
+    this.setLoading(true);
+    return this.planterRepository.update(planter).pipe(
+      catchError(error => throwError(() => this.errorService.handleError(error))),
+      finalize(() => this.setLoading(false))
+    )
+  }
 }
