@@ -2,7 +2,12 @@
 import { BehaviorSubject, Observable, catchError, finalize, of, throwError } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { BaseRepository } from '../repositories/base-repository';
+import {PaginationResponse} from '../models/pagination-response-model';
+import {ErrorService} from './error-service';
+import {Planter} from '../models/planter-model';
+import {Injectable} from '@angular/core';
 
+@Injectable({providedIn: 'root'})
 export abstract class BaseService<T> {
   private _loading = new BehaviorSubject<boolean>(false);
   public readonly loading$: Observable<boolean> = this._loading.asObservable();
@@ -10,10 +15,26 @@ export abstract class BaseService<T> {
   private _data = new BehaviorSubject<T[] | null>(null);
   public readonly data$: Observable<T[] | null> = this._data.asObservable();
 
-  protected constructor(protected repository: BaseRepository<T>) {}
+  private _pagedData = new BehaviorSubject<PaginationResponse<T> | null>(null);
+  public readonly pagedData$: Observable<PaginationResponse<T> | null> = this._pagedData.asObservable();
+  private errorService: ErrorService = new ErrorService();
+
+  constructor(protected repository: BaseRepository<T>) {}
 
   protected setLoading(state: boolean) {
     this._loading.next(state);
+  }
+
+  /**
+   * Récupère tous les éléments (cache si déjà chargé)
+   */
+  getAllPaged(page?: number, size?: number): Observable<PaginationResponse<T>> {
+    this.setLoading(true);
+    return this.repository.getAllPaged(page, size).pipe(
+      tap(data => this._pagedData.next(data)), // mise à jour du cache
+      finalize(() => this.setLoading(false)),
+      catchError(err => throwError(() => this.errorService.handleError(err)))
+    );
   }
 
   /**
@@ -29,7 +50,7 @@ export abstract class BaseService<T> {
     return this.repository.getAll().pipe(
       tap(data => this._data.next(data)), // mise à jour du cache
       finalize(() => this.setLoading(false)),
-      catchError(err => throwError(() => err))
+      catchError(err => throwError(() => this.errorService.handleError(err)))
     );
   }
 
@@ -40,7 +61,7 @@ export abstract class BaseService<T> {
     this.setLoading(true);
     return this.repository.getById(id).pipe(
       finalize(() => this.setLoading(false)),
-      catchError(err => throwError(() => err))
+      catchError(err => throwError(() => this.errorService.handleError(err)))
     );
   }
 
@@ -56,7 +77,7 @@ export abstract class BaseService<T> {
         }
       }),
       finalize(() => this.setLoading(false)),
-      catchError(err => throwError(() => err))
+      catchError(err => throwError(() => this.errorService.handleError(err)))
     );
   }
 
@@ -76,7 +97,7 @@ export abstract class BaseService<T> {
         }
       }),
       finalize(() => this.setLoading(false)),
-      catchError(err => throwError(() => err))
+      catchError(err => throwError(() => this.errorService.handleError(err)))
     );
   }
 
@@ -92,7 +113,7 @@ export abstract class BaseService<T> {
         }
       }),
       finalize(() => this.setLoading(false)),
-      catchError(err => throwError(() => err))
+      catchError(err => throwError(() => this.errorService.handleError(err)))
     );
   }
 
@@ -101,5 +122,20 @@ export abstract class BaseService<T> {
    */
   clearCache() {
     this._data.next(null);
+  }
+
+  loadNextData(size?: number): void {
+    const currentPage = this._pagedData.getValue()?.currentPage;
+    const totalPage = this._pagedData.getValue()?.totalPages;
+    if (currentPage! < totalPage!) {
+      this.getAllPaged(currentPage! + 1, size);
+    }
+  }
+
+  loadPreviousData(size?: number): void {
+    const currentPage = this._pagedData.getValue()?.currentPage;
+    if (currentPage! > 0) {
+      this.getAllPaged(currentPage! - 1, size);
+    }
   }
 }

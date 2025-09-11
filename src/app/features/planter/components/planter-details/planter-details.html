@@ -70,7 +70,7 @@
     <div class="card">
       <div class="row flex--between">
         <span class="title">Plantations</span>
-        <button class="btn btn--primary">
+        <button (click)="addPlantation()" class="btn btn--primary">
           <mat-icon matIconPrefix>add</mat-icon>
           <span>Ajouter une plantation</span>
         </button>
@@ -86,7 +86,7 @@
                 <span>{{ plantation.village }}</span>
                 <span class="muted">{{ plantation.farmedArea }} ha •  </span>
               </div>
-              <button class="btn btn--outline">
+              <button (click)="comingSoon()" class="btn btn--outline">
                 <mat-icon matIconPrefix>open_in_new</mat-icon>
                 <span>Ouvrir</span>
               </button>
@@ -99,6 +99,7 @@
     </div>
   </div>
 
+  <!--Erreur de chargement des données du planteur-->
   <ng-template #noContent>
     <app-no-content-error
         title="Erreur de chargement"
@@ -107,6 +108,7 @@
     ></app-no-content-error>
   </ng-template>
 
+  <!--Modal de modification du planteur-->
   <ng-template #modificationDialog>
     <h2 mat-dialog-title>Modifier un planteur</h2>
 

@@ -15,7 +15,7 @@ import {Router} from '@angular/router';
 })
 export class PlanterList implements OnInit {
   loading$!: Observable<boolean>;
-  plantersPaged$!: Observable<PaginationResponse<Planter>>;
+  plantersPaged$!: Observable<PaginationResponse<Planter> | null>;
   planters$!: Observable<Planter[]>;
   searchSubject = new BehaviorSubject<string>('');
   listSizeCtrl!: FormControl<number | null>;
@@ -28,18 +28,18 @@ export class PlanterList implements OnInit {
   ngOnInit() {
     this.listSizeCtrl = this.formBuilder.control(10);
     this.listSizeCtrl.valueChanges.pipe(
-      tap(size => this.planterService.getPlanterPaged(0, size!))
+      tap(size => this.planterService.getAllPaged(0, size!))
     ).subscribe();
 
     this.listFiltersCtrl = this.formBuilder.control('Toutes les régions');
 
-    this.loading$ = this.planterService.loading;
-    this.planterService.getPlanterPaged(0, this.listSizeCtrl.value!);
+    this.loading$ = this.planterService.loading$;
+    this.planterService.getAllPaged(0, this.listSizeCtrl.value!).subscribe();
 
-    this.plantersPaged$ = this.planterService.planterPaged;
+    this.plantersPaged$ = this.planterService.pagedData$;
 
     this.planters$ = combineLatest([
-      this.planterService.getAllPlanter(),
+      this.planterService.getAll(),
       this.searchSubject.asObservable(),
       this.listFiltersCtrl.valueChanges.pipe(startWith(''))
     ]).pipe(
@@ -56,6 +56,8 @@ export class PlanterList implements OnInit {
         });
       })
     );
+
+    this.planterService.setSelectedPlanter(null);
   }
 
   loadNextPage(): void {
@@ -79,6 +81,6 @@ export class PlanterList implements OnInit {
 
   viewProfile(planter: Planter): void {
     this.planterService.setSelectedPlanter(planter);
-    this.router.navigateByUrl('/planters/profiles').then(null);
+    this.router.navigateByUrl('/planters/profile').then(null);
   }
 }

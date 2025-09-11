@@ -71,6 +71,17 @@
             <mat-icon matSuffix *ngIf="emailCtrl.valid && emailCtrl.value">check_circle</mat-icon>
             <mat-error *ngIf="emailCtrl.touched">{{ getFieldErrorMessage('email') }}</mat-error>
           </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Numéro de téléphone</mat-label>
+            <input
+              matInput
+              type="tel"
+              formControlName="phone"
+              placeholder="000123400"
+              [class.error]="phoneCtrl.invalid && phoneCtrl.touched"
+              autocomplete="email">
+            <mat-error *ngIf="phoneCtrl.touched">{{ getFieldErrorMessage('phone') }}</mat-error>
+          </mat-form-field>
         </div>
 
         <!-- Mots de passe -->

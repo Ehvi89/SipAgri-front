@@ -1,0 +1,142 @@
+<div class="plantation-list-container">
+  <app-header (textChange)="onSearch($event)" placeholder="Rechercher une plantation"></app-header>
+
+  <div class="content">
+    <div class="row flex--between mb-2 header">
+      <div class="title">
+        <span class="text--lg text--bold">Plantations</span>
+        <span>Gérez les parcelles, cultures et superficies.</span>
+      </div>
+
+      <button routerLink="add" class="btn btn--primary">
+        <mat-icon>add</mat-icon>
+        <span>Ajouter une plantation</span>
+      </button>
+    </div>
+
+    <div class="list">
+      <div class="list-header">
+        <mat-form-field appearance="outline">
+          <mat-label>Filtrer par culture</mat-label>
+          <mat-select [formControl]="cultureFilter">
+            <mat-option value="">Toutes les cultures</mat-option>
+            <mat-option *ngFor="let culture of cultures" [value]="culture">
+              {{ culture }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="spacer"></div>
+        <mat-form-field appearance="outline">
+          <mat-label>Filtrer par village</mat-label>
+          <mat-select [formControl]="villageFilter">
+            <mat-option value="">Tous les villages</mat-option>
+            <mat-option *ngFor="let village of villages" [value]="village">
+              {{ village }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="list-content">
+        <div class="list-item">
+          <div class="plantations-table">
+            <div class="table-header">
+              <div class="column">Village</div>
+              <div class="column">Superficie</div>
+              <div class="column">Planteur</div>
+              <div class="column">Actions</div>
+            </div>
+
+            <div class="table-body">
+              @if (loading$ | async) {
+                <div class="loading-state">
+                  <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+                  <span>Chargement des plantations...</span>
+                </div>
+              }
+
+              @if (!(loading$ | async) && (filteredPlantations$ | async)?.length === 0) {
+                <div class="empty-state">
+                  <mat-icon>grass</mat-icon>
+                  <span>Aucune plantation trouvée</span>
+                </div>
+              }
+
+              @for (plantation of (filteredPlantations$ | async); track plantation.id) {
+                <div class="table-row"
+                     [class.selected]="selectedPlantation?.id === plantation.id"
+                     (click)="selectPlantation(plantation)">
+                  <div class="column">
+                    <span class="village">{{ (plantation.name!) ?? (plantation.village$ | async)}}</span>
+                  </div>
+                  <div class="column">
+                    <span class="surface">{{ plantation.farmedArea | number:'1.2-2' }} ha</span>
+                  </div>
+                  <div class="planter-info">
+                    @if (plantation.planter$ | async; as planter) {
+                      <span class="name btn--link" (click)="viewPlanter(planter)">{{ planter.firstname }} {{ planter.lastname }}</span>
+                    } @else {
+                      <span class="loading">Chargement...</span>
+                    }
+                  </div>
+                  <div class="column actions">
+                    <button mat-icon-button [routerLink]="['edit', plantation.id]"
+                            matTooltip="Modifier">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="deletePlantation(plantation.id!); $event.stopPropagation()"
+                            matTooltip="Supprimer">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="map">
+          @if (!selectedPlantation) {
+            <div class="no-selection">
+              <span>Cliquez sur une plantation pour voir sa position</span>
+            </div>
+          }
+          @else if (isGoogleMapsReady) {
+            <div class="view">
+              <google-map
+                width="100%"
+                [zoom]="mapZoom"
+                [center]="(mapCenter | async)!"
+                [options]="mapOptions">
+
+                <!-- Afficher uniquement le marqueur de la plantation sélectionnée -->
+                @if (selectedPlantation && selectedPlantation.gpsLocation.latitude! && selectedPlantation.gpsLocation.longitude!) {
+                  <map-marker
+                    [position]="{lat: selectedPlantation.gpsLocation.latitude, lng: selectedPlantation.gpsLocation.longitude}"
+                    [title]="selectedPlantation.id?.toString() || 'Plantation'"
+                    [options]="selectedMarkerOptions">
+                  </map-marker>
+                }
+              </google-map>
+            </div>
+          } @else {
+            <div class="maps-loading">
+              <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+              <span>Chargement de Google Maps...</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="list-footer row" *ngIf="(plantations$ | async)?.totalPages! > 1">
+        <button (click)="loadPreviousPage()" [disabled]="(plantations$ | async)?.currentPage === 0">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <span>Page: {{ ((plantations$ | async)?.currentPage || 0) + 1 }} / {{ (plantations$ | async)?.totalPages || 1 }}</span>
+        <button (click)="loadNextPage()" [disabled]="((plantations$ | async)?.currentPage || 0) >= ((plantations$ | async)?.totalPages || 1) - 1">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

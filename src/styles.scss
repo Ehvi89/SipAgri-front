@@ -208,6 +208,10 @@ mat-icon {
   flex: 1;
   min-height: 0;
 }
+
+.content {
+  width: 100%;
+}
 app-sidebar {
   flex: 1;
 }
@@ -265,6 +269,11 @@ app-header{
 .col { width: 100%; @extend .flex; @extend .flex--column; gap: .5rem}
 .row { width: 100%; @extend .flex; @extend .flex--center;}
 .list { @extend .col; gap:.25rem}
+.form-grid {
+  @extend .grid;
+  @extend .grid--two;
+  @extend .gap--md;
+}
 
 // Notifications styles
 .custom-notification-container {

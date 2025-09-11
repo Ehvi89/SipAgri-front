@@ -7,7 +7,7 @@ import {PlanterDetails} from './components/planter-details/planter-details';
 const routes: Routes = [
   { path: "", component: PlanterList },
   { path: "new", component: NewPlanter },
-  { path: "profiles", component: PlanterDetails },
+  { path: "profile", component: PlanterDetails },
 ];
 
 @NgModule({

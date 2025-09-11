@@ -52,7 +52,7 @@ export class PlanterDetails implements OnInit {
 
   ngOnInit() {
     this.planter = this.planterService.selectedPlanter;
-    this.loadingUpdate = this.planterService.loading;
+    this.loadingUpdate = this.planterService.loading$;
     if (this.planter?.plantations) {
       this.loading = true;
       const villageRequests = this.planter.plantations.map(plantation =>
@@ -100,7 +100,7 @@ export class PlanterDetails implements OnInit {
           id: this.planter?.id,
           ...this.planterForm.value,
         }
-        this.planterService.updatePlanter(planter).pipe(
+        this.planterService.update(planter.id, planter).pipe(
           tap((planter: Planter) => {
             this.planter = planter;
             this.cdr.detectChanges();
@@ -152,7 +152,7 @@ export class PlanterDetails implements OnInit {
       deletion: true
     }).subscribe((result: boolean) => {
       if (result) {
-        this.planterService.deletePlanter(this.planter!.id!).subscribe({
+        this.planterService.delete(this.planter!.id!).subscribe({
           next: () => this.router.navigateByUrl('/planters')
         });
       }
@@ -174,5 +174,15 @@ export class PlanterDetails implements OnInit {
       default:
         return '';
     }
+  }
+
+  comingSoon() {
+    this.notifService.comingSoon();
+  }
+
+  addPlantation() {
+    this.router.navigate(['/plantations/add'], {
+      queryParams: { planter: this.planter!.id }
+    });
   }
 }
