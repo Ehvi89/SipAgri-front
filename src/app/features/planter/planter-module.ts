@@ -21,7 +21,7 @@ import {PlanterService} from './services/planter-service';
     ShareModule
   ],
   providers: [
-    // PlanterService,
+    PlanterService,
     PlanterRepository
   ],
 })

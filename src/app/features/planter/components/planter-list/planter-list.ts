@@ -56,8 +56,6 @@ export class PlanterList implements OnInit {
         });
       })
     );
-
-    this.planterService.setSelectedPlanter(null);
   }
 
   loadNextPage(): void {
@@ -74,13 +72,14 @@ export class PlanterList implements OnInit {
 
   getUniqueVillages(): string[] {
     // Cette méthode devrait idéalement être un Observable
-    // Pour simplifier, on retourne un tableau vide ici
-    // Vous devriez l'implémenter selon vos besoins
+    // Pour simplifier, on retourne un tableau vide ici.
+    // Vous devriez l'implémenter selon vos besoins.
     return ['Toutes les régions'];
   }
 
   viewProfile(planter: Planter): void {
-    this.planterService.setSelectedPlanter(planter);
-    this.router.navigateByUrl('/planters/profile').then(null);
+    this.router.navigate(['/planters/profile'], {
+      queryParams: {planter: planter.id}
+    }).then(null);
   }
 }

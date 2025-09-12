@@ -80,51 +80,17 @@
                     }
                   </div>
                   <div class="column actions">
-                    <button mat-icon-button [routerLink]="['edit', plantation.id]"
-                            matTooltip="Modifier">
-                      <mat-icon>edit</mat-icon>
-                    </button>
-                    <button mat-icon-button (click)="deletePlantation(plantation.id!); $event.stopPropagation()"
-                            matTooltip="Supprimer">
-                      <mat-icon>delete</mat-icon>
+                    <button mat-icon-button [routerLink]="['details']"
+                            [queryParams]="{ plantation: plantation.id }"
+                            matTooltip="Voir">
+                      <mat-icon matIconPrefix>open_in_new</mat-icon>
+                      <span>Voir</span>
                     </button>
                   </div>
                 </div>
               }
             </div>
           </div>
-        </div>
-
-        <div class="map">
-          @if (!selectedPlantation) {
-            <div class="no-selection">
-              <span>Cliquez sur une plantation pour voir sa position</span>
-            </div>
-          }
-          @else if (isGoogleMapsReady) {
-            <div class="view">
-              <google-map
-                width="100%"
-                [zoom]="mapZoom"
-                [center]="(mapCenter | async)!"
-                [options]="mapOptions">
-
-                <!-- Afficher uniquement le marqueur de la plantation sélectionnée -->
-                @if (selectedPlantation && selectedPlantation.gpsLocation.latitude! && selectedPlantation.gpsLocation.longitude!) {
-                  <map-marker
-                    [position]="{lat: selectedPlantation.gpsLocation.latitude, lng: selectedPlantation.gpsLocation.longitude}"
-                    [title]="selectedPlantation.id?.toString() || 'Plantation'"
-                    [options]="selectedMarkerOptions">
-                  </map-marker>
-                }
-              </google-map>
-            </div>
-          } @else {
-            <div class="maps-loading">
-              <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
-              <span>Chargement de Google Maps...</span>
-            </div>
-          }
         </div>
       </div>
 

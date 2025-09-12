@@ -243,7 +243,7 @@ export class AddPlantation implements OnInit, OnDestroy {
         ...this.plantationForm.value,
         gpsLocation: this.gpsLocation
       };
-      console.log(plantation)
+      // console.log(plantation)
 
       this.plantationService.create(plantation).pipe(
         takeUntil(this.destroy$)

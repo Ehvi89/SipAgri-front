@@ -10,6 +10,8 @@ export const routes: Routes = [
       .then(m => m.PlanterModule), canActivate: [AuthGuard], runGuardsAndResolvers: "always" },
   { path: "plantations", loadChildren: () => import("./features/plantation/plantation-module")
       .then(m => m.PlantationModule) },
+  { path: "productions", loadChildren: () => import("./features/production/production-module")
+      .then(m => m.ProductionModule) },
   { path: "error", component: ErrorComponent },
   { path: "", redirectTo: "dashboard", pathMatch: "full" },
   { path: "**", redirectTo: "error" },

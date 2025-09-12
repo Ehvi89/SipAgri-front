@@ -9,12 +9,14 @@ import {PlantationService} from './services/plantation-service';
 import {PlantationRepository} from './repository/plantation-repository';
 import {PlanterModule} from '../planter/planter-module';
 import { AddPlantation } from './components/add-plantation/add-plantation';
+import { PlantationDetails } from './components/planation-details/plantation-details';
 
 
 @NgModule({
   declarations: [
     PlantationList,
-    AddPlantation
+    AddPlantation,
+    PlantationDetails,
   ],
   imports: [
     CommonModule,

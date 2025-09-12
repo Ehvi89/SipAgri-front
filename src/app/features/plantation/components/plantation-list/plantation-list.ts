@@ -84,7 +84,6 @@ export class PlantationList implements OnInit, OnDestroy {
   private initializeData(): void {
     this.loading$ = this.plantationService.loading$;
     this.plantations$ = this.plantationService.getAllPaged();
-    this.planterService.setSelectedPlanter(null);
   }
 
   private setupFilters(): void {
@@ -95,8 +94,8 @@ export class PlantationList implements OnInit, OnDestroy {
     ]).pipe(
       map(([plantations, villageFilter, search]) =>
         plantations
-          .filter(p => (!search /*&& p.location.name?.toLowerCase().includes(search.toLowerCase())) &&
-            this.matchesVillageFilter(p, villageFilter*/))
+          .filter(p => (!search && p.gpsLocation.display_name?.toLowerCase().includes(search.toLowerCase())) &&
+            this.matchesVillageFilter(p, villageFilter))
           .map(p => this.enrichPlantationWithObservables(p))
       ),
       shareReplay(1),
@@ -107,7 +106,7 @@ export class PlantationList implements OnInit, OnDestroy {
   }
 
   private matchesVillageFilter(_plantation: Plantation, _villageFilter: string | null): boolean {
-    return true; // logique à implémenter
+    return !_villageFilter && _plantation.name.toLowerCase().includes(_villageFilter!.toLowerCase());
   }
 
   private enrichPlantationWithObservables(plantation: Plantation): ExtendedPlantation {
@@ -181,7 +180,6 @@ export class PlantationList implements OnInit, OnDestroy {
   }
 
   viewPlanter(planter: Planter) {
-    this.planterService.setSelectedPlanter(planter);
-    this.router.navigateByUrl('/planters/profile').then(r => null)
+    this.router.navigate(['/planters/profile'], {queryParams: {planter: planter.id}}).then(() => null)
   }
 }
