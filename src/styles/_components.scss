@@ -409,7 +409,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 
   &--two { grid-template-columns: 1fr 1fr; @extend .gap--md}
   &--two-fs { grid-template-columns: 1.2fr .8fr; @extend .gap--md }

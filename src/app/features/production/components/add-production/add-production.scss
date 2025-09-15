@@ -1,0 +1,34 @@
+@use "../../../../../styles";
+
+.add-production-container {
+  @extend .container;
+  @extend .container--lg;
+  @extend .container--without-top;
+
+  .content {
+    .section-title {
+      @extend .text--medium;
+      @extend .text--lg;
+      @extend .mb-2;
+    }
+    .form {
+      margin: auto;
+    }
+    .actions{
+      @extend .flex;
+      justify-content: flex-end;
+
+      button{
+        @extend .flex;
+        @extend .gap--sm;
+      }
+    }
+
+    img {
+      @extend .radius-md;
+      width: 100%;
+      height: 500px;
+      object-fit: cover;
+    }
+  }
+}

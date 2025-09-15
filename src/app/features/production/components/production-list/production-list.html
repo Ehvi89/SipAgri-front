@@ -1,0 +1,88 @@
+<div class="production-list-container">
+  <app-header placeholder="Rechercher par production"></app-header>
+
+  <div class="content">
+    <div class="page-header">
+      <div class="section-title">Productions</div>
+      <button routerLink="add" class="btn btn--primary">
+        <mat-icon>add</mat-icon>
+        <span>Ajouter une production</span>
+      </button>
+    </div>
+    <div class="stats">
+      <div class="stat-card">
+        <div>
+          <div class="helper"></div>
+          <div class="value"></div>
+        </div>
+        <mat-icon></mat-icon>
+      </div>
+      <div class="stat-card">
+        <div>
+          <div class="helper"></div>
+          <div class="value"></div>
+        </div>
+        <mat-icon></mat-icon>
+      </div>
+      <div class="stat-card">
+        <div>
+          <div class="helper"></div>
+          <div class="value"></div>
+        </div>
+        <mat-icon></mat-icon>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table">
+        <div class="table-row header">
+          <div class="column">Date</div>
+          <div class="column center">Planteur • Plantation</div>
+          <div class="column center">Quantité</div>
+          <div class="column mustBePaid">Actions</div>
+        </div>
+
+        <div class="table-body">
+          @if (loading$ | async) {
+            <div class="loading-state">
+              <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+              <span>Chargement des productions...</span>
+            </div>
+          }
+
+          @if (!(loading$ | async) && (productionsPaged$ | async)?.data?.length === 0) {
+            <div class="empty-state">
+              <i class="fas fa-wheat-alt"></i>
+              <span>Aucune production trouvée</span>
+            </div>
+          }
+
+          @for (production of (productionsPaged$ | async)?.data; track production.id) {
+            <div class="table-row">
+              <div class="column">
+                <span class="date">{{ production.year }}</span>
+              </div>
+              <div class="column center" *ngIf="getPlantation(production.plantationId!) | async as plantation">
+                <div *ngIf="getPlanter(plantation.planterId!) | async as planter">
+                  <span>{{ planter.firstname }} {{planter.lastname}} • {{plantation.name}} </span>
+                </div>
+              </div>
+              <div class="column center">
+                <span class="production">{{ production.productionInKg | number:'1.2-2' }} </span>
+              </div>
+              <div class="column actions mustBePaid">
+                <button mat-icon-button [routerLink]="['edit', production.id]"
+                        matTooltip="Modifier">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="deleteProduction(production.id!); $event.stopPropagation()"
+                        matTooltip="Supprimer">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

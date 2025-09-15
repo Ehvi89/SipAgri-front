@@ -38,7 +38,7 @@
 
               @if (!(loading$ | async) && (plantation$ | async)?.productions?.length === 0) {
                 <div class="empty-state">
-                  <i class="fas fa-wheat-awn"></i>
+                  <mat-icon>grass</mat-icon>
                   <span>Aucune plantation trouvée</span>
                 </div>
               }
