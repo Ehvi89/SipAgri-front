@@ -23,7 +23,7 @@ import {SAError} from '../../../../core/services/error-service';
 export class PlanterDetails implements OnInit {
   @ViewChild('modificationDialog') modificationDialog!: TemplateRef<any>;
 
-  planter!: Planter | null;
+  planter!: Planter;
   plantationsWithVillage: any[] = [];
   loading = false;
   loadingUpdate!: Observable<boolean>

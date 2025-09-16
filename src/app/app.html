@@ -1,8 +1,10 @@
 @if (showFullLayout()) {
   <div class="page-wrapper">
-    <div class="loader" *ngIf="loading">
-      <mat-spinner diameter="50"></mat-spinner>
-    </div>
+    @if(loading) {
+      <div class="loader">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+    }
     <div class="flex">
       <app-sidebar></app-sidebar>
       <main class="main-content">

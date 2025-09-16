@@ -5,7 +5,6 @@ import {AuthRepository} from '../repositories/auth-repository';
 import {catchError} from 'rxjs/operators';
 import {ErrorService} from '../../../core/services/error-service';
 import {Supervisor} from '../../../core/models/supervisor-model';
-import {parseJsonSchemaToOptions} from '@angular/cli/src/command-builder/utilities/json-schema';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
@@ -65,7 +64,7 @@ export class AuthService {
     return this.forgetConnexionInfo().pipe(
       tap(() => {
         if (!this.router.url.startsWith('/auth/login')) {
-          this.router.navigateByUrl('/auth/login');
+          this.router.navigateByUrl('/auth/login').then(() => console.log("User logged out"));
         }
       })
     );
@@ -74,7 +73,7 @@ export class AuthService {
   resetPassword(value: {field: string | number, method: string}): Observable<any> {
     this.setLoading(true)
     return this.authRepository.resetPassword(value).pipe(
-      catchError(err => throwError(this.errorService.handleError(err))),
+      catchError(err => throwError(() => this.errorService.handleError(err))),
       finalize(() => this.setLoading(false))
     );
   }

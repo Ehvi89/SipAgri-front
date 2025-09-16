@@ -59,7 +59,7 @@ export class AuthInterceptor implements HttpInterceptor {
             this.router.navigate(['/auth/login'], {
               queryParams: { sessionExpired: true, redirectUrl: this.router.url },
               replaceUrl: true
-            });
+            }).then(() => console.log('Redirecting to login page...'));
           }
           return next.handle(request);
         })

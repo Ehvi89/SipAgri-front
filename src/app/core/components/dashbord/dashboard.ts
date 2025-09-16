@@ -79,15 +79,15 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
     this.resumes$ = this.dashboardService.getResumesData();
 
     // Charger les données de production par période
-    forkJoin({
-      production: this.dashboardService.getProductionByPeriod(this.selectedPeriodFilter),
-      cultural: this.dashboardService.getCulturalDistribution(),
-      trend: this.dashboardService.getProductionTrend()
-    }).subscribe({
+    forkJoin([
+      this.dashboardService.getProductionByPeriod(this.selectedPeriodFilter),
+      this.dashboardService.getCulturalDistribution(),
+      this.dashboardService.getProductionTrend()
+    ]).subscribe({
       next: (data) => {
-        this.culturalDistribution = data.cultural;
-        this.productionTrend = data.trend;
-        this.productionByPeriod = data.production;
+        this.culturalDistribution = data[0];
+        this.productionByPeriod = data[1];
+        this.productionTrend = data[2];
 
         this.updateAllCharts();
 

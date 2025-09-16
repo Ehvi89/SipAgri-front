@@ -1,16 +1,16 @@
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {Environment} from '../../environments/environment';
+
 import {PaginationResponse} from '../models/pagination-response-model';
 import {Injectable} from '@angular/core';
+import {environment} from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export abstract class BaseRepository<T> {
   protected abstract endpoint: string;
   private readonly apiUrl: string;
 
-  constructor(protected http: HttpClient,
-              private environment: Environment) {
+  constructor(protected http: HttpClient) {
     this.apiUrl = environment.apiUrl;
   }
 
