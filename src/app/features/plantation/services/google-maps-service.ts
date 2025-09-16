@@ -1,10 +1,9 @@
-import { Injectable, inject } from '@angular/core';
-import { Environment } from '../../../environments/environment';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class GoogleMapsService {
-  private readonly environment = inject(Environment);
 
   /** Observable qui émet quand Google Maps est prêt */
   private loader$?: ReplaySubject<void>;
@@ -48,7 +47,7 @@ export class GoogleMapsService {
     }
 
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${this.environment.googleMapsApiKey}&libraries=geometry,places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&libraries=geometry,places`;
     script.async = true;
     script.defer = true;
 

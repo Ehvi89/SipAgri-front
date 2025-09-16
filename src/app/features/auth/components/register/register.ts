@@ -240,7 +240,7 @@ export class Register implements OnInit, OnDestroy {
       next: () => {
         this.notifService.showSuccess("Votre compte a été créer avec success");
         delay(1000);
-        this.router.navigateByUrl('/auth/login');
+        this.router.navigateByUrl('/auth/login').then();
       },
       error: (error) => {
         this.handleRegistrationError(error);
@@ -250,7 +250,7 @@ export class Register implements OnInit, OnDestroy {
   }
 
   goToLogin(): void {
-    this.router.navigateByUrl('/auth/login');
+    this.router.navigateByUrl('/auth/login').then();
   }
 
   // Méthodes utilitaires privées

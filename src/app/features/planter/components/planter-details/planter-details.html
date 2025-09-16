@@ -83,17 +83,17 @@
             </button>
           </div>
           <mat-divider></mat-divider>
-          <div class="list" [class]="{'no-content': planter!.plantations?.length == 0}">
+          <div class="list" [class]="{'no-content': planter.plantations?.length == 0}">
             @if (loading) {
               <mat-spinner mode="indeterminate" diameter="30"></mat-spinner>
-            } @else if (plantationsWithVillage.length > 0) {
-              @for (plantation of plantationsWithVillage; track plantation.id) {
+            } @else if (planter.plantations!.length > 0) {
+              @for (plantation of planter.plantations; track plantation.id) {
                 <div class="list-item">
                   <div class="infos col">
-                    <span>{{ plantation.village }}</span>
-                    <span class="muted">{{ plantation.farmedArea }} ha •  </span>
+                    <span>{{ plantation.name }}</span>
+                    <span class="muted">Superficie: {{ plantation.farmedArea }} ha </span>
                   </div>
-                  <button (click)="comingSoon()" class="btn btn--outline">
+                  <button routerLink="/plantations/details" [queryParams]="{ plantation: plantation.id }" class="btn btn--outline">
                     <mat-icon matIconPrefix>open_in_new</mat-icon>
                     <span>Ouvrir</span>
                   </button>

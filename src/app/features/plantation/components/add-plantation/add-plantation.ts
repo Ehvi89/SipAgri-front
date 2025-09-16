@@ -1,10 +1,9 @@
 import {ChangeDetectorRef, Component, OnInit, OnDestroy} from '@angular/core';
-import {map, Observable, startWith, takeUntil, Subject, window, BehaviorSubject} from 'rxjs';
+import {map, Observable, startWith, takeUntil, Subject, BehaviorSubject} from 'rxjs';
 import {
   AbstractControl,
   FormBuilder,
   FormControl,
-  FormControlOptions,
   FormGroup, ValidationErrors,
   ValidatorFn,
   Validators

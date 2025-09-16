@@ -166,7 +166,7 @@ export class ResetPassword implements OnInit, OnDestroy {
         next: () => {
           this.notifService.showSuccess("Mot de passe changé avec succès. Vous serez redirigé vers la page de connexion");
           delay(2000);
-          this.router.navigateByUrl('/auth/login');
+          this.router.navigateByUrl('/auth/login').then(() => console.log("Redirect to login page"));
         },
         error: (error: SAError) => {
           if (error.statusCode === 401) {
