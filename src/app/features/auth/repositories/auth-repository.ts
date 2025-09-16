@@ -1,8 +1,8 @@
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {catchError, map, Observable, throwError} from 'rxjs';
-import {Environment} from '../../../environments/environment';
 import { Injectable } from '@angular/core';
 import {Supervisor} from '../../../core/models/supervisor-model';
+import {environment} from '../../../../environments/environment';
 
 export interface LoginCredential {
   email: string;
@@ -16,19 +16,18 @@ export interface LoginResponse {
 
 @Injectable()
 export class LoginRepository {
-  constructor(private http: HttpClient,
-              private environment: Environment) {}
+  constructor(private http: HttpClient,) {}
 
   login(credential: LoginCredential): Observable<LoginResponse> {
     return this.http
-      .post<LoginResponse>(`${this.environment.apiUrl}/auth/login`, credential)
+      .post<LoginResponse>(`${environment.apiUrl}/auth/login`, credential)
       .pipe(
         map((response) => ({
           token: response.token,
           supervisor: response.supervisor,
         })),
         catchError((error: HttpErrorResponse) => {
-          if (!this.environment.prod) {
+          if (!environment.prod) {
             console.error('An error occurred during login: ', error.message);
           }
           return throwError(() => error);
@@ -54,15 +53,14 @@ export interface RegisterResponse {
 
 @Injectable()
 export class RegisterRepository {
-  constructor(private http: HttpClient,
-              private environment: Environment,) {}
+  constructor(private http: HttpClient,) {}
 
   register(user: RegisterCredential): Observable<RegisterResponse> {
-    return this.http.post<RegisterResponse>(this.environment.apiUrl + '/auth/register', user)
+    return this.http.post<RegisterResponse>(environment.apiUrl + '/auth/register', user)
       .pipe(
         map((response) => response),
         catchError((error: HttpErrorResponse) => {
-          if (!this.environment.prod) {
+          if (!environment.prod) {
             console.error('An error occurred during registry: ', error.message);
           }
           return throwError(() => error);
@@ -71,7 +69,7 @@ export class RegisterRepository {
   }
 
   checkEmailExist(email: string): Observable<boolean> {
-    return this.http.post<any>(this.environment.apiUrl + '/auth/email-exist', email)
+    return this.http.post<any>(environment.apiUrl + '/auth/email-exist', email)
       .pipe(
         map(response => {
           return response != null;
@@ -83,20 +81,19 @@ export class RegisterRepository {
 
 @Injectable({providedIn: "root"})
 export class AuthRepository {
-  constructor(private http: HttpClient,
-              private environment: Environment,) {}
+  constructor(private http: HttpClient,) {}
 
   resetPassword(value: { field: string | number; method: string }): Observable<any> {
-    return this.http.post<any>(`${this.environment.apiUrl}/auth/forgot-password`, value.field).pipe(
+    return this.http.post<any>(`${environment.apiUrl}/auth/forgot-password`, value.field).pipe(
       map((response) => response),
-      catchError(err => throwError(err))
+      catchError(err => throwError(() => err))
     )
   }
 
   changePassword(request: { newPassword: string; token: any; method: any }) {
-    return this.http.post<any>(`${this.environment.apiUrl}/auth/reset-password`, request).pipe(
+    return this.http.post<any>(`${environment.apiUrl}/auth/reset-password`, request).pipe(
       map((response) => response),
-      catchError(err => throwError(err))
+      catchError(err => throwError(() => err))
     )
   }
 }

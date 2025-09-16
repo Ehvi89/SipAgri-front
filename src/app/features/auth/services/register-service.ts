@@ -40,7 +40,6 @@ export class RegisterService {
   // Regex patterns
   private readonly EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
   private readonly PASSWORD_MIN_LENGTH = 8;
-  private readonly COMMON_EMAIL_DOMAINS = ['sipra.ci'];
 
   constructor(private registerRepository: RegisterRepository,
               private errorService: ErrorService) {}
@@ -191,7 +190,7 @@ export class RegisterService {
       return { score: 0, label: 'Aucun', color: 'red' };
     }
 
-    let score = 0;
+    let score: number;
     const checks = [
       password.length >= 8,
       /[a-z]/.test(password),
@@ -268,19 +267,6 @@ export class RegisterService {
       createdAt: response.createdAt || new Date().toISOString(),
       isVerified: response.isVerified || false
     };
-  }
-
-  private transformError(error: any): Error {
-    if (error.status === 409) {
-      return new Error('Un compte existe déjà avec cet email');
-    }
-    if (error.status === 400) {
-      return new Error('Données invalides');
-    }
-    if (error.status === 500) {
-      return new Error('Erreur serveur, veuillez réessayer');
-    }
-    return new Error('Erreur inattendue lors de l\'inscription');
   }
 
   private generateEmailSuggestions(email: string): string[] {

@@ -4,7 +4,6 @@ import { tap } from 'rxjs/operators';
 import { BaseRepository } from '../repositories/base-repository';
 import {PaginationResponse} from '../models/pagination-response-model';
 import {ErrorService} from './error-service';
-import {Planter} from '../models/planter-model';
 import {Injectable} from '@angular/core';
 
 @Injectable({providedIn: 'root'})
@@ -19,7 +18,7 @@ export abstract class BaseService<T> {
   public readonly pagedData$: Observable<PaginationResponse<T> | null> = this._pagedData.asObservable();
   private errorService: ErrorService = new ErrorService();
 
-  constructor(protected repository: BaseRepository<T>) {}
+  protected constructor(protected repository: BaseRepository<T>) {}
 
   protected setLoading(state: boolean) {
     this._loading.next(state);
@@ -116,14 +115,6 @@ export abstract class BaseService<T> {
       catchError(err => throwError(() => this.errorService.handleError(err)))
     );
   }
-
-  /**
-   * Vide le cache
-   */
-  clearCache() {
-    this._data.next(null);
-  }
-
   loadNextData(size?: number): void {
     const currentPage = this._pagedData.getValue()?.currentPage;
     const totalPage = this._pagedData.getValue()?.totalPages;

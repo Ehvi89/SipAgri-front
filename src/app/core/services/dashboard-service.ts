@@ -56,7 +56,7 @@ export class DashboardService {
    * Récupère les données de production par période
    */
   getProductionByPeriod(period: string = 'mois'): Observable<ChartData[]> {
-    const params = new HttpParams().set('period', period);
+    // const params = new HttpParams().set('period', period);
 
     // return this.http.get<ApiResponse<ChartData[]>>(`${this.baseUrl}/production-by-period`, { params })
     //   .pipe(
@@ -91,7 +91,7 @@ export class DashboardService {
    * Récupère les données de tendance de production
    */
   getProductionTrend(months: number = 12): Observable<ProductionData[]> {
-    const params = new HttpParams().set('months', months.toString());
+    // const params = new HttpParams().set('months', months.toString());
 
     // return this.http.get<ApiResponse<ProductionData[]>>(`${this.baseUrl}/production-trend`, { params })
     //   .pipe(
@@ -217,15 +217,5 @@ export class DashboardService {
     }
 
     return data;
-  }
-
-  /**
-   * Méthode utilitaire pour la gestion d'erreurs
-   */
-  private handleError<T>(operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
-      console.error(`${operation} failed:`, error);
-      return of(result as T);
-    };
   }
 }

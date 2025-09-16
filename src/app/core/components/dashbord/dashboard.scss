@@ -63,8 +63,6 @@
 
 // Section graphiques
 .graphics {
-  @extend .grid;
-
   .grid {
     @extend .grid--two;
     @extend .gap--xl;
