@@ -3,7 +3,7 @@
 
   <div class="content">
     <div class="header row">
-      <div class="title col">
+      <div class="title">
         <span class="text--lg text--bold">{{ (plantation$ | async)?.name }}</span>
         <span *ngIf="planter$ | async">
           Planteur: {{(planter$ | async)?.firstname}} {{ (planter$ | async)?.lastname }} •

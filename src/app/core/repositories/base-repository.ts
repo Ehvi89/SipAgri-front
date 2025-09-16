@@ -10,7 +10,7 @@ export abstract class BaseRepository<T> {
   protected abstract endpoint: string;
   private readonly apiUrl: string;
 
-  constructor(protected http: HttpClient) {
+  protected constructor(protected http: HttpClient) {
     this.apiUrl = environment.apiUrl;
   }
 

@@ -74,6 +74,12 @@ export abstract class BaseService<T> {
         if (this._data.value) {
           this._data.next([...this._data.value, newItem]);
         }
+        if (this._pagedData.value) {
+          this._pagedData.next({
+            ...this._pagedData.value,
+            data: [...this._pagedData.value.data, newItem],
+          });
+        }
       }),
       finalize(() => this.setLoading(false)),
       catchError(err => throwError(() => this.errorService.handleError(err)))
@@ -88,11 +94,21 @@ export abstract class BaseService<T> {
     return this.repository.update(payload).pipe(
       tap(updatedItem => {
         if (this._data.value) {
-          this._data.next(
-            this._data.value.map(item =>
+          this._data.next([
+            ...this._data.value.map(item =>
               (item as any).id === id ? updatedItem : item
             )
-          );
+          ]);
+        }
+        if (this._pagedData.value) {
+          this._pagedData.next({
+            ...this._pagedData.value,
+            data: [
+              ...this._pagedData.value.data.map(item =>
+                (item as any).id === id ? updatedItem : item
+              )
+            ],
+          });
         }
       }),
       finalize(() => this.setLoading(false)),
@@ -107,14 +123,19 @@ export abstract class BaseService<T> {
     this.setLoading(true);
     return this.repository.delete(id).pipe(
       tap(() => {
-        if (this._data.value) {
-          this._data.next(this._data.value.filter(item => (item as any).id !== id));
+        if (this._pagedData.value) {
+          this._pagedData.next({
+            ...this._pagedData.value,
+            data: this._pagedData.value.data.filter(item => (item as any).id !== id)
+          });
         }
       }),
       finalize(() => this.setLoading(false)),
       catchError(err => throwError(() => this.errorService.handleError(err)))
     );
   }
+
+
   loadNextData(size?: number): void {
     const currentPage = this._pagedData.getValue()?.currentPage;
     const totalPage = this._pagedData.getValue()?.totalPages;
