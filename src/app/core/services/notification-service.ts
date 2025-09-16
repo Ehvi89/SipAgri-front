@@ -1,6 +1,6 @@
 import { Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 export interface Notification {
   id: number;
@@ -17,8 +17,7 @@ export class NotificationService {
   private notifications = new BehaviorSubject<Notification[]>([]);
   private timeoutRefs: Map<number, any> = new Map(); // Pour stocker les timeouts
 
-  constructor(private rendererFactory: RendererFactory2,
-              private environment: Environment) {
+  constructor(private rendererFactory: RendererFactory2) {
     this.renderer = this.rendererFactory.createRenderer(null, null);
     this.createNotificationContainer();
   }
@@ -104,7 +103,7 @@ export class NotificationService {
     this.renderer.setProperty(closeButton, 'textContent', '×');
     this.renderer.setAttribute(closeButton, 'aria-label', 'Fermer la notification');
     this.renderer.listen(closeButton, 'click', () => {
-      if (!this.environment.prod) {
+      if (!environment.prod) {
         console.log("Bouton de fermeture cliqué pour la notification:", notification.id);
       }
       this.removeNotification(notification.id);
@@ -123,7 +122,7 @@ export class NotificationService {
   }
 
   private removeNotification(id: number): void {
-    if (!this.environment.prod) {
+    if (!environment.prod) {
       console.log("Tentative de suppression de la notification:", id);
     }
 
@@ -140,7 +139,7 @@ export class NotificationService {
     // Retirer du DOM
     const element = document.querySelector(`[data-notification-id="${id}"]`);
     if (element) {
-      if (!this.environment.prod) {
+      if (!environment.prod) {
         console.log("Élément trouvé, suppression en cours...");
       }
 
@@ -152,13 +151,13 @@ export class NotificationService {
       setTimeout(() => {
         if (element.parentNode) {
           this.renderer.removeChild(element.parentNode, element);
-          if (!this.environment.prod) {
+          if (!environment.prod) {
             console.log("Notification supprimée du DOM:", id);
           }
         }
       }, 300);
     } else {
-      if (!this.environment.prod) {
+      if (!environment.prod) {
         console.warn("Élément non trouvé pour l'ID:", id);
       }
     }

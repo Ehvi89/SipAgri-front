@@ -1,0 +1,91 @@
+<div class="plantation-details-container">
+  <app-header placeholder="" [breadcrumb]="true"></app-header>
+
+  <div class="content">
+    <div class="header row">
+      <div class="title col">
+        <span class="text--lg text--bold">{{ (plantation$ | async)?.name }}</span>
+        <span *ngIf="planter$ | async">
+          Planteur: {{(planter$ | async)?.firstname}} {{ (planter$ | async)?.lastname }} •
+          superficie: {{ (plantation$ | async)?.farmedArea }} ha
+        </span>
+      </div>
+
+      <button [routerLink]="['/productions/add']" [queryParams]="{ plantation: (plantation$ | async)?.id }" class="btn btn--primary">
+        <mat-icon>add</mat-icon>
+        <span>Ajouter une production</span>
+      </button>
+    </div>
+
+    <div class="list">
+      <div class="list-content">
+        <div class="list-item">
+          <div class="plantations-table">
+            <div class="table-header">
+              <div class="column">Date</div>
+              <div class="column center">Production (Kg)</div>
+              <div class="column center">Prix d'achat</div>
+              <div class="column mustBePaid">Status</div>
+            </div>
+
+            <div class="table-body">
+              @if (loading$ | async) {
+                <div class="loading-state">
+                  <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+                  <span>Chargement des plantations...</span>
+                </div>
+              }
+
+              @if (!(loading$ | async) && (plantation$ | async)?.productions?.length === 0) {
+                <div class="empty-state">
+                  <i class="fas fa-wheat-awn"></i>
+                  <span>Aucune plantation trouvée</span>
+                </div>
+              }
+
+              @for (production of (plantation$ | async)?.productions; track production.id) {
+                <div class="table-row">
+                  <div class="column"><span>{{ production.year | date }}</span></div>
+                  <div class="column center"><span>{{ production.productionInKg }}</span></div>
+                  <div class="column center"><span>{{ production.purchasePrice | currency:'XOF':'symbol':'1.0-0' }}</span></div>
+                  <div class="column mustBePaid"><span>{{ production.mustBePaid ? 'Bénéficiaire' : 'Déficitaire' }}</span></div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="map">
+          @if (isGoogleMapsReady) {
+            <div class="view">
+              <google-map
+                min-height="300px"
+                height="100%"
+                width="100%"
+                [zoom]="mapZoom"
+                [center]="(mapCenter$ | async)!"
+                [options]="mapOptions">
+
+                @if ((plantation$ | async)?.gpsLocation?.latitude && (plantation$ | async)?.gpsLocation?.longitude) {
+                  <map-marker
+                    [position]="{
+                      lat: (plantation$ | async)?.gpsLocation!.latitude,
+                      lng: (plantation$ | async)?.gpsLocation!.longitude
+                    }"
+                    [title]="(plantation$ | async)?.name?.toString() || 'Plantation'"
+                    [options]="mapMarkers">
+                  </map-marker>
+                }
+              </google-map>
+            </div>
+          } @else {
+            <div class="maps-loading">
+              <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+              <span>Chargement de Google Maps...</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

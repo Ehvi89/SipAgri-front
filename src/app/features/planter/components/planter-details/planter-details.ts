@@ -4,7 +4,7 @@ import {GeocodingService} from '../../../../core/services/geocoding-service';
 import {finalize, forkJoin, map, Observable, take, tap} from 'rxjs';
 import {PlanterService} from '../../services/planter-service';
 import {NotificationService} from '../../../../core/services/notification-service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {DialogService} from '../../../../share/services/dialog-service';
 import {MaritalStatus} from '../../../../core/enums/marital-status-enum';
 import {Gender} from '../../../../core/enums/gender-enum';
@@ -23,7 +23,7 @@ import {SAError} from '../../../../core/services/error-service';
 export class PlanterDetails implements OnInit {
   @ViewChild('modificationDialog') modificationDialog!: TemplateRef<any>;
 
-  planter!: Planter | null;
+  planter!: Planter;
   plantationsWithVillage: any[] = [];
   loading = false;
   loadingUpdate!: Observable<boolean>
@@ -47,12 +47,20 @@ export class PlanterDetails implements OnInit {
               private dialogService: DialogService,
               private supervisorService: SupervisorService,
               private dialog: MatDialog,
-              private formBuilder: FormBuilder,) {
+              private formBuilder: FormBuilder,
+              private route: ActivatedRoute) {
   }
 
   ngOnInit() {
-    this.planter = this.planterService.selectedPlanter;
-    this.loadingUpdate = this.planterService.loading;
+    this.route.queryParams.subscribe(params => {
+      const planterId: string = params['planter'];
+      if (planterId) {
+        this.planterService.getById(planterId)
+          .subscribe(planter => this.planter = planter);
+      }
+    });
+
+    this.loadingUpdate = this.planterService.loading$;
     if (this.planter?.plantations) {
       this.loading = true;
       const villageRequests = this.planter.plantations.map(plantation =>
@@ -100,7 +108,7 @@ export class PlanterDetails implements OnInit {
           id: this.planter?.id,
           ...this.planterForm.value,
         }
-        this.planterService.updatePlanter(planter).pipe(
+        this.planterService.update(planter.id, planter).pipe(
           tap((planter: Planter) => {
             this.planter = planter;
             this.cdr.detectChanges();
@@ -152,7 +160,7 @@ export class PlanterDetails implements OnInit {
       deletion: true
     }).subscribe((result: boolean) => {
       if (result) {
-        this.planterService.deletePlanter(this.planter!.id!).subscribe({
+        this.planterService.delete(this.planter!.id!).subscribe({
           next: () => this.router.navigateByUrl('/planters')
         });
       }
@@ -174,5 +182,15 @@ export class PlanterDetails implements OnInit {
       default:
         return '';
     }
+  }
+
+  comingSoon() {
+    this.notifService.comingSoon();
+  }
+
+  addPlantation() {
+    this.router.navigate(['/plantations/add'], {
+      queryParams: { planter: this.planter!.id }
+    }).then();
   }
 }

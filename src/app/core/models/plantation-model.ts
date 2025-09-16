@@ -4,6 +4,8 @@ import {Kit} from './kit-model';
 
 export interface Plantation {
   id?: number;
+  name: string;
+  description: string;
   gpsLocation: Location,
   farmedArea: number,
   productions: Production [],

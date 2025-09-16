@@ -33,7 +33,7 @@ export class NewPlanter implements OnInit {
               private supervisorService: SupervisorService) {}
 
   ngOnInit(): void {
-    this.loading$ = this.planterService.loading;
+    this.loading$ = this.planterService.loading$;
     this.initForm();
     this.supervisors$ = this.supervisorService.getAllSupervisors();
   }
@@ -54,7 +54,7 @@ export class NewPlanter implements OnInit {
   create(): void {
     if (this.planterForm.valid) {
       // Ne pas marquer les champs comme "touched" quand le formulaire est valide
-      this.planterService.addNewPlanter(this.planterForm.value).subscribe({
+      this.planterService.create(this.planterForm.value).subscribe({
         next: () => {
           this.notifService.showSuccess("Nouveau planteur ajouté avec succès");
           this.resetForm();

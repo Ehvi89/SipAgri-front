@@ -1,13 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {Router, RouterOutlet} from '@angular/router';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import {NgIf} from '@angular/common';
-import {Sidebar} from './core/components/sidebar/sidebar';
 import {CoreModule} from './core/core-module';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MatProgressSpinnerModule, NgIf, CoreModule],
+  imports: [RouterOutlet, MatProgressSpinnerModule, CoreModule],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

@@ -9,11 +9,18 @@ export class GeocodingService {
 
   getPlaceName(location: Location): Observable<string> {
     return this.repo.reverseGeocode(location).pipe(
-      map((response) => response.display_name.split(',').slice(0, -1) || 'Inconnu'),
+      map((response) => {
+        // console.log(response);
+        return response.display_name.split(',').slice(0, -1).join(',')
+      }),
       catchError((error) => {
         console.error('Erreur reverse geocoding :', error);
         return of('Inconnu');
       })
     );
+  }
+
+  getRegions(): Observable<string[]> {
+    return of(["Bonoua"]);
   }
 }

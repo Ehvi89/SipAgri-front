@@ -63,7 +63,7 @@ export class Login implements OnInit {
   }
 
   goToRegister() {
-    this.router.navigateByUrl('/auth/register');
+    this.router.navigateByUrl('/auth/register').then();
   }
 
   comingSoon() {

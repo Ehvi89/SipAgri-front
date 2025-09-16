@@ -1,104 +1,114 @@
 <div class="planter-details-container">
   <app-header placeholder="" [breadcrumb]="true"></app-header>
 
-  <div class="content" *ngIf="planter != null; else noContent">
-    <div class="row mb-2">
-      <div class="planter col">
-        <span class="title">{{ planter!.firstname }} {{ planter!.lastname }}</span>
-        <span>{{ planter!.village }}</span>
+  <div class="content">
+    @if (loadingUpdate | async) {
+      <!-- Overlay de chargement -->
+      <div class="overlay" *ngIf="loadingUpdate | async">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
       </div>
-      <div class="actions">
-        <button (click)="modifyPlanter()">
-          <mat-icon matIconPrefix>edit</mat-icon>
-          <span>Modifier</span>
-        </button>
-        <button class="delete" (click)="deletePlanter()">
-          <mat-icon matIconPrefix>delete</mat-icon>
-          <span>Supprimer</span>
-        </button>
-      </div>
-    </div>
+    } @else {
+      <div  *ngIf="planter != null; else noContent">
+        <div class="row mb-2">
+          <div class="planter col">
+            <span class="title">{{ planter!.firstname }} {{ planter!.lastname }}</span>
+            <span>{{ planter!.village }}</span>
+          </div>
+          <div class="actions">
+            <button (click)="modifyPlanter()">
+              <mat-icon matIconPrefix>edit</mat-icon>
+              <span>Modifier</span>
+            </button>
+            <button class="delete" (click)="deletePlanter()">
+              <mat-icon matIconPrefix>delete</mat-icon>
+              <span>Supprimer</span>
+            </button>
+          </div>
+        </div>
 
-    <div class="grid grid--two">
-      <div class="card">
-        <div class="section-title">Resumé</div>
-        <div class="list">
-          <div class="row flex--between">
-            <span>Plantations:</span>
-            <span>{{ planter!.plantations?.length }}</span>
-          </div>
-          <div class="row flex--between">
-            <span>Surface totale:</span>
-            <span>{{ getTotalSurface() }} ha</span>
-          </div>
-          <div class="row flex--between">
-            <span>Production annuelle:</span>
-            <span>{{ getAnnualProduction() }} kg</span>
-          </div>
-          <div class="row flex--between" *ngIf="planter?.supervisor">
-            <span>Encadreur:</span>
-            <span>{{ planter!.supervisor.firstname }} {{planter!.supervisor.lastname}}</span>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="section-title">Informations personnelle</div>
-        <div class="list">
-          <div class="row flex--between">
-            <span>Date de naissance:</span>
-            <span>{{ planter!.birthday | date }}</span>
-          </div>
-          <div class="row flex--between">
-            <span>Genre:</span>
-            <span>{{ planter!.gender ? (planter!.gender == 'MALE' ? 'Homme' : 'Femme') : '' }}</span>
-          </div>
-          <div class="row flex--between">
-            <span>Status matrimonial:</span>
-            <span>{{ getMaritalStatusLabel(planter!.maritalStatus) }}</span>
-          </div>
-          <div class="row flex--between">
-            <span>Nombre d'enfant:</span>
-            <span>{{ planter!.childrenNumber }}</span>
-          </div>
-          <div class="row flex--between">
-            <span>Numéro de téléphone:</span>
-            <span>{{ planter!.phoneNumber }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="row flex--between">
-        <span class="title">Plantations</span>
-        <button class="btn btn--primary">
-          <mat-icon matIconPrefix>add</mat-icon>
-          <span>Ajouter une plantation</span>
-        </button>
-      </div>
-      <mat-divider></mat-divider>
-      <div class="list" [class]="{'no-content': planter!.plantations?.length == 0}">
-        @if (loading) {
-          <mat-spinner mode="indeterminate" diameter="30"></mat-spinner>
-        } @else if (plantationsWithVillage.length > 0) {
-          @for (plantation of plantationsWithVillage; track plantation.id) {
-            <div class="list-item">
-              <div class="infos col">
-                <span>{{ plantation.village }}</span>
-                <span class="muted">{{ plantation.farmedArea }} ha •  </span>
+        <div class="grid grid--two">
+          <div class="card">
+            <div class="section-title">Resumé</div>
+            <div class="list">
+              <div class="row flex--between">
+                <span>Plantations:</span>
+                <span>{{ planter!.plantations?.length }}</span>
               </div>
-              <button class="btn btn--outline">
-                <mat-icon matIconPrefix>open_in_new</mat-icon>
-                <span>Ouvrir</span>
-              </button>
+              <div class="row flex--between">
+                <span>Surface totale:</span>
+                <span>{{ getTotalSurface() }} ha</span>
+              </div>
+              <div class="row flex--between">
+                <span>Production annuelle:</span>
+                <span>{{ getAnnualProduction() }} kg</span>
+              </div>
+              <div class="row flex--between" *ngIf="planter?.supervisor">
+                <span>Encadreur:</span>
+                <span>{{ planter!.supervisor.firstname }} {{planter!.supervisor.lastname}}</span>
+              </div>
             </div>
-          }
-        } @else {
-          <span>Aucune plantation</span>
-        }
+          </div>
+          <div class="card">
+            <div class="section-title">Informations personnelle</div>
+            <div class="list">
+              <div class="row flex--between">
+                <span>Date de naissance:</span>
+                <span>{{ planter!.birthday | date }}</span>
+              </div>
+              <div class="row flex--between">
+                <span>Genre:</span>
+                <span>{{ planter!.gender ? (planter!.gender == 'MALE' ? 'Homme' : 'Femme') : '' }}</span>
+              </div>
+              <div class="row flex--between">
+                <span>Status matrimonial:</span>
+                <span>{{ getMaritalStatusLabel(planter!.maritalStatus) }}</span>
+              </div>
+              <div class="row flex--between">
+                <span>Nombre d'enfant:</span>
+                <span>{{ planter!.childrenNumber }}</span>
+              </div>
+              <div class="row flex--between">
+                <span>Numéro de téléphone:</span>
+                <span>{{ planter!.phoneNumber }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="row flex--between">
+            <span class="title">Plantations</span>
+            <button (click)="addPlantation()" class="btn btn--primary">
+              <mat-icon matIconPrefix>add</mat-icon>
+              <span>Ajouter une plantation</span>
+            </button>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="list" [class]="{'no-content': planter.plantations?.length == 0}">
+            @if (loading) {
+              <mat-spinner mode="indeterminate" diameter="30"></mat-spinner>
+            } @else if (planter.plantations!.length > 0) {
+              @for (plantation of planter.plantations; track plantation.id) {
+                <div class="list-item">
+                  <div class="infos col">
+                    <span>{{ plantation.name }}</span>
+                    <span class="muted">Superficie: {{ plantation.farmedArea }} ha </span>
+                  </div>
+                  <button routerLink="/plantations/details" [queryParams]="{ plantation: plantation.id }" class="btn btn--outline">
+                    <mat-icon matIconPrefix>open_in_new</mat-icon>
+                    <span>Ouvrir</span>
+                  </button>
+                </div>
+              }
+            } @else {
+              <span>Aucune plantation</span>
+            }
+          </div>
+        </div>
       </div>
-    </div>
+    }
   </div>
 
+  <!--Erreur de chargement des données du planteur-->
   <ng-template #noContent>
     <app-no-content-error
         title="Erreur de chargement"
@@ -107,6 +117,7 @@
     ></app-no-content-error>
   </ng-template>
 
+  <!--Modal de modification du planteur-->
   <ng-template #modificationDialog>
     <h2 mat-dialog-title>Modifier un planteur</h2>
 
@@ -216,8 +227,4 @@
       </button>
     </mat-dialog-actions>
   </ng-template>
-</div>
-<!-- Overlay de chargement -->
-<div class="overlay" *ngIf="loadingUpdate | async">
-  <mat-spinner diameter="60"></mat-spinner>
 </div>

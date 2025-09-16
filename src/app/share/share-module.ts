@@ -11,7 +11,9 @@ import {SupervisorRepository} from './repositories/supervisor-repository';
 import { ConfirmationDialog } from './components/confirmation-dialog/confirmation-dialog';
 import {DialogService} from './services/dialog-service';
 import { NoContentError } from './components/no-content-error/no-content-error';
-
+import { GoogleMapsModule } from '@angular/google-maps';
+import {KitService} from './services/kit-service';
+import {KitRepository} from './repositories/kit-repository';
 
 
 @NgModule({
@@ -28,11 +30,14 @@ import { NoContentError } from './components/no-content-error/no-content-error';
     RouterLink,
     RouterLinkActive,
     ReactiveFormsModule,
+    GoogleMapsModule
   ],
   providers: [
     SupervisorService,
     SupervisorRepository,
-    DialogService
+    DialogService,
+    KitService,
+    KitRepository
   ],
   exports: [
     CommonModule,
@@ -44,6 +49,7 @@ import { NoContentError } from './components/no-content-error/no-content-error';
     Logo,
     Header,
     NoContentError,
+    GoogleMapsModule,
   ]
 })
 export class ShareModule { }

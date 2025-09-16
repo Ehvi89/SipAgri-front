@@ -24,6 +24,7 @@ export class Register implements OnInit, OnDestroy {
   emailCtrl!: FormControl;
   passwordCtrl!: FormControl;
   confirmPasswordCtrl!: FormControl;
+  phoneCtrl!: FormControl;
   passwordStrength!: {score: number, label: string, color: string}
 
   constructor(
@@ -65,6 +66,12 @@ export class Register implements OnInit, OnDestroy {
       this.customEmailValidator
     ]);
 
+    this.phoneCtrl = this.formBuilder.control('', [
+      Validators.required,
+      Validators.minLength(10),
+      Validators.maxLength(10)
+    ])
+
     this.passwordCtrl = this.formBuilder.control('', [
       Validators.required,
       Validators.minLength(8),
@@ -81,6 +88,7 @@ export class Register implements OnInit, OnDestroy {
       firstname: this.firstnameCtrl,
       lastname: this.lastnameCtrl,
       email: this.emailCtrl,
+      phone: this.phoneCtrl,
       password: this.passwordCtrl,
       confirmPassword: this.confirmPasswordCtrl
     }, {
@@ -184,6 +192,11 @@ export class Register implements OnInit, OnDestroy {
         if (errors['email'] || errors['invalidEmail']) return 'Format d\'email invalide';
         break;
 
+      case 'phone':
+        if (errors['required']) return 'Le numéro de téléphone est requis';
+        if (errors['phone'] || errors['invalidPhone']) return 'Format de numéro invalide';
+        break;
+
       case 'password':
         if (errors['required']) return 'Le mot de passe est requis';
         if (errors['minlength']) return 'Minimum 8 caractères requis';
@@ -227,7 +240,7 @@ export class Register implements OnInit, OnDestroy {
       next: () => {
         this.notifService.showSuccess("Votre compte a été créer avec success");
         delay(1000);
-        this.router.navigateByUrl('/auth/login');
+        this.router.navigateByUrl('/auth/login').then();
       },
       error: (error) => {
         this.handleRegistrationError(error);
@@ -237,7 +250,7 @@ export class Register implements OnInit, OnDestroy {
   }
 
   goToLogin(): void {
-    this.router.navigateByUrl('/auth/login');
+    this.router.navigateByUrl('/auth/login').then();
   }
 
   // Méthodes utilitaires privées

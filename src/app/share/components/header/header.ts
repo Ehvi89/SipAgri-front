@@ -3,6 +3,7 @@ import {FormBuilder, FormControl} from '@angular/forms';
 import {tap} from 'rxjs/operators';
 import {Supervisor} from '../../../core/models/supervisor-model';
 import {AuthService} from '../../../features/auth/services/auth-service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -20,7 +21,8 @@ export class Header implements OnInit {
   searchCtrl!: FormControl;
 
   constructor(private formBuilder: FormBuilder,
-              private authService: AuthService,) {}
+              private authService: AuthService,
+              private router: Router) {}
 
   ngOnInit() {
     this.user = this.authService.getCurrentUser();
@@ -30,8 +32,8 @@ export class Header implements OnInit {
       tap((value: string) => this.textChange.emit(value)),
     ).subscribe()
 
-    const url = window.location.href;
-    this.navs = url.split("/").slice(3);
+    const url = this.router.url.split('?')[0];
+    this.navs = url.split("/").slice(1);
   }
 
   logout(): void {
