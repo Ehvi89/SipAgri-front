@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {combineLatest, map, Observable, BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, combineLatest, map, Observable} from 'rxjs';
 import {Planter} from '../../../../core/models/planter-model';
 import {PlanterService} from '../../services/planter-service';
 import {PaginationResponse} from '../../../../core/models/pagination-response-model';
@@ -40,19 +40,12 @@ export class PlanterList implements OnInit {
 
     this.planters$ = combineLatest([
       this.planterService.getAll(),
-      this.searchSubject.asObservable(),
       this.listFiltersCtrl.valueChanges.pipe(startWith(''))
     ]).pipe(
-      map(([planters, search, filter]) => {
+      map(([planters, filter]) => {
         return planters.filter(planter => {
-          const matchesSearch = !search ||
-            planter.firstname.toLowerCase().includes(search.toLowerCase()) ||
-            planter.lastname.toLowerCase().includes(search.toLowerCase());
-
-          const matchesFilter = !filter || filter === 'Toutes les régions' ||
+          return !filter || filter === 'Toutes les régions' ||
             planter.village.toLowerCase().includes(filter.toLowerCase());
-
-          return matchesSearch && matchesFilter;
         });
       })
     );
@@ -67,7 +60,8 @@ export class PlanterList implements OnInit {
   }
 
   onSearch(text: any): void {
-    this.searchSubject.next(text);
+    // console.log(text);
+    this.planterService.search(text, undefined, this.listSizeCtrl.value!);
   }
 
   getUniqueVillages(): string[] {

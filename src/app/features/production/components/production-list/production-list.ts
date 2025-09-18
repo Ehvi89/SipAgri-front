@@ -140,5 +140,4 @@ export class ProductionList implements OnInit {
       }
     });
   }
-
 }

@@ -67,7 +67,7 @@
                      [class.selected]="selectedPlantation?.id === plantation.id"
                      (click)="selectPlantation(plantation)">
                   <div class="column">
-                    <span class="village">{{ (plantation.name!) ?? (plantation.village$ | async)}}</span>
+                    <span class="village">{{ (plantation.name!)}}</span>
                   </div>
                   <div class="column">
                     <span class="surface">{{ plantation.farmedArea | number:'1.2-2' }} ha</span>
