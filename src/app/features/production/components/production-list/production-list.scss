@@ -31,7 +31,7 @@
 
       .header {
         @extend .grid;
-        grid-template-columns: .8fr 1.2fr 1fr 1fr;
+        grid-template-columns: .7fr 2fr .8fr .8fr .8fr 1fr;
         background-color: var(--color-secondary);
         @extend .padding--md;
         @extend .text--bold;
@@ -46,7 +46,7 @@
 
         .table-row {
           @extend .grid;
-          grid-template-columns: .8fr 1.2fr 1fr 1fr;
+          grid-template-columns: .7fr 2fr .8fr .8fr .8fr 1fr;
           padding: .5rem 1rem;
           border-bottom: 1px solid var(--color-border);
           cursor: pointer;
@@ -66,8 +66,10 @@
             padding: 0 .25rem;
 
             &.actions {
+              @extend .gap--md;
+
               button {
-                width: 100px;
+                width: auto;
                 @extend .btn;
                 @extend .btn--outline;
                 mat-icon {
