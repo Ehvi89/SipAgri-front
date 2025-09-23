@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AddPlantation } from './add-plantation';
 import {PlantationModule} from '../../plantation-module';
+import {ActivatedRoute} from '@angular/router';
+import {HttpTestingController} from '@angular/common/http/testing';
 
 describe('AddPlantation', () => {
   let component: AddPlantation;
@@ -10,7 +12,7 @@ describe('AddPlantation', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [AddPlantation],
-      imports: [PlantationModule],
+      imports: [PlantationModule, ActivatedRoute, HttpTestingController],
     })
     .compileComponents();
 

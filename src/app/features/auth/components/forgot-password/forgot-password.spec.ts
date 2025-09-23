@@ -4,6 +4,8 @@ import {of, throwError} from 'rxjs';
 import {ForgotPassword} from './forgot-password';
 import {AuthService} from '../../services/auth-service';
 import {NotificationService} from '../../../../core/services/notification-service';
+import {AuthModule} from '../../auth-module';
+import {HttpTestingController} from '@angular/common/http/testing';
 
 describe('ForgotPassword', () => {
   let component: ForgotPassword;
@@ -17,7 +19,7 @@ describe('ForgotPassword', () => {
 
         await TestBed.configureTestingModule({
             declarations: [ForgotPassword],
-            imports: [ReactiveFormsModule],
+            imports: [ReactiveFormsModule, AuthModule, HttpTestingController],
             providers: [
                 {provide: AuthService, useValue: authServiceSpy},
                 {provide: NotificationService, useValue: notificationServiceSpy}

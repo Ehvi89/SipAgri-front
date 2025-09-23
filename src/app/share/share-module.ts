@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {MaterialModule} from './material-module';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
-import {RouterLink, RouterLinkActive} from '@angular/router';
+import {RouterLink, RouterLinkActive, RouterModule} from '@angular/router';
 import {Logo} from './components/logo/logo';
 import {Header} from './components/header/header';
 import {ReactiveFormsModule} from '@angular/forms';
@@ -30,7 +30,8 @@ import {KitRepository} from './repositories/kit-repository';
     RouterLink,
     RouterLinkActive,
     ReactiveFormsModule,
-    GoogleMapsModule
+    GoogleMapsModule,
+    RouterModule
   ],
   providers: [
     SupervisorService,

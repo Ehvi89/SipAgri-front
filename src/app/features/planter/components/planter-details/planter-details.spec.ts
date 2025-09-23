@@ -11,6 +11,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {ActivatedRoute} from '@angular/router';
 import {PlanterService} from '../../services/planter-service';
 import {PlanterModule} from '../../planter-module';
+import {HttpTestingController} from '@angular/common/http/testing';
 
 describe('PlanterDetails', () => {
   let component: PlanterDetails;
@@ -19,7 +20,7 @@ describe('PlanterDetails', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [PlanterDetails],
-      imports: [PlanterModule]
+      imports: [PlanterModule, ActivatedRoute, HttpTestingController],
     })
     .compileComponents();
 
