@@ -8,6 +8,12 @@ inputs:
   build-config:
     description: 'Build configuration'
     required: true
+  api-url:
+    description: 'API URL'
+    required: true
+  google-maps-api-key:
+    description: 'Google Maps API Key'
+    required: true
 
 runs:
   using: "composite"
@@ -15,7 +21,10 @@ runs:
     - name: Generate environment file
       shell: bash
       run: npx cross-env ANGULAR_ENV=${{ inputs.angular-env }} node set-env.js
+      env:
+        API_URL: ${{ inputs.api-url }}
+        GOOGLE_MAPS_API_KEY: ${{ inputs.google-maps-api-key }}
 
     - name: Build Angular application
       shell: bash
-      run: ng build --configuration ${{ inputs.build-config }}
+      run: npm run build -- --configuration=${{ inputs.build-config }}
