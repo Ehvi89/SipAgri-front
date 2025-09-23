@@ -48,7 +48,7 @@ try {
 // Environment: ${env}
 
 export const environment = {
-  prod: ${env === 'production'},
+  production: ${env === 'production'},
   googleMapsApiKey: '${process.env.GOOGLE_MAPS_API_KEY}',
   apiUrl: '${process.env.API_URL}'
 };
