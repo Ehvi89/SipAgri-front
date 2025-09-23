@@ -4,6 +4,7 @@ import {Dashboard} from './dashboard';
 import {of} from 'rxjs';
 import {DashboardService} from '../../services/dashboard-service';
 import {ChangeDetectorRef, ElementRef} from '@angular/core';
+import {HttpTestingController} from '@angular/common/http/testing';
 
 describe('Dashbord', () => {
   let component: Dashboard;
@@ -25,6 +26,7 @@ describe('Dashbord', () => {
 
         await TestBed.configureTestingModule({
             declarations: [Dashboard],
+            imports: [HttpTestingController],
             providers: [
                 {provide: DashboardService, useValue: mockDashboardService},
                 {provide: ChangeDetectorRef, useValue: jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges'])},

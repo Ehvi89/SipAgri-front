@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ProductionList } from './production-list';
 import {ProductionModule} from '../../production-module';
+import {HttpTestingController} from '@angular/common/http/testing';
 
 describe('ProductionList', () => {
   let component: ProductionList;
@@ -10,7 +11,7 @@ describe('ProductionList', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ProductionList],
-      imports: [ProductionModule],
+      imports: [ProductionModule, HttpTestingController],
     })
     .compileComponents();
 
