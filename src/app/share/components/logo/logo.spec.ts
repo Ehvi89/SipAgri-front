@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { Logo } from './logo';
+import {ShareModule} from '../../share-module';
 
 describe('Logo', () => {
   let component: Logo;
@@ -8,7 +9,7 @@ describe('Logo', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Logo]
+      imports: [ShareModule]
     })
     .compileComponents();
 
