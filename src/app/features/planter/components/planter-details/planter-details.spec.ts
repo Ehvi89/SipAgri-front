@@ -10,6 +10,7 @@ import {of, Subscription} from 'rxjs';
 import {MatDialog} from '@angular/material/dialog';
 import {ActivatedRoute} from '@angular/router';
 import {PlanterService} from '../../services/planter-service';
+import {PlanterModule} from '../../planter-module';
 
 describe('PlanterDetails', () => {
   let component: PlanterDetails;
@@ -17,7 +18,8 @@ describe('PlanterDetails', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PlanterDetails]
+      declarations: [PlanterDetails],
+      imports: [PlanterModule]
     })
     .compileComponents();
 

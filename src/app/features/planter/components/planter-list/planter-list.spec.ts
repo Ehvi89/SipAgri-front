@@ -2,6 +2,7 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {PlanterList} from './planter-list';
 import {Planter} from '../../../../core/models/planter-model';
+import {PlanterModule} from '../../planter-module';
 
 describe('PlanterList', () => {
   let component: PlanterList;
@@ -9,7 +10,8 @@ describe('PlanterList', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [PlanterList]
+      declarations: [PlanterList],
+      imports: [PlanterModule]
     })
     .compileComponents();
 
