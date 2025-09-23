@@ -4,7 +4,7 @@ import {Dashboard} from './dashboard';
 import {of} from 'rxjs';
 import {DashboardService} from '../../services/dashboard-service';
 import {ChangeDetectorRef, ElementRef} from '@angular/core';
-import {HttpClientTestingModule, HttpClientTestingModule} from '@angular/common/http/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Dashbord', () => {
   let component: Dashboard;
