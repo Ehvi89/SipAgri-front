@@ -29,6 +29,7 @@ jobs:
         run: |
           echo "GOOGLE_MAPS_API_KEY=${{ secrets.DEV_GOOGLE_MAPS_API_KEY }}" > .env.development
           echo "API_URL=${{ secrets.DEV_API_URL }}" >> .env.development
+          cat .env.production
 
       - name: Setup and build
         uses: ./.github/actions/setup-environment
