@@ -1,0 +1,128 @@
+name: Build and Deploy Sipagri
+
+on:
+  push:
+    branches: [ "develop", "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # Job de build pour la branche develop
+  build-develop:
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test -- --watch=false --browsers=ChromeHeadless
+
+      - name: Build application
+        run: npm run build -- --configuration=production
+        env:
+          NODE_ENV: production
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sipagri-build-develop
+          path: dist/
+          retention-days: 7
+
+  # Job de build et déploiement pour la branche main
+  build-deploy-main:
+    if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test -- --watch=false --browsers=ChromeHeadless
+
+      - name: Build application
+        run: npm run build -- --configuration=production
+        env:
+          NODE_ENV: production
+
+      - name: Deploy to production server
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.PROD_SERVER_HOST }}
+          REMOTE_USER: ${{ secrets.PROD_SERVER_USER }}
+          REMOTE_PORT: ${{ secrets.PROD_SERVER_PORT }}
+          SOURCE: "dist/"
+          TARGET: ${{ secrets.PROD_DEPLOY_PATH }}
+          EXCLUDE: "/dist/, /node_modules/"
+
+      - name: Restart nginx (production)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.PROD_SERVER_HOST }}
+          username: ${{ secrets.PROD_SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.PROD_SERVER_PORT }}
+          script: |
+            sudo nginx -t
+            sudo systemctl reload nginx
+            echo "Déploiement terminé avec succès sur le serveur de production"
+
+  # Job supplémentaire pour les pull requests sur main
+  pr-checks:
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test -- --watch=false --browsers=ChromeHeadless
+
+      - name: Build application
+        run: npm run build -- --configuration=production
+        env:
+          NODE_ENV: production
+
+      - name: Upload build artifacts for PR
+        uses: actions/upload-artifact@v4
+        with:
+          name: sipagri-pr-build
+          path: dist/
+          retention-days: 3
