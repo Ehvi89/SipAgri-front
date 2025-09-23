@@ -28,6 +28,15 @@ jobs:
       - name: Run tests
         run: npm test -- --watch=false --browsers=ChromeHeadless
 
+      - name: Setup and build
+        uses: ./.github/actions/setup-environment
+        with:
+          angular-env: 'production'
+          build-config: 'production'
+          env:
+            API_URL: ${{ secrets.PROD_API_URL }}
+            GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+
       - name: Build application
         run: npm run build -- --configuration=production
         env:

@@ -1,0 +1,21 @@
+name: 'Setup Angular Environment'
+description: 'Generate environment file and build Angular app'
+
+inputs:
+  angular-env:
+    description: 'Angular environment'
+    required: true
+  build-config:
+    description: 'Build configuration'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Generate environment file
+      shell: bash
+      run: npx cross-env ANGULAR_ENV=${{ inputs.angular-env }} node set-env.js
+
+    - name: Build Angular application
+      shell: bash
+      run: ng build --configuration ${{ inputs.build-config }}

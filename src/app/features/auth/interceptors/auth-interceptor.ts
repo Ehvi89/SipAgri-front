@@ -5,7 +5,7 @@ import { catchError, switchMap } from 'rxjs/operators';
 import { AuthService } from '../services/auth-service';
 import { Router } from '@angular/router';
 
-@Injectable()
+@Injectable({ providedIn: "root" })
 export class AuthInterceptor implements HttpInterceptor {
   private isRefreshing = false;
 
