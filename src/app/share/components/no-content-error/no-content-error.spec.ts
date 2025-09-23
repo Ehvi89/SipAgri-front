@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NoContentError } from './no-content-error';
+import {ShareModule} from '../../share-module';
 
 describe('NoContentError', () => {
   let component: NoContentError;
@@ -8,7 +9,8 @@ describe('NoContentError', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [NoContentError]
+      declarations: [NoContentError],
+      imports: [ShareModule]
     })
     .compileComponents();
 

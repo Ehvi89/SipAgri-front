@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PlantationList } from './plantation-list';
 import {PlantationModule} from '../../plantation-module';
-import {HttpTestingController} from '@angular/common/http/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('PlantationList', () => {
   let component: PlantationList;
@@ -11,7 +11,7 @@ describe('PlantationList', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [PlantationList],
-      imports: [PlantationModule, HttpTestingController]
+      imports: [PlantationModule, HttpClientTestingModule]
     })
     .compileComponents();
 

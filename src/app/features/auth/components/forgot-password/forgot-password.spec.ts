@@ -5,7 +5,7 @@ import {ForgotPassword} from './forgot-password';
 import {AuthService} from '../../services/auth-service';
 import {NotificationService} from '../../../../core/services/notification-service';
 import {AuthModule} from '../../auth-module';
-import {HttpTestingController} from '@angular/common/http/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('ForgotPassword', () => {
   let component: ForgotPassword;
@@ -19,7 +19,7 @@ describe('ForgotPassword', () => {
 
         await TestBed.configureTestingModule({
             declarations: [ForgotPassword],
-            imports: [ReactiveFormsModule, AuthModule, HttpTestingController],
+            imports: [ReactiveFormsModule, AuthModule, HttpClientTestingModule],
             providers: [
                 {provide: AuthService, useValue: authServiceSpy},
                 {provide: NotificationService, useValue: notificationServiceSpy}

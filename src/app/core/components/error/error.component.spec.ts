@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ErrorComponent } from './error.component';
+import {ShareModule} from '../../../share/share-module';
 
 describe('Error', () => {
   let component: ErrorComponent;
@@ -8,7 +9,7 @@ describe('Error', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ErrorComponent]
+      imports: [ErrorComponent, ShareModule]
     })
     .compileComponents();
 
