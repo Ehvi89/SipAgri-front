@@ -243,7 +243,7 @@ export class ForgotPassword implements OnInit, OnDestroy {
     this.notificationService.showError(errorMessage);
   }
 
-  private focusInvalidField(): void {
+  focusInvalidField(): void {
     const fieldName = this.selectedMethod === 'EMAIL' ? 'email' : 'tel';
     const element = document.querySelector(`input[name="${fieldName}"]`) as HTMLElement;
     element?.focus();

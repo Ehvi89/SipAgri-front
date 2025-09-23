@@ -86,7 +86,7 @@ export class PlanterDetails implements OnInit {
     }
   }
 
-  private initForm(): void {
+  initForm(): void {
     this.planterForm = this.formBuilder.group({
       firstname: [this.planter?.firstname, [Validators.required, Validators.minLength(2)]],
       lastname: [this.planter?.lastname, [Validators.required, Validators.minLength(2)]],

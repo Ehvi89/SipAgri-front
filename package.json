@@ -31,6 +31,7 @@
     "@angular/build": "^20.0.2",
     "@angular/cli": "^20.0.2",
     "@angular/compiler-cli": "^20.0.0",
+    "@angular/platform-browser-dynamic": "^20.2.1",
     "@types/jasmine": "~5.1.0",
     "cross-env": "^10.0.0",
     "dotenv": "^17.2.2",
@@ -40,6 +41,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.8.2"
+    "typescript": "~5.8.2",
+    "zone.js": "^0.15.1"
   }
 }

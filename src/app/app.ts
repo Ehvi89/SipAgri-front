@@ -2,10 +2,11 @@ import {Component, OnInit} from '@angular/core';
 import {Router, RouterOutlet} from '@angular/router';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {CoreModule} from './core/core-module';
+import {ShareModule} from './share/share-module';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MatProgressSpinnerModule, CoreModule],
+  imports: [RouterOutlet, MatProgressSpinnerModule, CoreModule, ShareModule],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
