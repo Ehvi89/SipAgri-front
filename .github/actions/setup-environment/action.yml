@@ -34,7 +34,8 @@ runs:
         API_URL: ${{ inputs.api-url }}
         GOOGLE_MAPS_API_KEY: ${{ inputs.google-maps-api-key }}
         ANGULAR_ENV: ${{ inputs.build-config }}
-      run: node set-env.js
+      run: |
+          node set-env.js
 
 
     # Étape pour prod → script PowerShell
