@@ -1,0 +1,51 @@
+<div class="header-container">
+  <!-- Champ de recherche ou breadcrumb-->
+  @if (breadcrumb) {
+    <div class="breadcrumb">
+      <ng-container *ngFor="let nav of navs; let i = index">
+        <div class="breadcrumb">
+          <!-- Si ce n'est pas le dernier élément -->
+          <ng-container *ngIf="i < navs.length - 1; else last">
+            <a [routerLink]="getRouterLink(i)">{{ nav | titlecase }}</a>
+            <mat-icon>chevron_right</mat-icon>
+          </ng-container>
+
+          <!-- Dernier élément (pas de lien, pas de chevron) -->
+          <ng-template #last>
+            <span style="color: var(--color-accent  )">{{ nav | titlecase }}</span>
+          </ng-template>
+        </div>
+      </ng-container>
+    </div>
+
+  } @else {
+    <mat-form-field appearance="outline" hideRequiredMarker>
+      <mat-icon matPrefix>search</mat-icon>
+      <input
+        matInput
+        name="search"
+        [placeholder]="placeholder"
+        [formControl]="searchCtrl"
+      >
+    </mat-form-field>
+  }
+
+  <span class="spacer"></span>
+
+  <!-- Utilisateur connecté -->
+  <div class="user" *ngIf="user" [matMenuTriggerFor]="userMenu">
+    <mat-icon class="avatar-icon" aria-hidden="true">person</mat-icon>
+    <!-- Si tu veux l’avatar image à la place -->
+    <!-- <img src="assets/images/avatar.png" [alt]="user.lastname" class="avatar-img"> -->
+    <span>{{ user.firstname }} {{ user.lastname }}</span>
+  </div>
+
+  <!-- Menu utilisateur -->
+  <mat-menu #userMenu="matMenu" xPosition="before">
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Déconnexion</span>
+    </button>
+  </mat-menu>
+</div>
+<mat-divider></mat-divider>

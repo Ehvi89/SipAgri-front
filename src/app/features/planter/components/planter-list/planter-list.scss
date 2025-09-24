@@ -1,0 +1,113 @@
+@use '../../../../../styles';
+@use 'sass:color';
+@use '../../../../../styles/variables' as *;
+
+.planterList-container {
+  @extend .container;
+  @extend .container--lg;
+  @extend .container--without-top;
+
+  .content {
+    width: 100%;
+
+    .header {
+      @extend .flex;
+      @extend .flex--between;
+      @extend .flex--center;
+      @extend .mb-2;
+
+      .title {
+        @extend .flex;
+        @extend .flex--column
+      }
+
+      button {
+        @extend .btn;
+        @extend .btn--primary;
+      }
+    }
+
+    .row {
+      @extend .flex;
+      width: 100%;
+    }
+
+    .col {
+      @extend .flex;
+      @extend .flex--column;
+    }
+
+    .list {
+      .list-header {
+        @extend .flex;
+        @extend .flex--between;
+        @extend .flex--center;
+        margin-bottom: .5rem;
+      }
+
+      .list-content {
+        @extend .card;
+        @extend .flex;
+        @extend .flex--column;
+        @extend .gap--md;
+
+        .planter {
+          @extend .flex--between;
+          @extend .padding--sm-50;
+          @extend .flex;
+          align-items: center;
+          border-bottom: var(--color-border) 1px solid;
+
+          .infos {
+            @extend .flex;
+            @extend .flex--column;
+
+            .personal {
+              @extend .text--bold;
+              @extend .text--lg;
+            }
+          }
+
+          &:hover {
+            border-bottom: var(--color-border) 3px solid;
+            transform: translateY(-2px);
+            //@extend .radius-sm;
+
+            .infos > .personal {
+              color: var(--color-accent);
+            }
+          }
+        }
+
+        .no-results{
+          height: 150px;
+          align-items: center;
+          @extend .flex;
+          @extend .flex--center;
+          @extend .flex--column;
+          @extend .padding--md;
+          @extend .gap--md;
+          @extend .text--medium;
+          @extend .text--lg;
+
+          i {
+            @extend .text--xl;
+          }
+        }
+
+        &.loading{
+          height: 150px;
+          align-items: center;
+          @extend .flex;
+          @extend .flex--center;
+          @extend .flex--column;
+        }
+      }
+
+      .list-footer {
+        @extend .flex--center;
+        @extend .gap--sm;
+      }
+    }
+  }
+}

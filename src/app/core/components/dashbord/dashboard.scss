@@ -1,0 +1,304 @@
+@use "../../../../styles";
+@use "sass:color";
+@use "../../../../styles/variables" as *;
+
+.dashboard-container {
+  @extend .container;
+  @extend .container--lg;
+  @extend .container--without-top;
+}
+
+// Cards de résumé
+.content { width: 100% }
+.overview-card {
+  @extend .flex;
+  @extend .gap--md;
+
+  .stat {
+    @extend .flex;
+    @extend .flex--column;
+    @extend .gap--sm;
+    @extend .card;
+
+    flex: 1;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    .stat-title {
+      @extend .text--accent;
+      @extend .text--base;
+      @extend .text--medium;
+    }
+
+    .stat-value {
+      @extend .text--bold;
+      @extend .text--xxl;
+      @extend .text--primary
+    }
+
+    .hint {
+      @extend .text--sm;
+      @extend .text--muted;
+      @extend .text--medium;
+    }
+  }
+}
+
+// Boutons d'actions
+.actions-buttons {
+  @extend .flex;
+  @extend .gap--md;
+  margin-bottom: 2rem;
+
+  button {
+    @extend .btn;
+    @extend .btn--outline;
+    background-color: white;
+    flex: 1;
+
+    .button-icon {
+      font-size: 1.25rem;
+    }
+  }
+}
+
+// Section graphiques
+.graphics {
+  .grid {
+    @extend .grid--two;
+    @extend .gap--xl;
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+}
+
+// Cards des graphiques
+.card {
+  @extend .card;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .chart {
+    padding: 1.5rem;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+      max-height: 300px;
+    }
+  }
+}
+
+// État de chargement des graphiques
+.chart-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+
+  mat-icon {
+    font-size: 2rem;
+    width: 2rem;
+    height: 2rem;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// Sélecteur de filtre
+.filter-select {
+  width: 150px;
+
+  ::ng-deep {
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none !important;
+    }
+
+    .mat-mdc-form-field-infix {
+      min-height: 36px;
+      padding: 0.5rem 0;
+    }
+
+    .mdc-text-field {
+      height: 40px;
+    }
+
+    .mat-mdc-select-value {
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// Statistiques supplémentaires
+.stats-row {
+  @extend .flex;
+  @extend .gap--md;
+
+  // Mini cards pour statistiques supplémentaires
+  .mini-card {
+    @extend .card;
+    @extend .gap--md;
+    @extend .flex;
+    flex: 1;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    align-items: center;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+
+    .mini-card-icon {
+      background-color: color.adjust($color-primary, $lightness: 55%);
+      border-radius: 8px;
+      padding: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      mat-icon {
+        font-size: 1.5rem;
+        color: var(--color-primary);
+      }
+    }
+
+    .mini-card-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      .mini-card-title {
+        @extend .text--base;
+        @extend .text--medium;
+        @extend .text--primary;
+      }
+
+      .mini-card-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #111827;
+      }
+    }
+  }
+}
+
+
+
+// Responsive design
+@media (max-width: 768px) {
+  .dashboard-container .content {
+    padding: 1rem;
+  }
+
+  .overview-card {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .actions-buttons {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+
+    button {
+      justify-content: center;
+      padding: 0.875rem;
+    }
+  }
+
+  .graphics .grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .additional-stats .stats-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+// Animations pour l'apparition des cards
+.card, .stat, .mini-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Style pour les graphiques Chart.js
+.chart {
+  canvas {
+    border-radius: 8px;
+  }
+}
+
+// États spécifiques aux graphiques
+.chart-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: #ef4444;
+  font-size: 0.875rem;
+  text-align: center;
+
+  mat-icon {
+    font-size: 2rem;
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+.chart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+  text-align: center;
+
+  mat-icon {
+    font-size: 2rem;
+    width: 2rem;
+    height: 2rem;
+  }
+}

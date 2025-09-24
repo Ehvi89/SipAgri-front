@@ -1,0 +1,78 @@
+@use "../../../../../styles";
+@use "../../../../../styles/variables" as *;
+@use "sass:color";
+
+.planter-details-container {
+  @extend .container;
+  @extend .container--lg;
+  @extend .container--without-top;
+
+  .content {
+    width: 100%;
+
+    .actions {
+      @extend .flex;
+      @extend .gap--sm;
+
+      button {
+        @extend .btn;
+        @extend .btn--outline;
+
+        &.delete {
+          color: var(--color-error);
+          &:hover {
+            background-color: color.adjust($color-error, $lightness: 45%)
+          }
+        }
+      }
+    }
+
+    .title {
+      @extend .text--lg;
+      @extend .text--medium;
+    }
+
+    .section-title {
+      @extend .text--base;
+      @extend .text--bold;
+      @extend .mb-2;
+    }
+
+    .list-item {
+      @extend .row;
+
+      .muted {
+        color: $text-muted;
+        @extend .text--sm;
+        @extend .text--normal;
+      }
+
+      &:hover {
+        background-color: color.adjust($color-border, $lightness: 15%);
+        transition: ease-in-out 200ms;
+        @extend .padding--sm-50;
+        @extend .radius-sm;
+
+        .infos {
+          @extend .text--base;
+          @extend .text--bold;
+        }
+      }
+    }
+  }
+}
+
+mat-dialog-content {
+  .form {
+    .row {
+      @extend .flex;
+      @extend .gap--md;
+    }
+  }
+}
+
+mat-dialog-actions > button {
+  @extend .btn;
+  @extend .btn--outline;
+  @extend .gap--md;
+}

@@ -1,0 +1,93 @@
+<div class="planterList-container">
+  <app-header (textChange)="onSearch($event)" placeholder="Rechercher un planteur..."></app-header>
+
+  <div class="content">
+    <div class="row flex--between mb-2 header">
+      <div class="title">
+        <span class="text--lg text--bold">Planteurs</span>
+        <span>Gérez vos planteurs, ajoutez-en de nouveaux et consultez leurs informations.</span>
+      </div>
+
+      <button routerLink="new">
+        <mat-icon>person_add</mat-icon>
+        <span>Ajouter un planteur</span>
+      </button>
+    </div>
+    <div class="row">
+
+    </div>
+    <div class="list">
+      <div class="col">
+        <div class="list-header">
+          <mat-form-field class="flex--1" appearance="outline">
+            <mat-select [formControl]="listFiltersCtrl">
+              <mat-option *ngFor="let option of getUniqueVillages()" [value]="option">{{ option }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div class="flex--1"></div>
+
+          <div class="list-size flex--1">
+            <mat-form-field appearance="outline">
+              <mat-label>Afficher</mat-label>
+              <mat-select matInput [formControl]="listSizeCtrl">
+                <mat-option [value]="10">10</mat-option>
+                <mat-option [value]="25">25</mat-option>
+                <mat-option [value]="50">50</mat-option>
+                <mat-option [value]="100">100</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <mat-progress-bar [mode]="'indeterminate'" *ngIf="loading$ | async"></mat-progress-bar>
+        <div class="list-content" [ngClass]="{'loading': loading$ | async}">
+          @if (loading$ | async) { <mat-spinner diameter="50"></mat-spinner> }
+          @else if (searchSubject.getValue()) {
+            @for (planter of (planters$ | async); track planter.id) {
+              <div (click)="viewProfile(planter)" class="planter flex--between">
+                <div class="infos">
+                  <span class="personal">{{ planter.firstname }} {{ planter.lastname }}</span>
+                  <span class="plantation">{{ planter.village }} • {{ planter.plantations?.length || 0 }} plantation(s)</span>
+                </div>
+                <mat-icon>chevron_right</mat-icon>
+              </div>
+            }
+            @if ((planters$ | async)?.length === 0 && !(loading$ | async)) {
+              <div class="no-results">
+                <i class='fas fa-users-slash'></i>
+                Aucun planteur trouvé
+              </div>
+            }
+          } @else {
+            @for (planter of (plantersPaged$ | async)?.data; track planter.id) {
+              <div (click)="viewProfile(planter)" class="planter flex--between">
+                <div class="infos">
+                  <span class="personal">{{ planter.firstname }} {{ planter.lastname }}</span>
+                  <span class="plantation">{{ planter.village }} • {{ planter.plantations?.length || 0 }} plantation(s)</span>
+                </div>
+                <mat-icon>chevron_right</mat-icon>
+              </div>
+            }
+            @if ((plantersPaged$ | async)?.data?.length === 0 && !(loading$ | async)) {
+              <div class="no-results">
+                <i class='fas fa-users-slash'></i>
+                Aucun planteur trouvé
+              </div>
+            }
+          }
+        </div>
+
+        <div class="list-footer row" *ngIf="(plantersPaged$ | async)?.totalPages! > 1">
+          <button (click)="loadPreviousPage()" [disabled]="(plantersPaged$ | async)?.currentPage === 0">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <span>Page: {{ ((plantersPaged$ | async)?.currentPage || 0) + 1 }} / {{ (plantersPaged$ | async)?.totalPages || 1 }}</span>
+          <button (click)="loadNextPage()" [disabled]="((plantersPaged$ | async)?.currentPage || 0) >= ((plantersPaged$ | async)?.totalPages || 1) - 1">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

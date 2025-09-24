@@ -1,0 +1,30 @@
+@use "../../../../styles";
+
+.noContent {
+  @extend .container;
+  @extend .container--sm;
+  @extend .flex;
+  @extend .flex--column;
+  @extend .flex--center;
+  @extend .gap--md;
+  height: 100%;
+  margin: auto;
+  align-items: center;
+
+  mat-icon {
+    font-size: 4rem;
+    height: 4rem;
+    width: 4rem;
+    color: var(--color-warn);
+  }
+  .description {
+    @extend .text--center;
+    @extend .mb-2;
+
+    h2 { margin: 1rem 0}
+  }
+  button {
+    @extend .btn;
+    @extend .btn--secondary;
+  }
+}

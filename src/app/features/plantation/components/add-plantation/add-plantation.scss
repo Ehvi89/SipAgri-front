@@ -1,0 +1,34 @@
+@use "../../../../../styles";
+
+.add-plantation-container {
+  @extend .container;
+  @extend .container--lg;
+  @extend .container--without-top;
+
+  .content {
+    .page-header {
+      @extend .text--medium;
+      @extend .text--lg;
+      @extend .mb-2;
+    }
+    .section-title {
+      @extend .text--bold;
+      @extend .text--base;
+      @extend .mb-2;
+    }
+
+    .field {
+      @extend .mb-1;
+    }
+
+    .map-container {
+      @extend .radius-md;
+      overflow: hidden;
+    }
+
+    .form-actions {
+      @extend .flex;
+      justify-content: flex-end;
+    }
+  }
+}
