@@ -31,8 +31,8 @@ runs:
       if: inputs.build-config == 'development'
       shell: bash
       env:
-        API_URL: ${{ secrets.PROD_API_URL }}
-        GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+        API_URL: ${{ inputs.api-url }}
+        GOOGLE_MAPS_API_KEY: ${{ inputs.google-maps-api-key }}
         ANGULAR_ENV: ${{ inputs.build-config }}
       run: |
           node set-env.js
