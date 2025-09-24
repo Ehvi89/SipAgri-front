@@ -21,9 +21,9 @@ runs:
     - name: Create .env file
       shell: powershell
       run: |
-        echo "GOOGLE_MAPS_API_KEY=${{ inputs.google-maps-api-key }}" > .env.${{ inputs.build-config }}
-        echo "API_URL=${{ inputs.api-url }}" >> .env.${{ inputs.build-config }}
-        cat .env.${{ inputs.build-config }}
+        "GOOGLE_MAPS_API_KEY=${{ inputs.google-maps-api-key }}" | Out-File -FilePath ".env.${{ inputs.build-config }}" -Encoding UTF8
+        "API_URL=${{ inputs.api-url }}" | Out-File -FilePath ".env.${{ inputs.build-config }}" -Encoding UTF8 -Append
+        Get-Content ".env.${{ inputs.build-config }}"
 
     - name: Generate environment file from .env file
       shell: powershell
@@ -31,3 +31,4 @@ runs:
         API_URL: ${{ inputs.api-url }}
         GOOGLE_MAPS_API_KEY: ${{ inputs.google-maps-api-key }}
       run: npx cross-env ANGULAR_ENV=${{ inputs.angular-env }} node set-env.js
+
