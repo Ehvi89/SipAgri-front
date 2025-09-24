@@ -19,14 +19,14 @@ runs:
   using: "composite"
   steps:
     - name: Create .env file
-      shell: bash
+      shell: powershell
       run: |
         echo "GOOGLE_MAPS_API_KEY=${{ inputs.google-maps-api-key }}" > .env.${{ inputs.build-config }}
         echo "API_URL=${{ inputs.api-url }}" >> .env.${{ inputs.build-config }}
         cat .env.${{ inputs.build-config }}
 
     - name: Generate environment file from .env file
-      shell: bash
+      shell: powershell
       env:
         API_URL: ${{ inputs.api-url }}
         GOOGLE_MAPS_API_KEY: ${{ inputs.google-maps-api-key }}
