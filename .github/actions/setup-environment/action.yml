@@ -36,6 +36,7 @@ runs:
         ANGULAR_ENV: ${{ inputs.build-config }}
       run: |
           node set-env.js
+          ng build --configuration ${{ inputs.build-config }}
 
 
     # Étape pour prod → script PowerShell
