@@ -27,7 +27,7 @@ runs:
 
     - name: Generate environment file from .env file
       shell: bash
-      run: npx cross-env ANGULAR_ENV=${{ inputs.angular-env }} node set-env.js
       env:
         API_URL: ${{ inputs.api-url }}
         GOOGLE_MAPS_API_KEY: ${{ inputs.google-maps-api-key }}
+      run: npx cross-env ANGULAR_ENV=${{ inputs.angular-env }} node set-env.js
