@@ -28,7 +28,7 @@ export class Sidebar implements OnInit {
       { label: "Planteurs", link: "/planters", icon: "fa-people-group", fa: true },
       { label: "Plantations", link: "/plantations", icon: "fa-tractor", fa: true },
       { label: "Productions", link: "/productions", icon: "fa-wheat-awn", fa: true },
-      { label: "Paramètres", link: "/settings", icon: "settings", fa: false }
+      { label: "Paramètres", link: "/settings/general", icon: "settings", fa: false }
     ]
   }
 }
