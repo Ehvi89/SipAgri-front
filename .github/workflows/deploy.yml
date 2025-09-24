@@ -92,7 +92,7 @@ jobs:
             New-Item -ItemType Directory -Path $TODAY_ARCHIVE -Force -ErrorAction SilentlyContinue
 
             Write-Output "Archivage des anciens fichiers..."
-            $OLD_FILES = Get-ChildItem -Path $DEPLOY_DIR -ErrorAction SilentlyContinue
+            $OLD_FILES = Get-ChildItem -Path $DEPLOY_DIR -ErrorAction SilentlyContinue | Where-Object { $_.FullName -ne $ARCHIVE_DIR }
             foreach ($FILE in $OLD_FILES) {
               Move-Item -Path $FILE.FullName -Destination "$TODAY_ARCHIVE\$($FILE.Name)" -Force
             }
