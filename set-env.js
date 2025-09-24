@@ -23,7 +23,7 @@ try {
   };
 
   const missingVars = Object.entries(requiredVars)
-    .filter(([key, value]) => !value)
+    .filter(([value]) => !value)
     .map(([key]) => key);
 
   if (missingVars.length > 0) {
@@ -46,7 +46,6 @@ try {
   const envConfigFile = `// ⚠️ Ce fichier est généré automatiquement - NE PAS MODIFIER MANUELLEMENT
 // Généré le: ${new Date().toISOString()}
 // Environment: ${env}
-
 export const environment = {
   prod: ${env === 'production'},
   googleMapsApiKey: '${process.env.GOOGLE_MAPS_API_KEY}',
