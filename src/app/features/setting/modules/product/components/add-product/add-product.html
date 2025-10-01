@@ -1,1 +1,123 @@
-<p>add-product works!</p>
+<div class="product-add-container">
+  <!-- Breadcrumb / Navigation -->
+  <div class="breadcrumb">
+    <button mat-button (click)="cancel()">
+      <mat-icon>arrow_back</mat-icon>
+      Retour à la liste
+    </button>
+  </div>
+
+  <!-- En-tête -->
+  <div class="header">
+    <div class="header-content">
+      <h1>{{ editMode ? 'Modifier le produit' : 'Ajouter un produit' }}</h1>
+      <p class="subtitle">
+        {{ editMode ? 'Modifiez les informations du produit' : 'Remplissez les informations du nouveau produit' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Formulaire -->
+  <div class="card">
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+      <div class="form-content">
+        <!-- Nom du produit -->
+        <div class="field">
+          <mat-form-field appearance="outline">
+            <mat-label>Nom du produit</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="name"
+              placeholder="Ex: Ordinateur portable Dell XPS 15">
+            <mat-error *ngIf="nameCtrl.invalid && nameCtrl.touched">
+              {{ nameError }}
+            </mat-error>
+            <mat-hint>Nom commercial du produit (3-100 caractères)</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <!-- Description -->
+        <div class="field">
+          <mat-form-field appearance="outline">
+            <mat-label>Description</mat-label>
+            <textarea
+              matInput
+              formControlName="description"
+              rows="5"
+              placeholder="Décrivez les caractéristiques principales du produit..."></textarea>
+            <mat-error *ngIf="descriptionCtrl.invalid && descriptionCtrl.touched">
+              {{ descriptionError }}
+            </mat-error>
+            <mat-hint align="end">{{ descriptionCharCount }}</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <!-- Prix -->
+        <div class="field price-field">
+          <mat-form-field appearance="outline">
+            <mat-label>Prix</mat-label>
+            <input
+              matInput
+              type="number"
+              formControlName="price"
+              step="0.01"
+              min="0"
+              placeholder="0.00">
+            <mat-error *ngIf="priceCtrl.invalid && priceCtrl.touched">
+              {{ priceError }}
+            </mat-error>
+            <mat-hint>Prix TTC en Fcfa</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Boutons d'action -->
+      <div class="form-actions">
+        <button
+          type="submit"
+          class="btn--primary"
+          [disabled]="(loading$ | async) || productForm.invalid">
+          @if (loading$ | async) {
+            <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+          } @else {
+            <mat-icon>{{ editMode ? 'save' : 'add_circle' }}</mat-icon>
+          }
+          <span>{{ editMode ? 'Mettre à jour' : 'Créer le produit' }}</span>
+        </button>
+
+        <button
+          class="btn--secondary"
+          type="button"
+          (click)="resetForm()"
+          [disabled]="loading$ | async">
+          <mat-icon>refresh</mat-icon>
+          <span>Réinitialiser</span>
+        </button>
+
+        <button
+          mat-button
+          type="button"
+          class="btn-cancel"
+          (click)="cancel()"
+          [disabled]="loading$ | async">
+          <span>Annuler</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Aide et informations -->
+  <div class="help-section">
+    <mat-icon>info</mat-icon>
+    <div class="help-content">
+      <h4>Conseils pour ajouter un produit</h4>
+      <ul>
+        <li>Choisissez un nom clair et descriptif</li>
+        <li>Détaillez les caractéristiques principales dans la description</li>
+        <li>Indiquez le prix TTC (toutes taxes comprises)</li>
+        <li>Tous les champs sont obligatoires</li>
+      </ul>
+    </div>
+  </div>
+</div>

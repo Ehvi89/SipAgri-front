@@ -10,7 +10,7 @@ import {MaritalStatus} from '../../../../core/enums/marital-status-enum';
 import {Gender} from '../../../../core/enums/gender-enum';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Supervisor} from '../../../../core/models/supervisor-model';
-import {SupervisorService} from '../../../../share/services/supervisor-service';
+import {SupervisorService} from '../../../setting/modules/supervisor/services/supervisor-service';
 import {MatDialog} from '@angular/material/dialog';
 import {SAError} from '../../../../core/services/error-service';
 
@@ -101,7 +101,7 @@ export class PlanterDetails implements OnInit {
 
   modifyPlanter(): void {
     this.initForm();
-    this.supervisors$ = this.supervisorService.getAllSupervisors();
+    this.supervisors$ = this.supervisorService.getAll();
     this.dialog.open(this.modificationDialog).afterClosed().subscribe((result: boolean) => {
       if (result) {
         const planter = {

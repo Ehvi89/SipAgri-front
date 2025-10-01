@@ -271,7 +271,7 @@ app-header{
 
 // Columns & row
 .col { width: 100%; @extend .flex; @extend .flex--column; gap: .5rem}
-.row { width: 100%; @extend .flex; @extend .flex--center;}
+.row { width: 100%; @extend .flex;}
 .list { @extend .col; gap:.25rem}
 .form-grid {
   @extend .grid;

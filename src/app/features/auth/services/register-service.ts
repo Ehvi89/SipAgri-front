@@ -3,12 +3,14 @@ import { BehaviorSubject, Observable, of, throwError, finalize } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
 import { RegisterRepository } from '../repositories/auth-repository';
 import {ErrorService} from '../../../core/services/error-service';
+import {AbstractControl, ValidationErrors} from '@angular/forms';
 
 export interface RegisterCredential {
   firstname: string;
   lastname: string;
   email: string;
   password: string;
+  phone: string;
 }
 
 export interface RegisterResponse {
@@ -16,6 +18,7 @@ export interface RegisterResponse {
   firstname: string;
   lastname: string;
   email: string;
+  phone: string;
   createdAt: string;
   isVerified: boolean;
 }
@@ -209,6 +212,37 @@ export class RegisterService {
     return { score, label: 'Excellent', color: 'green' };
   }
 
+
+
+  passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+
+    const password = control.value;
+    const errors: ValidationErrors = {};
+
+    // Au moins une minuscule
+    if (!/[a-z]/.test(password)) {
+      errors['noLowercase'] = true;
+    }
+
+    // Au moins une majuscule
+    if (!/[A-Z]/.test(password)) {
+      errors['noUppercase'] = true;
+    }
+
+    // Au moins un chiffre
+    if (!/[0-9]/.test(password)) {
+      errors['noNumber'] = true;
+    }
+
+    // Au moins un caractère spécial
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      errors['noSpecialChar'] = true;
+    }
+
+    return Object.keys(errors).length > 0 ? errors : null;
+  }
+
   // Méthodes privées
   private setLoading(loading: boolean): void {
     this._loading.next(loading);
@@ -247,7 +281,8 @@ export class RegisterService {
       firstname: this.normalizeString(credentials.firstname),
       lastname: this.normalizeString(credentials.lastname),
       email: credentials.email.trim().toLowerCase(),
-      password: credentials.password
+      password: credentials.password,
+      phone: credentials.phone
     };
   }
 
@@ -264,6 +299,7 @@ export class RegisterService {
       firstname: response.firstname,
       lastname: response.lastname,
       email: response.email,
+      phone: response.phone,
       createdAt: response.createdAt || new Date().toISOString(),
       isVerified: response.isVerified || false
     };

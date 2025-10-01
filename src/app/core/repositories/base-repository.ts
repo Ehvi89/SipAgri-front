@@ -100,6 +100,16 @@ export abstract class BaseRepository<T> {
   }
 
   /**
+   * Partially updates an entity on the server.
+   *
+   * @param {Partial<T>} payload - An object with the properties to update. Only the specified fields will be updated.
+   * @return {Observable<T>} An observable that emits the updated entity after the partial update is applied.
+   */
+  partialUpdate(payload: Partial<T>): Observable<T> {
+    return this.http.patch<T>(`${this.apiUrl}/${this.endpoint}`, payload);
+  }
+
+  /**
    * Deletes a resource identified by the given ID from the specified API endpoint.
    *
    * @param {number | string} id - The unique identifier of the resource to be deleted.

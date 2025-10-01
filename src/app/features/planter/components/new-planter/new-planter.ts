@@ -5,7 +5,7 @@ import {PlanterService} from '../../services/planter-service';
 import {NotificationService} from "../../../../core/services/notification-service";
 import {MaritalStatus} from "../../../../core/enums/marital-status-enum";
 import {Supervisor} from "../../../../core/models/supervisor-model";
-import {SupervisorService} from '../../../../share/services/supervisor-service';
+import {SupervisorService} from '../../../setting/modules/supervisor/services/supervisor-service';
 import { Gender } from "../../../../core/enums/gender-enum";
 
 @Component({
@@ -35,7 +35,7 @@ export class NewPlanter implements OnInit {
   ngOnInit(): void {
     this.loading$ = this.planterService.loading$;
     this.initForm();
-    this.supervisors$ = this.supervisorService.getAllSupervisors();
+    this.supervisors$ = this.supervisorService.getAll();
   }
 
   private initForm(): void {

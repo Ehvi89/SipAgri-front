@@ -1,1 +1,150 @@
-<p>account works!</p>
+<div class="account-container">
+  <!-- Section Informations personnelles -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Informations personnelles</h2>
+    </div>
+
+    <form [formGroup]="personalInfoForm" class="form-content">
+      <div class="grid--two">
+        <mat-form-field appearance="outline">
+          <mat-label>Prénom</mat-label>
+          <input matInput type="text" formControlName="firstname">
+          <mat-error *ngIf="firstnameCtrl.invalid && firstnameCtrl.touched">
+            {{ firstnameError }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Nom</mat-label>
+          <input matInput type="text" formControlName="lastname">
+          <mat-error *ngIf="lastnameCtrl.invalid && lastnameCtrl.touched">
+            {{ lastnameError }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Téléphone</mat-label>
+          <input matInput type="tel" formControlName="phone">
+          <mat-error *ngIf="phoneCtrl.invalid && phoneCtrl.touched">
+            {{ phoneError }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="button-group">
+        @if (editModePersonal) {
+          <button
+            class="save-button"
+            type="button"
+            (click)="savePersonalInfo()"
+            [disabled]="loadingPersonal || personalInfoForm.invalid || !personalInfoForm.touched">
+            @if (loadingPersonal) {
+              <mat-progress-spinner mode="indeterminate" diameter="20"></mat-progress-spinner>
+            } @else {
+              <mat-icon>save</mat-icon>
+            }
+            <span>Enregistrer</span>
+          </button>
+          <button
+            class="cancel-button"
+            type="button"
+            (click)="toggleEditPersonal()"
+            [disabled]="loadingPersonal">
+            <span>Annuler</span>
+          </button>
+        } @else {
+          <button
+            class="edit-button"
+            type="button"
+            (click)="toggleEditPersonal()">
+            <mat-icon>edit</mat-icon>
+            <span>Modifier vos informations</span>
+          </button>
+        }
+      </div>
+    </form>
+  </div>
+
+  <!-- Section Informations de connexion -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Informations de connexion</h2>
+    </div>
+
+    <form [formGroup]="loginForm" class="form-content">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email">
+        <mat-error *ngIf="emailCtrl.invalid && emailCtrl.touched">
+          {{ emailError }}
+        </mat-error>
+      </mat-form-field>
+
+      @if (editModeLogin) {
+        <div class="password-section">
+          <h3>Modifier le mot de passe</h3>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Mot de passe actuel</mat-label>
+            <input matInput type="password" formControlName="currentPassword">
+            <mat-error *ngIf="currentPasswordCtrl.invalid && currentPasswordCtrl.touched">
+              {{ currentPasswordError }}
+            </mat-error>
+          </mat-form-field>
+
+          <div class="grid--two">
+            <mat-form-field appearance="outline">
+              <mat-label>Nouveau mot de passe</mat-label>
+              <input matInput type="password" formControlName="newPassword">
+              <mat-error *ngIf="newPasswordCtrl.invalid && newPasswordCtrl.touched">
+                {{ newPasswordError }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Confirmer le mot de passe</mat-label>
+              <input matInput type="password" formControlName="confirmPassword">
+              <mat-error *ngIf="confirmPasswordCtrl.invalid && confirmPasswordCtrl.touched">
+                {{ confirmPasswordError }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+      }
+
+      <div class="button-group">
+        @if (editModeLogin) {
+          <button
+            class="save-button"
+            type="button"
+            (click)="saveLoginInfo()"
+            [disabled]="loadingLogin || (loginForm.invalid && newPasswordCtrl.value) || !loginForm.touched">
+            @if (loadingLogin) {
+              <mat-progress-spinner mode="indeterminate" diameter="20"></mat-progress-spinner>
+            } @else {
+              <mat-icon>save</mat-icon>
+            }
+            <span>Enregistrer</span>
+          </button>
+          <button
+            class="cancel-button"
+            type="button"
+            (click)="toggleEditLogin()"
+            [disabled]="loadingLogin">
+            <span>Annuler</span>
+          </button>
+        } @else {
+          <button
+            class="edit-button"
+            color="accent"
+            type="button"
+            (click)="toggleEditLogin()">
+            <mat-icon>edit</mat-icon>
+            <span>Modifier vos informations</span>
+          </button>
+        }
+      </div>
+    </form>
+  </div>
+</div>

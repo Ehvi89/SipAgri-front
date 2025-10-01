@@ -384,12 +384,12 @@
 .flex {
   display: flex;
 
-  &--column { flex-direction: column; }
-  &--center { align-items: center; justify-content: center; }
-  &--between { justify-content: space-between; }
-  &--around { justify-content: space-around; }
-  &--start { align-items: flex-start; }
-  &--end { align-items: flex-end; }
+  &--column { display: flex; flex-direction: column; }
+  &--center { display: flex; align-items: center; justify-content: center; }
+  &--between { display: flex; justify-content: space-between; }
+  &--around { display: flex; justify-content: space-around; }
+  &--start { display: flex; align-items: flex-start; }
+  &--end { display: flex; align-items: flex-end; }
 
   &--1 { flex: 1; }
   &--2 { flex: 2; }

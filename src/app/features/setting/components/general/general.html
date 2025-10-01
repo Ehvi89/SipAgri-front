@@ -1,1 +1,208 @@
-<p>general works!</p>
+<div class="general-container">
+  <div class="grid grid--two-fs">
+    <!-- Section Liste des paramètres -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Liste des paramètres</h2>
+        <div class="card-actions">
+          <button mat-icon-button (click)="loadParams()" [disabled]="loading$ | async">
+            <mat-icon>refresh</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="list">
+        <div class="table">
+          <div class="table-header">
+            <div class="table-row header">
+              <div class="column">Nom</div>
+              <div class="column center">Valeur</div>
+              <div class="column center">Description</div>
+              <div class="column center">Code Param</div>
+              <div class="column center">Actions</div>
+            </div>
+          </div>
+
+          <div class="table-body">
+            @if (loading$ | async) {
+              <div class="loading-state">
+                <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+                <span>Chargement...</span>
+              </div>
+            }
+
+            @if (!(loading$ | async) && (params$ | async)?.data?.length === 0) {
+              <div class="empty-state">
+                <mat-icon>settings</mat-icon>
+                <span>Aucun paramètre trouvé</span>
+                <p>Créez votre premier paramètre en utilisant le formulaire ci-contre</p>
+              </div>
+            }
+
+            @if (!(loading$ | async) && (params$ | async)?.data) {
+              @for (param of (params$ | async)?.data; track param.id) {
+                <div class="table-row" [class.selected]="selectedParam?.id === param.id">
+                  <div class="column">
+                    <span class="param-name">{{ param.name }}</span>
+                  </div>
+                  <div class="column center">
+                    <span class="param-value">{{ param.value }}</span>
+                  </div>
+                  <div class="column center">
+                    <span class="param-description">{{ param.description || '-' }}</span>
+                  </div>
+                  <div class="column center">
+                    <span class="param-code">{{ param.codeParams || '-' }}</span>
+                  </div>
+                  <div class="column center actions">
+                    <button
+                      mat-icon-button
+                      color="primary"
+                      (click)="editParam(param)"
+                      matTooltip="Modifier">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    @if (param.codeParams !== 'BACKEND') {
+                      <button
+                        mat-icon-button
+                        color="warn"
+                        (click)="deleteParam(param)"
+                        matTooltip="Supprimer">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        @if ((params$ | async)?.data && (params$ | async)?.totalPages! > 1) {
+          <div class="pagination">
+            <button
+              mat-button
+              (click)="previous()"
+              [disabled]="(loading$ | async) || (params$ | async)?.currentPage === 1">
+              <mat-icon>chevron_left</mat-icon>
+              Précédent
+            </button>
+            <span class="page-info">
+              Page {{ (params$ | async)?.currentPage! + 1 }} sur {{ (params$ | async)?.totalPages }}
+            </span>
+            <button
+              mat-button
+              (click)="next()"
+              [disabled]="(loading$ | async) || (params$ | async)?.currentPage === (params$ | async)?.totalPages">
+              Suivant
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Section Formulaire -->
+    <div class="card">
+      <div class="card-header">
+        <h2>{{ editMode ? 'Modifier le paramètre' : 'Nouveau paramètre' }}</h2>
+        @if (editMode) {
+          <button mat-icon-button color="warn" (click)="cancelEdit()" matTooltip="Annuler">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+
+      <div class="form">
+        <form [formGroup]="settingForm" (ngSubmit)="onSubmit()">
+          <div class="field">
+            <mat-form-field appearance="outline">
+              <mat-label>Nom</mat-label>
+              <input matInput type="text" formControlName="name" placeholder="Ex: API_URL"/>
+              <mat-error *ngIf="nameCtrl.invalid && nameCtrl.touched">
+                {{ nameError }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="field">
+            <mat-form-field appearance="outline">
+              <mat-label>Valeur</mat-label>
+              <input matInput type="text" formControlName="value" placeholder="Ex: https://api.example.com"/>
+              <mat-error *ngIf="valueCtrl.invalid && valueCtrl.touched">
+                {{ valueError }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="field">
+            <mat-form-field appearance="outline">
+              <mat-label>Description</mat-label>
+              <textarea
+                matInput
+                formControlName="description"
+                rows="3"
+                placeholder="Description du paramètre (optionnel)"></textarea>
+              <mat-error *ngIf="descriptionCtrl.invalid && descriptionCtrl.touched">
+                {{ descriptionError }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="field">
+            <mat-form-field appearance="outline">
+              <mat-label>Code Paramètre</mat-label>
+              <input matInput type="text" formControlName="codeParams" placeholder="Ex: API_001"/>
+              <mat-error *ngIf="codeParamsCtrl.invalid && codeParamsCtrl.touched">
+                {{ codeParamsError }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="field">
+            <mat-form-field appearance="outline">
+              <mat-label>Crypté</mat-label>
+              <mat-select formControlName="encrypted">
+                <mat-option [value]="false">
+                  <mat-icon>lock_open</mat-icon>
+                  Non
+                </mat-option>
+                <mat-option [value]="true">
+                  <mat-icon>lock</mat-icon>
+                  Oui
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="encryptedCtrl.invalid && encryptedCtrl.touched">
+                {{ encryptedError }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="button-group">
+            <button
+              type="submit"
+              [disabled]="(loading$ | async) || settingForm.invalid">
+              @if (loading$ | async) {
+                <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+              } @else {
+                <mat-icon>{{ editMode ? 'save' : 'add' }}</mat-icon>
+              }
+              <span>{{ editMode ? 'Mettre à jour' : 'Enregistrer' }}</span>
+            </button>
+
+            @if (editMode) {
+              <button
+                mat-button
+                type="button"
+                (click)="cancelEdit()"
+                [disabled]="loading$ | async">
+                <span>Annuler</span>
+              </button>
+            }
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

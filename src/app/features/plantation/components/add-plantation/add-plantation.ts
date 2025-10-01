@@ -12,7 +12,7 @@ import {Planter} from '../../../../core/models/planter-model';
 import {Kit} from '../../../../core/models/kit-model';
 import {PlanterService} from '../../../planter/services/planter-service';
 import {NotificationService} from '../../../../core/services/notification-service';
-import {KitService} from '../../../../share/services/kit-service';
+import {KitService} from '../../../setting/modules/kit/services/kit-service';
 import {GoogleMapsService} from '../../services/google-maps-service';
 import {tap, catchError} from 'rxjs/operators';
 import {PlantationService} from '../../services/plantation-service';

@@ -1,1 +1,155 @@
-<p>list-product works!</p>
+<div class="product-list-container">
+  <!-- En-tête avec actions -->
+  <div class="header">
+    <div class="header-content">
+      <h1>Gestion des Produits</h1>
+      <p class="subtitle">Liste et gestion de vos produits</p>
+    </div>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="navigateToAdd()"
+      class="add-button">
+      <mat-icon>add</mat-icon>
+      <span>Ajouter un produit</span>
+    </button>
+  </div>
+
+  <!-- Barre de recherche et filtres -->
+  <div class="search-bar">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Rechercher un produit</mat-label>
+      <input
+        matInput
+        (keyup.enter)="onSearch()"
+        [formControl]="searchTerm"
+        placeholder="name, description...">
+      <mat-icon matPrefix>search</mat-icon>
+      @if (searchTerm.value) {
+        <button
+          matSuffix
+          (click)="clearSearch()"
+          aria-label="Effacer">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+    <button
+      class="btn btn--outline"
+      mat-raised-button
+      (click)="onSearch()"
+      [disabled]="!searchTerm.value">
+      Rechercher
+    </button>
+    <button
+      mat-icon-button
+      (click)="refresh()"
+      matTooltip="Actualiser">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </div>
+
+  <!-- Liste des produits -->
+  <div class="card">
+    @if (loading$ | async) {
+      <div class="loading-state">
+        <mat-progress-spinner diameter="50" mode="indeterminate"></mat-progress-spinner>
+        <span>Chargement des produits...</span>
+      </div>
+    }
+
+    @if (!(loading$ | async) && (products$ | async)?.data?.length === 0) {
+      <div class="empty-state">
+        <mat-icon>inventory_2</mat-icon>
+        <h3>Aucun produit trouvé</h3>
+        <p>Commencez par ajouter votre premier produit</p>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="navigateToAdd()">
+          <mat-icon>add</mat-icon>
+          Ajouter un produit
+        </button>
+      </div>
+    }
+
+    @if (!(loading$ | async) && (products$ | async)?.data && (products$ | async)?.data?.length! > 0) {
+      <div class="table">
+        <div class="table-header">
+          <div class="table-row header">
+            <div class="column">name</div>
+            <div class="column">Description</div>
+            <div class="column center">price</div>
+            <div class="column center">Actions</div>
+          </div>
+        </div>
+
+        <div class="table-body">
+          @for (product of (products$ | async)?.data; track product.id) {
+            <div class="table-row">
+              <div class="column">
+                <span class="product-name">{{ product.name }}</span>
+              </div>
+              <div class="column">
+                <span class="product-description" [matTooltip]="product.description">
+                  {{ truncateDescription(product.description) }}
+                </span>
+              </div>
+              <div class="column center">
+                <span class="product-price">{{ formatPrice(product.price) }}</span>
+              </div>
+              <div class="column center actions">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="editProduct(product)"
+                  matTooltip="Modifier">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="deleteProduct(product)"
+                  matTooltip="Supprimer">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      @if ((products$ | async)?.data && (products$ | async)?.totalPages! > 1) {
+        <div class="pagination">
+          <div class="pagination-info">
+          <span>
+            Affichage de {{ ((products$ | async)?.currentPage!) * 10 + 1}}
+            à {{ Math.min(((products$ | async)?.currentPage! + 1) * 10, (products$ | async)?.totalElements!) }}
+            sur {{ (products$ | async)?.totalElements }} produits
+          </span>
+          </div>
+          <div class="pagination-controls">
+            <button
+              mat-button
+              (click)="previousPage()"
+              [disabled]="(loading$ | async) || (products$ | async)?.currentPage === 1">
+              <mat-icon>chevron_left</mat-icon>
+              Précédent
+            </button>
+            <span class="page-number">
+            Page {{ (products$ | async)?.currentPage! + 1}}  / {{ (products$ | async)?.totalPages }}
+          </span>
+            <button
+              mat-button
+              (click)="nextPage()"
+              [disabled]="(loading$ | async) || (products$ | async)?.currentPage === (products$ | async)?.totalPages">
+              Suivant
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>

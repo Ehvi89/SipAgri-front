@@ -27,12 +27,13 @@
 
   .user {
     @extend .flex;
-    @extend .flex--center;
     @extend .gap--md;
     @extend .radius-md;
     @extend .text--xl;
 
     flex: 1;
+    justify-content: flex-end;
+    align-items: center;
     padding: 0.5rem 0.75rem;
     cursor: pointer;
     transition: all 0.3s ease;

@@ -118,4 +118,8 @@ export class AuthService {
       finalize(() => this.setLoading(false))
     );
   }
+
+  updateCurrentUser(supervisor: Supervisor) {
+    localStorage.setItem("user", JSON.stringify(supervisor));
+  }
 }

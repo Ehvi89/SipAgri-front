@@ -90,7 +90,7 @@ export abstract class BaseService<T> {
         return this.repository.search(params.search, params.page, params.size).pipe(
           tap(data => {
             this._pagedData.next(data);
-            console.log('Search results:', data);
+            // console.log('Search results:', data);
           }),
           catchError(err => throwError(() => this.errorService.handleError(err))),
           finalize(() => this.setLoading(false))
@@ -160,6 +160,40 @@ export abstract class BaseService<T> {
   update(id: number | string, payload: Partial<T>): Observable<T> {
     this.setLoading(true);
     return this.repository.update(payload).pipe(
+      tap(updatedItem => {
+        if (this._data.value) {
+          this._data.next([
+            ...this._data.value.map(item =>
+              (item as any).id === id ? updatedItem : item
+            )
+          ]);
+        }
+        if (this._pagedData.value) {
+          this._pagedData.next({
+            ...this._pagedData.value,
+            data: [
+              ...this._pagedData.value.data.map(item =>
+                (item as any).id === id ? updatedItem : item
+              )
+            ],
+          });
+        }
+      }),
+      finalize(() => this.setLoading(false)),
+      catchError(err => throwError(() => this.errorService.handleError(err)))
+    );
+  }
+
+  /**
+   * Partially updates an item with the provided payload and updates the local state accordingly.
+   *
+   * @param {number | string} id - The unique identifier of the item to update.
+   * @param {Partial<T>} payload - The partial payload containing properties to update.
+   * @return {Observable<T>} An observable that emits the updated item.
+   */
+  partialUpdate(id: number | string, payload: Partial<T>): Observable<T> {
+    this.setLoading(true);
+    return this.repository.partialUpdate(payload).pipe(
       tap(updatedItem => {
         if (this._data.value) {
           this._data.next([
