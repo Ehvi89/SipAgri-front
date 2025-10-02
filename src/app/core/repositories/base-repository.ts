@@ -39,6 +39,18 @@ export abstract class BaseRepository<T> {
     );
   }
 
+  getAllPagedByUserId(page?: number, size?: number, userId?: number): Observable<PaginationResponse<T>> {
+    const params: any = {};
+    if (page !== undefined) params.page = page;
+    if (size !== undefined) params.size = size;
+    if (userId !== undefined) params.userId = userId;
+
+    return this.http.get<PaginationResponse<T>>(
+      `${this.apiUrl}/${this.endpoint}/by_supervisor`,
+      { params }
+    )
+  }
+
   /**
    * Performs a search request to the API and retrieves a paginated response.
    *

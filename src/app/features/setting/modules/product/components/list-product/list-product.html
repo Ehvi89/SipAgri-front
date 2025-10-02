@@ -27,6 +27,7 @@
       <mat-icon matPrefix>search</mat-icon>
       @if (searchTerm.value) {
         <button
+          mat-icon-button
           matSuffix
           (click)="clearSearch()"
           aria-label="Effacer">
