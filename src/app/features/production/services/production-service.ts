@@ -8,16 +8,7 @@ import { PaginationResponse } from "../../../core/models/pagination-response-mod
 
 @Injectable()
 export class ProductionService extends BaseService<Production>{
-  constructor(private productionRepository: ProductionRepository,
-              private authService: AuthService) {
+  constructor(private productionRepository: ProductionRepository) {
     super(productionRepository);
-  }
-
-  override getAllPaged(page?: number, size?: number): Observable<PaginationResponse<Production>> {
-    const currentSupervisor = this.authService.getCurrentUser();
-    if (currentSupervisor.profile === "ADMINISTRATOR") {
-      return super.getAllPaged(page, size);
-    }
-    return this.productionRepository.getAllPagedByUserId(page, size, currentSupervisor.id)
   }
 }

@@ -43,7 +43,7 @@ export class Account implements OnInit {
 
   ngOnInit(): void {
     this.loading$ = this.supervisorService.loading$;
-    this.supervisor = this.authService.getCurrentUser();
+    this.supervisor = AuthService.getCurrentUser();
 
     this.initializeForms();
   }

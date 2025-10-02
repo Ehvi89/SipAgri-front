@@ -43,7 +43,7 @@ export abstract class BaseRepository<T> {
     const params: any = {};
     if (page !== undefined) params.page = page;
     if (size !== undefined) params.size = size;
-    if (userId !== undefined) params.userId = userId;
+    if (userId !== undefined) params.supervisorId = userId;
 
     return this.http.get<PaginationResponse<T>>(
       `${this.apiUrl}/${this.endpoint}/by_supervisor`,

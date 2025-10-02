@@ -9,16 +9,7 @@ import { AuthService } from "../../auth/services/auth-service";
 @Injectable()
 export class PlantationService extends BaseService<Plantation> {
 
-  constructor(private plantationRepository: PlantationRepository,
-              private authService: AuthService) {
+  constructor(private plantationRepository: PlantationRepository) {
     super(plantationRepository);
-  }
-
-  override getAllPaged(page?: number, size?: number): Observable<PaginationResponse<Plantation>> {
-    const currentSupervisor = this.authService.getCurrentUser();
-    if (currentSupervisor.profile === "ADMINISTRATOR") {
-      return super.getAllPaged(page, size);
-    }
-    return this.plantationRepository.getAllPagedByUserId(page, size, currentSupervisor.id)
   }
 }

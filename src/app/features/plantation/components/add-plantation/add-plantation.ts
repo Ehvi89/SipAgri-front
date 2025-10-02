@@ -83,7 +83,7 @@ export class AddPlantation implements OnInit, OnDestroy {
     this.loading$ = this.plantationService.loading$;
 
     // get planters data
-    const currentUser = this.authService.getCurrentUser();
+    const currentUser = AuthService.getCurrentUser();
     if (currentUser.profile === "ADMINISTRATOR") {
       this.planters$ = this.planterService.getAll();
     } else {

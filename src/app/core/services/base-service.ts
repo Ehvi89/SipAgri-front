@@ -14,6 +14,7 @@ import { BaseRepository } from '../repositories/base-repository';
 import {PaginationResponse} from '../models/pagination-response-model';
 import {ErrorService} from './error-service';
 import {Injectable} from '@angular/core';
+import { AuthService } from "../../features/auth/services/auth-service";
 
 /**
  * BaseService provides a generic abstraction for managing entities, with functionalities
@@ -32,7 +33,7 @@ export abstract class BaseService<T> {
   private errorService: ErrorService = new ErrorService();
   private searchSubject = new Subject<{ search: string; page?: number; size?: number }>();
 
-  protected constructor(protected repository: BaseRepository<T>,) {
+  protected constructor(protected repository: BaseRepository<T>) {
     this.setupSearchPipeline();
   }
 
@@ -48,12 +49,20 @@ export abstract class BaseService<T> {
    * @return {Observable<PaginationResponse<T>>} An observable emitting the paginated response containing the data.
    */
   getAllPaged(page?: number, size?: number): Observable<PaginationResponse<T>> {
-    this.setLoading(true);
-    return this.repository.getAllPaged(page, size).pipe(
-      tap(data => this._pagedData.next(data)), // mise à jour du cache
-      finalize(() => this.setLoading(false)),
-      catchError(err => throwError(() => this.errorService.handleError(err)))
-    );
+    this.setLoading(true);const currentSupervisor = AuthService.getCurrentUser();
+    if (currentSupervisor.profile === "ADMINISTRATOR") {
+      return this.repository.getAllPaged(page, size).pipe(
+        tap(data => this._pagedData.next(data)), // mise à jour du cache
+        finalize(() => this.setLoading(false)),
+        catchError(err => throwError(() => this.errorService.handleError(err)))
+      );
+    } else {
+      return this.repository.getAllPagedByUserId(page, size, currentSupervisor.id).pipe(
+        tap(data => this._pagedData.next(data)), // mise à jour du cache
+        finalize(() => this.setLoading(false)),
+        catchError(err => throwError(() => this.errorService.handleError(err)))
+      );
+    }
   }
 
   /**

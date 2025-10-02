@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {PlanterService} from '../../services/planter-service';
 import {NotificationService} from "../../../../core/services/notification-service";
@@ -7,6 +7,7 @@ import {MaritalStatus} from "../../../../core/enums/marital-status-enum";
 import {Supervisor} from "../../../../core/models/supervisor-model";
 import {SupervisorService} from '../../../setting/modules/supervisor/services/supervisor-service';
 import { Gender } from "../../../../core/enums/gender-enum";
+import { AuthService } from "../../../auth/services/auth-service";
 
 @Component({
   selector: 'app-new-planter',
@@ -35,7 +36,12 @@ export class NewPlanter implements OnInit {
   ngOnInit(): void {
     this.loading$ = this.planterService.loading$;
     this.initForm();
-    this.supervisors$ = this.supervisorService.getAll();
+    const currentUser = AuthService.getCurrentUser();
+    if (currentUser.profile === 'ADMINISTRATOR'){
+      this.supervisors$ = this.supervisorService.getAll();
+    } else {
+      this.supervisors$ = of([currentUser]);
+    }
   }
 
   private initForm(): void {

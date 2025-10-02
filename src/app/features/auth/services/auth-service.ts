@@ -26,7 +26,7 @@ export class AuthService {
   /**
    * Retourne l'utilisateur connecté
    */
-  getCurrentUser(): Supervisor {
+  static getCurrentUser(): Supervisor {
     const userData = localStorage.getItem("user");
     return JSON.parse(userData!) as Supervisor;
   }

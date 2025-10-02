@@ -20,7 +20,7 @@ export class Setting implements OnInit {
   constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.supervisor = this.authService.getCurrentUser();
+    this.supervisor = AuthService.getCurrentUser();
     this.menus = [
       { label: "Compte", link: "/settings", exact: true },
       { label: "Superviseurs", link: "supervisors", exact: false },
