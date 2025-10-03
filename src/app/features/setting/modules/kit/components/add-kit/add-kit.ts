@@ -140,7 +140,7 @@ export class AddKit implements OnInit{
         },
         error: (error) => {
           console.error('Erreur lors du chargement du kit:', error);
-          this.router.navigate(['/kits']);
+          this.router.navigate(['/settings/kits']);
         }
       });
   }
@@ -317,10 +317,10 @@ export class AddKit implements OnInit{
   cancel(): void {
     if (this.kitForm.dirty || this.kitProducts.length > 0) {
       if (confirm('Voulez-vous vraiment annuler ? Les modifications seront perdues.')) {
-        this.router.navigate(['/kits']);
+        this.router.navigate(['/settings/kits']);
       }
     } else {
-      this.router.navigate(['/kits']);
+      this.router.navigate(['/settings/kits']);
     }
   }
 

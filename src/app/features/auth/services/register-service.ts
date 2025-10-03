@@ -4,6 +4,7 @@ import { catchError, tap, map } from 'rxjs/operators';
 import { RegisterRepository } from '../repositories/auth-repository';
 import {ErrorService} from '../../../core/services/error-service';
 import {AbstractControl, ValidationErrors} from '@angular/forms';
+import {SupervisorProfile} from '../../../core/enums/supervisor-profile';
 
 export interface RegisterCredential {
   firstname: string;
@@ -14,11 +15,12 @@ export interface RegisterCredential {
 }
 
 export interface RegisterResponse {
-  id: string;
+  id: string | number;
   firstname: string;
   lastname: string;
   email: string;
   phone: string;
+  profile: SupervisorProfile,
   createdAt: string;
   isVerified: boolean;
 }
@@ -300,6 +302,7 @@ export class RegisterService {
       lastname: response.lastname,
       email: response.email,
       phone: response.phone,
+      profile: response.profile,
       createdAt: response.createdAt || new Date().toISOString(),
       isVerified: response.isVerified || false
     };

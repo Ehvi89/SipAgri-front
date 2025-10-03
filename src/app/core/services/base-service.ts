@@ -41,6 +41,10 @@ export abstract class BaseService<T> {
     this._loading.next(state);
   }
 
+  protected setPagedData(data: PaginationResponse<T> | null) {
+    this._pagedData.next(data);
+  }
+
   /**
    * Retrieves a paginated list of data based on the provided page number and size.
    *

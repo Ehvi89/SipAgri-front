@@ -1,1 +1,181 @@
-<p>edit-supervisor works!</p>
+<div class="profile-change-container">
+  <!-- Breadcrumb / Navigation -->
+  <div class="breadcrumb">
+    <button mat-button (click)="cancel()">
+      <mat-icon>arrow_back</mat-icon>
+      Retour à la liste
+    </button>
+  </div>
+
+  <!-- En-tête -->
+  <div class="header">
+    <div class="header-content">
+      <h1>Modifier le profil</h1>
+      <p class="subtitle">Changez le niveau d'accès et les permissions</p>
+    </div>
+  </div>
+
+  @if (loading$ | async) {
+    <div class="loader">
+      <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+    </div>
+  }
+  @if (supervisor) {
+    <div class="layout">
+      <!-- Informations du superviseur -->
+      <div class="supervisor-card">
+        <div class="supervisor-header">
+          <div class="avatar">
+            <mat-icon>account_circle</mat-icon>
+          </div>
+          <div class="info">
+            <h2>{{ getFullName() }}</h2>
+            <div class="details">
+              <div class="detail-item">
+                <mat-icon>email</mat-icon>
+                <span>{{ supervisor.email }}</span>
+              </div>
+              <div class="detail-item">
+                <mat-icon>phone</mat-icon>
+                <span>{{ supervisor.phone }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profil actuel -->
+        <div class="current-profile">
+          <h3>Profil actuel</h3>
+          <div class="profile-badge current" [style.background]="getProfileColor(previousProfile!) + '20'" [style.color]="getProfileColor(previousProfile!)">
+            <mat-icon>{{ getProfileIcon(previousProfile!) }}</mat-icon>
+            <span>{{ getProfileLabel(previousProfile!) }}</span>
+          </div>
+          <p class="profile-desc">{{ getProfileDescription(previousProfile!) }}</p>
+        </div>
+      </div>
+
+      <!-- Sélection du nouveau profil -->
+      <div class="profile-selection-card">
+        <h2>
+          Sélectionner un nouveau profil
+        </h2>
+
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+          <div class="profiles-grid">
+            @for (profile of profiles; track profile) {
+              <div
+                class="profile-option"
+                [class.selected]="profileCtrl.value === profile"
+                [class.current]="profile === previousProfile"
+                (click)="profileCtrl.setValue(profile)">
+
+                <div class="profile-header">
+                  <mat-icon [style.color]="getProfileColor(profile)">
+                    {{ getProfileIcon(profile) }}
+                  </mat-icon>
+                  <div class="profile-title">
+                    <span class="profile-name">{{ getProfileLabel(profile) }}</span>
+                    @if (profile === previousProfile) {
+                      <span class="current-badge">Actuel</span>
+                    }
+                  </div>
+                </div>
+
+                <p class="profile-description">{{ getProfileDescription(profile) }}</p>
+
+                <!-- Permissions -->
+                <div class="permissions">
+                  <h4>Permissions :</h4>
+                  <ul>
+                    @for (permission of getProfilePermissions(profile); track permission) {
+                      <li>
+                        <mat-icon>check_circle</mat-icon>
+                        <span>{{ permission }}</span>
+                      </li>
+                    }
+                  </ul>
+                </div>
+
+                <!-- Indicateur de sélection -->
+                <div class="selection-indicator">
+                  @if (profileCtrl.value === profile) {
+                    <mat-icon>radio_button_checked</mat-icon>
+                  } @else {
+                    <mat-icon>radio_button_unchecked</mat-icon>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Avertissement si downgrade -->
+          @if (isDowngrade()) {
+            <div class="warning-message">
+              <mat-icon>warning</mat-icon>
+              <div class="warning-content">
+                <strong>Attention !</strong>
+                <p>Vous êtes sur le point de réduire les privilèges de ce superviseur. Cette action restreindra son accès aux fonctionnalités du système.</p>
+              </div>
+            </div>
+          }
+
+          <!-- Comparaison des profils -->
+          @if (profileCtrl.value && profileCtrl.value !== previousProfile) {
+            <div class="comparison-section">
+              <h3>Résumé des changements</h3>
+              <div class="comparison-grid">
+                <div class="comparison-item from">
+                  <span class="label">De :</span>
+                  <div class="profile-badge" [style.background]="getProfileColor(previousProfile!) + '20'" [style.color]="getProfileColor(previousProfile!)">
+                    <mat-icon>{{ getProfileIcon(previousProfile!) }}</mat-icon>
+                    <span>{{ getProfileLabel(previousProfile!) }}</span>
+                  </div>
+                </div>
+                <mat-icon class="arrow">arrow_forward</mat-icon>
+                <div class="comparison-item to">
+                  <span class="label">Vers :</span>
+                  <div class="profile-badge" [style.background]="getProfileColor(profileCtrl.value!) + '20'" [style.color]="getProfileColor(profileCtrl.value!)">
+                    <mat-icon>{{ getProfileIcon(profileCtrl.value!) }}</mat-icon>
+                    <span>{{ getProfileLabel(profileCtrl.value!) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Boutons d'action -->
+          <div class="form-actions">
+            <button
+              class="btn btn--primary"
+              type="submit"
+              [disabled]="(loading$ | async) || profileForm.invalid || profileCtrl.value === previousProfile">
+              @if (loading$ | async) {
+                <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+              } @else {
+                <mat-icon>save</mat-icon>
+              }
+              <span>Modifier le profil</span>
+            </button>
+
+            <button
+              class="btn btn--cancel"
+              (click)="cancel()"
+              [disabled]="loading$ | async">
+              <span>Annuler</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (!supervisor && !(loading$ | async)) {
+    <div class="error-state">
+      <mat-icon>error</mat-icon>
+      <h3>Superviseur introuvable</h3>
+      <button mat-raised-button color="primary" (click)="cancel()">
+        Retour à la liste
+      </button>
+    </div>
+  }
+</div>
