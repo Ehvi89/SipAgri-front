@@ -1,0 +1,18 @@
+@use "../../../../../styles";
+
+.account-container {
+  width: 100%;
+
+  .button-group {
+    @extend .flex;
+    @extend .gap--md;
+
+    button {
+      @extend .btn;
+
+      &.save-button { @extend .btn--primary; }
+      &.cancel-button { @extend .btn--outline; }
+      &.edit-button { background-color: var(--color-accent); color: white}
+    }
+  }
+}

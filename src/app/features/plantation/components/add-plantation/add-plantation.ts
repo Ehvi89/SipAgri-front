@@ -12,13 +12,14 @@ import {Planter} from '../../../../core/models/planter-model';
 import {Kit} from '../../../../core/models/kit-model';
 import {PlanterService} from '../../../planter/services/planter-service';
 import {NotificationService} from '../../../../core/services/notification-service';
-import {KitService} from '../../../../share/services/kit-service';
+import {KitService} from '../../../setting/modules/kit/services/kit-service';
 import {GoogleMapsService} from '../../services/google-maps-service';
 import {tap, catchError} from 'rxjs/operators';
 import {PlantationService} from '../../services/plantation-service';
 import {GeocodingService} from '../../../../core/services/geocoding-service';
 import {Location} from '../../../../core/models/location-model';
 import {ActivatedRoute} from '@angular/router';
+import { AuthService } from "../../../auth/services/auth-service";
 
 @Component({
   selector: 'app-add-plantation',
@@ -60,6 +61,7 @@ export class AddPlantation implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private geocodingService: GeocodingService,
     private route: ActivatedRoute,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -81,7 +83,14 @@ export class AddPlantation implements OnInit, OnDestroy {
     this.loading$ = this.plantationService.loading$;
 
     // get planters data
-    this.planters$ = this.planterService.getAll();
+    const currentUser = AuthService.getCurrentUser();
+    if (currentUser.profile === "ADMINISTRATOR") {
+      this.planters$ = this.planterService.getAll();
+    } else {
+      this.planters$ = this.planterService.getAllPaged(undefined, 50).pipe(
+        map(planters => planters.data)
+      );
+    }
     // get kits data
     this.kits$ = this.kitService.getAll();
 

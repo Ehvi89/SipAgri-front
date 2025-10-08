@@ -34,6 +34,7 @@
               matInput
               type="text"
               formControlName="lastname"
+              name="lastname"
               placeholder="Votre nom de famille"
               [class.error]="lastnameCtrl.invalid && lastnameCtrl.touched"
               autocomplete="family-name">
@@ -49,6 +50,7 @@
               type="text"
               formControlName="firstname"
               placeholder="Vos prénoms"
+              name="firstname"
               [class.error]="firstnameCtrl.invalid && firstnameCtrl.touched"
               autocomplete="given-name">
             <mat-error *ngIf="firstnameCtrl.touched">

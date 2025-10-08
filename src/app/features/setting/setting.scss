@@ -1,0 +1,24 @@
+@use "../../../styles";
+
+.setting-container {
+  @extend .container;
+  @extend .container--lg;
+  @extend .container--without-top;
+
+  .chip {
+    @extend .flex;
+    @extend .flex--center;
+    list-style: none;
+
+    button {
+      @extend .btn;
+      @extend .btn--link;
+      padding: 0.5rem 1.25rem;
+      margin: auto 1rem;
+    }
+
+    .active {
+      @extend .btn--primary;
+    }
+  }
+}

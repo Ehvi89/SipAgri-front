@@ -1,0 +1,248 @@
+<div class="kit-add-container">
+  <!-- Breadcrumb / Navigation -->
+  <div class="breadcrumb">
+    <button mat-button (click)="cancel()">
+      <mat-icon>arrow_back</mat-icon>
+      Retour à la liste
+    </button>
+  </div>
+
+  <!-- En-tête -->
+  <div class="header">
+    <div class="header-content">
+      <h1>{{ editMode ? 'Modifier le kit' : 'Créer un kit' }}</h1>
+      <p class="subtitle">
+        {{ editMode ? 'Modifiez les informations du kit' : 'Créez un nouveau kit de produits' }}
+      </p>
+    </div>
+  </div>
+
+  <div class="form-layout">
+    <!-- Formulaire principal -->
+    <div class="main-form">
+      <div class="card">
+        <div class="card-header">
+          <h2>Informations du kit</h2>
+        </div>
+
+        <form [formGroup]="kitForm" (ngSubmit)="onSubmit()">
+          <div class="form-content">
+            <!-- Nom du kit -->
+            <div class="field">
+              <mat-form-field appearance="outline">
+                <mat-label>Nom du kit</mat-label>
+                <input
+                  matInput
+                  type="text"
+                  formControlName="name"
+                  placeholder="Ex: Kit démarrage complet">
+                <mat-error *ngIf="nameCtrl.invalid && nameCtrl.touched">
+                  {{ nameError }}
+                </mat-error>
+                <mat-hint>Nom commercial du kit (3-100 caractères)</mat-hint>
+              </mat-form-field>
+            </div>
+
+            <!-- Description -->
+            <div class="field">
+              <mat-form-field appearance="outline">
+                <mat-label>Description</mat-label>
+                <textarea
+                  matInput
+                  formControlName="description"
+                  rows="4"
+                  placeholder="Décrivez le contenu et l'usage du kit..."></textarea>
+                <mat-error *ngIf="descriptionCtrl.invalid && descriptionCtrl.touched">
+                  {{ descriptionError }}
+                </mat-error>
+                <mat-hint align="end">{{ descriptionCharCount }}</mat-hint>
+              </mat-form-field>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Section ajout de produits -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Ajouter des produits</h2>
+        </div>
+
+        <div class="add-product-section">
+          <!-- Recherche de produits -->
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Rechercher un produit</mat-label>
+            <input
+              matInput
+              [formControl]="searchProduct"
+              (ngModelChange)="filterProducts()"
+              placeholder="Nom ou description...">
+            <mat-icon matPrefix>search</mat-icon>
+          </mat-form-field>
+
+          <!-- Liste des produits disponibles -->
+          <div class="products-list">
+            @if (filteredProducts.length === 0) {
+              <div class="no-products">
+                <mat-icon>warning</mat-icon>
+                <span>Aucun produit trouvé</span>
+              </div>
+            }
+
+            @for (product of filteredProducts; track product.id) {
+              <div
+                class="product-card"
+                [class.selected]="selectedProduct?.id === product.id"
+                (click)="selectProduct(product)">
+                <div class="product-info">
+                  <span class="product-name">{{ product.name }}</span>
+                  <span class="product-price">{{ formatPrice(product.price) }}</span>
+                </div>
+                <p class="product-description">{{ product.description }}</p>
+              </div>
+            }
+          </div>
+
+          <!-- Quantité et ajout -->
+          @if (selectedProduct) {
+            <div class="add-controls">
+              <mat-form-field appearance="outline" class="quantity-field">
+                <mat-label>Quantité</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  [formControl]="productQuantity"
+                  min="1"
+                  placeholder="1">
+                <mat-icon matPrefix>pin</mat-icon>
+              </mat-form-field>
+
+              <button
+                class="btn--primary"
+                (click)="addProductToKit()"
+                [disabled]="!selectedProduct || productQuantity.value <= 0">
+                <mat-icon>add_circle</mat-icon>
+                <span>Ajouter au kit</span>
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Panneau latéral - Récapitulatif -->
+    <div class="sidebar">
+      <div class="card summary-card">
+        <div class="card-header">
+          <h2>Récapitulatif du kit</h2>
+        </div>
+
+        <div class="summary-content">
+          <!-- Statistiques -->
+          <div class="stats">
+            <div class="stat-item">
+              <mat-icon>inventory_2</mat-icon>
+              <div class="stat-info">
+                <span class="stat-label">Produits</span>
+                <span class="stat-value">{{ getTotalProducts() }}</span>
+              </div>
+            </div>
+            <div class="stat-item total">
+              <div class="stat-info">
+                <span class="stat-label">Coût total</span>
+                <span class="stat-value">{{ formatPrice(calculateTotalCost()) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Liste des produits dans le kit -->
+          <div class="kit-products">
+            <h3>Produits sélectionnés</h3>
+
+            @if (kitProducts.length === 0) {
+              <div class="empty-kit">
+                <mat-icon>inbox</mat-icon>
+                <span>Aucun produit dans le kit</span>
+                <p>Ajoutez des produits depuis la liste ci-contre</p>
+              </div>
+            }
+
+            @for (kitProduct of kitProducts.controls; track $index; let i = $index) {
+              <div class="kit-product-item">
+                <div class="product-header">
+                  <span class="product-name">{{ kitProduct.value.product.name }}</span>
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    (click)="removeProductFromKit(i)"
+                    matTooltip="Retirer">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+
+                <div class="product-details">
+                  <div class="quantity-control">
+                    <button
+                      mat-icon-button
+                      (click)="updateProductQuantity(i, kitProduct.value.quantity - 1)"
+                      [disabled]="kitProduct.value.quantity <= 1">
+                      <mat-icon>remove</mat-icon>
+                    </button>
+                    <input
+                      type="number"
+                      [value]="kitProduct.value.quantity"
+                      (change)="updateProductQuantity(i, +$any($event.target).value)"
+                      min="1"
+                      class="quantity-input">
+                    <button
+                      mat-icon-button
+                      (click)="updateProductQuantity(i, kitProduct.value.quantity + 1)">
+                      <mat-icon>add</mat-icon>
+                    </button>
+                  </div>
+
+                  <div class="product-pricing">
+                    <span class="unit-price">{{ formatPrice(kitProduct.value.product.price) }} / unité</span>
+                    <span class="total-price">{{ formatPrice(kitProduct.value.totalCost) }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Boutons d'action -->
+          <div class="form-actions">
+            <button
+              class="btn--primary"
+              (click)="onSubmit()"
+              [disabled]="(loading$ | async) || kitForm.invalid || kitProducts.length === 0">
+              @if (loading$ | async) {
+                <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+              } @else {
+                <mat-icon>{{ editMode ? 'save' : 'add_box' }}</mat-icon>
+              }
+              <span>{{ editMode ? 'Mettre à jour' : 'Créer le kit' }}</span>
+            </button>
+
+            <button
+              type="button"
+              class="btn--secondary"
+              (click)="resetForm()"
+              [disabled]="loading$ | async">
+              <mat-icon>refresh</mat-icon>
+              <span>Réinitialiser</span>
+            </button>
+
+            <button
+              class="btn--cancel"
+              type="button"
+              (click)="cancel()"
+              [disabled]="loading$ | async">
+              <span>Annuler</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

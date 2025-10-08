@@ -1,0 +1,189 @@
+<div class="supervisor-list-container">
+  <!-- En-tête avec actions -->
+  <div class="header">
+    <div class="header-content">
+      <h1>Gestion des Superviseurs</h1>
+      <p class="subtitle">Liste et gestion des comptes superviseurs</p>
+    </div>
+    <button
+      (click)="navigateToAdd()"
+      class="add-button">
+      <mat-icon>person_add</mat-icon>
+      <span>Ajouter un superviseur</span>
+    </button>
+  </div>
+
+  <!-- Barre de recherche et filtres -->
+  <div class="filters-bar">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Rechercher</mat-label>
+      <input
+        matInput
+        [formControl]="searchTerm"
+        (keyup.enter)="onSearch()"
+        placeholder="Nom, prénom, email...">
+      <mat-icon matPrefix>search</mat-icon>
+      @if (searchTerm) {
+        <button
+          mat-icon-button
+          matSuffix
+          (click)="clearFilters()"
+          aria-label="Effacer">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="profile-filter">
+      <mat-label>Profil</mat-label>
+      <mat-select [formControl]="selectedProfile">
+        <mat-option value="ALL">Tous les profils</mat-option>
+        @for (profile of profiles; track profile) {
+          <mat-option [value]="profile">
+            <mat-icon>{{ getProfileIcon(profile) }}</mat-icon>
+            {{ getProfileLabel(profile) }}
+          </mat-option>
+        }
+      </mat-select>
+      <mat-icon matPrefix>filter_list</mat-icon>
+    </mat-form-field>
+
+    <button
+      mat-raised-button
+      (click)="onSearch()"
+      [disabled]="!searchTerm && selectedProfile.value === 'ALL'">
+      Rechercher
+    </button>
+
+    <button
+      mat-icon-button
+      (click)="refresh()"
+      matTooltip="Actualiser">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </div>
+
+  <!-- Liste des superviseurs -->
+  <div class="card">
+    @if (loading$ | async) {
+      <div class="loading-state">
+        <mat-progress-spinner diameter="50" mode="indeterminate"></mat-progress-spinner>
+        <span>Chargement des superviseurs...</span>
+      </div>
+    }
+
+    @if (!(loading$ | async) && (supervisors$ | async)?.data?.length === 0) {
+      <div class="empty-state">
+        <mat-icon>people</mat-icon>
+        <h3>Aucun superviseur trouvé</h3>
+        <p>Commencez par ajouter votre premier superviseur</p>
+        <button
+          class="btn btn--primary"
+          (click)="navigateToAdd()">
+          <mat-icon>person_add</mat-icon>
+          Ajouter un superviseur
+        </button>
+      </div>
+    }
+
+    @if (!(loading$ | async) && (supervisors$ | async)?.data && (supervisors$ | async)?.data?.length! > 0) {
+      <div class="table">
+        <div class="table-header">
+          <div class="table-row header">
+            <div class="column">Superviseur</div>
+            <div class="column center">Email</div>
+            <div class="column center">Téléphone</div>
+            <div class="column center">Profil</div>
+            <div class="column center">Actions</div>
+          </div>
+        </div>
+
+        <div class="table-body">
+          @for (supervisor of (supervisors$ | async)?.data; track supervisor.id) {
+            <div class="table-row">
+              <div class="column">
+                <div class="supervisor-info">
+                  <div class="avatar">
+                    <mat-icon [ngClass]="getProfileClass(supervisor.profile)">account_circle</mat-icon>
+                  </div>
+                  <div class="info">
+                    <span class="name">{{ getFullName(supervisor) }}</span>
+                    <span class="id">ID: {{ supervisor.id }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="column">
+                <div class="email-info">
+                  <mat-icon>email</mat-icon>
+                  <span>{{ supervisor.email }}</span>
+                </div>
+              </div>
+
+              <div class="column">
+                <div class="phone-info">
+                  <mat-icon>phone</mat-icon>
+                  <span>{{ supervisor.phone }}</span>
+                </div>
+              </div>
+
+              <div class="column center">
+                <div class="profile-badge" [ngClass]="getProfileClass(supervisor.profile)">
+                  <mat-icon>{{ getProfileIcon(supervisor.profile) }}</mat-icon>
+                  <span>{{ getProfileLabel(supervisor.profile) }}</span>
+                </div>
+              </div>
+
+              <div class="column center actions">
+                <button
+                  mat-icon-button
+                  (click)="changeProfile(supervisor)"
+                  matTooltip="Changer le profil">
+                  <mat-icon>badge</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  (click)="deleteSupervisor(supervisor)"
+                  matTooltip="Supprimer">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      @if ((supervisors$ | async)?.totalPages! > 1) {
+        <div class="pagination">
+          <div class="pagination-info">
+          <span>
+            Affichage de {{ ((supervisors$ | async)?.currentPage!) * 10 + 1}}
+            à {{ Math.min(((supervisors$ | async)?.currentPage! + 1) * 10, (supervisors$ | async)?.totalElements!) }}
+            sur {{ (supervisors$ | async)?.totalElements }} superviseurs
+          </span>
+          </div>
+          <div class="pagination-controls">
+            <button
+              mat-button
+              (click)="previousPage()"
+              [disabled]="(loading$ | async) || (supervisors$ | async)?.currentPage === 1">
+              <mat-icon>chevron_left</mat-icon>
+              Précédent
+            </button>
+            <span class="page-number">
+            Page {{ (supervisors$ | async)?.currentPage! + 1  }} / {{ (supervisors$ | async)?.totalPages }}
+          </span>
+            <button
+              mat-button
+              (click)="nextPage()"
+              [disabled]="(loading$ | async) || (supervisors$ | async)?.currentPage === (supervisors$ | async)?.totalPages">
+              Suivant
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>

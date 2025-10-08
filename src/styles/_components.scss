@@ -281,6 +281,14 @@
     }
   }
 
+  &--cancel {
+    background-color: transparent;
+    color: $color-error;
+    padding: 0.5rem;
+    border: none;
+    box-shadow: none;
+  }
+
   // États
   &:disabled {
     opacity: 0.6;
@@ -336,6 +344,19 @@
   &--bold { font-weight: 600; }
   &--medium { font-weight: 500; }
   &--normal { font-weight: 400; }
+
+  &--title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  &--subtitle {
+    font-weight: 400;
+    font-size: 1rem;
+    color: $text-muted;
+    margin: 0;
+  }
 }
 
 // Espacements utilitaires
@@ -384,12 +405,12 @@
 .flex {
   display: flex;
 
-  &--column { flex-direction: column; }
-  &--center { align-items: center; justify-content: center; }
-  &--between { justify-content: space-between; }
-  &--around { justify-content: space-around; }
-  &--start { align-items: flex-start; }
-  &--end { align-items: flex-end; }
+  &--column { display: flex; flex-direction: column; }
+  &--center { display: flex; align-items: center; justify-content: center; }
+  &--between { display: flex; justify-content: space-between; }
+  &--around { display: flex; justify-content: space-around; }
+  &--start { display: flex; align-items: flex-start; }
+  &--end { display: flex; align-items: flex-end; }
 
   &--1 { flex: 1; }
   &--2 { flex: 2; }
@@ -411,7 +432,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 
-  &--two { grid-template-columns: 1fr 1fr; @extend .gap--md}
+  &--two { display: grid; grid-template-columns: 1fr 1fr; @extend .gap--md}
   &--two-fs { grid-template-columns: 1.2fr .8fr; @extend .gap--md }
   &--three { grid-template-columns: 1fr 1fr 1fr; @extend .gap--md }
 }

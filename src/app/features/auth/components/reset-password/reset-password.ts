@@ -53,7 +53,7 @@ export class ResetPassword implements OnInit, OnDestroy {
       password: ['', [
         Validators.required,
         Validators.minLength(8),
-        this.passwordStrengthValidator
+        this.registerService.passwordStrengthValidator
       ]],
       confirmPassword: ['', Validators.required]
     }, { validators: this.passwordMatchValidator });
@@ -84,35 +84,6 @@ export class ResetPassword implements OnInit, OnDestroy {
         this.pwdForm.updateValueAndValidity();
       }
     });
-  }
-
-  private passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
-    if (!control.value) return null;
-
-    const password = control.value;
-    const errors: ValidationErrors = {};
-
-    // Au moins une minuscule
-    if (!/[a-z]/.test(password)) {
-      errors['noLowercase'] = true;
-    }
-
-    // Au moins une majuscule
-    if (!/[A-Z]/.test(password)) {
-      errors['noUppercase'] = true;
-    }
-
-    // Au moins un chiffre
-    if (!/[0-9]/.test(password)) {
-      errors['noNumber'] = true;
-    }
-
-    // Au moins un caractère spécial
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      errors['noSpecialChar'] = true;
-    }
-
-    return Object.keys(errors).length > 0 ? errors : null;
   }
 
   private passwordMatchValidator(group: AbstractControl): ValidationErrors | null {

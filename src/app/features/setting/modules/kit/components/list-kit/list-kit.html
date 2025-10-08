@@ -1,0 +1,204 @@
+<div class="kit-list-container">
+  <!-- En-tête avec actions -->
+  <div class="header">
+    <div class="header-content">
+      <h1>Gestion des Kits</h1>
+      <p class="subtitle">Liste et gestion de vos kits de produits</p>
+    </div>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="navigateToAdd()"
+      class="add-button">
+      <mat-icon>add_box</mat-icon>
+      <span>Créer un kit</span>
+    </button>
+  </div>
+
+  <!-- Barre de recherche et filtres -->
+  <div class="search-bar">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Rechercher un kit</mat-label>
+      <input
+        matInput
+        [formControl]="searchTerm"
+        (keyup.enter)="onSearch()"
+        placeholder="Nom, description...">
+      <mat-icon matPrefix>search</mat-icon>
+      @if (searchTerm.value) {
+        <button
+          mat-icon-button
+          matSuffix
+          (click)="clearSearch()"
+          aria-label="Effacer">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+    <button
+      mat-raised-button
+      class="btn btn--outline"
+      (click)="onSearch()"
+      [disabled]="!searchTerm.value">
+      Rechercher
+    </button>
+    <button
+      mat-icon-button
+      (click)="refresh()"
+      matTooltip="Actualiser">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </div>
+
+  <!-- Liste des kits -->
+  <div class="card">
+    @if (loading$ | async) {
+      <div class="loading-state">
+        <mat-progress-spinner diameter="50" mode="indeterminate"></mat-progress-spinner>
+        <span>Chargement des kits...</span>
+      </div>
+    }
+
+    @if (!(loading$ | async) && (kits$ | async)?.data?.length === 0) {
+      <div class="empty-state">
+        <mat-icon>inventory</mat-icon>
+        <h3>Aucun kit trouvé</h3>
+        <p>Créez votre premier kit de produits</p>
+        <button
+          class="btn btn--primary"
+          (click)="navigateToAdd()">
+          <mat-icon>add_box</mat-icon>
+          Créer un kit
+        </button>
+      </div>
+    }
+
+    @if (!(loading$ | async) && (kits$ | async)?.data && (kits$ | async)?.data?.length! > 0) {
+      <div class="kits-grid">
+        @for (kit of (kits$ | async)?.data; track kit.id) {
+          <div class="kit-card" [class.expanded]="isExpanded(kit.id!)">
+            <!-- En-tête du kit -->
+            <div class="kit-header">
+              <div class="kit-info">
+                <h3 class="kit-name">{{ kit.name }}</h3>
+                <p class="kit-description">{{ truncateDescription(kit.description) }}</p>
+              </div>
+              <div class="kit-badge" [ngClass]="getProductCountClass(getTotalProducts(kit))">
+                <mat-icon>inventory_2</mat-icon>
+                <span>{{ getTotalProducts(kit) }} produit(s)</span>
+              </div>
+            </div>
+
+            <!-- Prix total du kit -->
+            <div class="kit-price">
+              <span class="label">Coût total :</span>
+              <span class="price">{{ formatPrice(kit.totalCost) }}</span>
+            </div>
+
+            <!-- Liste des produits (expansible) -->
+            @if (kit.kitProducts.length > 0) {
+              <div class="kit-products-toggle">
+                <button
+                  mat-button
+                  (click)="toggleKitDetails(kit.id!)"
+                  class="toggle-button">
+                  <mat-icon>{{ isExpanded(kit.id!) ? 'expand_less' : 'expand_more' }}</mat-icon>
+                  <span>{{ isExpanded(kit.id!) ? 'Masquer' : 'Voir' }} les produits</span>
+                </button>
+              </div>
+
+              @if (isExpanded(kit.id!)) {
+                <div class="kit-products-list">
+                  <div class="products-header">
+                    <span>Produit</span>
+                    <span>Quantité</span>
+                    <span>Prix unitaire</span>
+                    <span style="text-align: right">Total</span>
+                  </div>
+                  @for (kitProduct of kit.kitProducts; track kitProduct.id) {
+                    <div class="product-item">
+                      <div class="product-name">
+                        <mat-icon>shopping_basket</mat-icon>
+                        <span>{{ kitProduct.product.name }}</span>
+                      </div>
+                      <div class="product-quantity">
+                        <span class="quantity-badge">× {{ kitProduct.quantity }}</span>
+                      </div>
+                      <div class="product-unit-price">
+                        {{ formatPrice(kitProduct.product.price) }}
+                      </div>
+                      <div class="product-total-price">
+                        {{ formatPrice(kitProduct.totalCost) }}
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            } @else {
+              <div class="empty-products">
+                <mat-icon>warning</mat-icon>
+                <span>Aucun produit dans ce kit</span>
+              </div>
+            }
+
+            <!-- Actions -->
+            <div class="kit-actions">
+              <button
+                mat-icon-button
+                color="primary"
+                (click)="editKit(kit)"
+                matTooltip="Modifier">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                (click)="duplicateKit(kit)"
+                matTooltip="Dupliquer">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                color="warn"
+                (click)="deleteKit(kit)"
+                matTooltip="Supprimer">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Pagination -->
+      @if ((kits$ | async)?.totalPages! > 1) {
+        <div class="pagination">
+          <div class="pagination-info">
+          <span>
+            Affichage de {{ ((kits$ | async)?.currentPage!) * 10 + 1 }}
+            à {{ Math.min(((kits$ | async)?.currentPage! + 1) * 10, (kits$ | async)?.totalElements!) }}
+            sur {{ (kits$ | async)?.totalElements }} kits
+          </span>
+          </div>
+          <div class="pagination-controls">
+            <button
+              mat-button
+              (click)="previousPage()"
+              [disabled]="(loading$ | async) || (kits$ | async)?.currentPage === 1">
+              <mat-icon>chevron_left</mat-icon>
+              Précédent
+            </button>
+            <span class="page-number">
+            Page {{ (kits$ | async)?.currentPage }} / {{ (kits$ | async)?.totalPages }}
+          </span>
+            <button
+              mat-button
+              (click)="nextPage()"
+              [disabled]="(loading$ | async) || (kits$ | async)?.currentPage === (kits$ | async)?.totalPages">
+              Suivant
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>
