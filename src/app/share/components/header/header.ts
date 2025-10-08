@@ -25,7 +25,7 @@ export class Header implements OnInit {
               private router: Router) {}
 
   ngOnInit() {
-    this.user = this.authService.getCurrentUser();
+    this.user = AuthService.getCurrentUser();
     this.searchCtrl = this.formBuilder.control('');
 
     this.searchCtrl.valueChanges.pipe(

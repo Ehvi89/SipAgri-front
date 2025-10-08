@@ -14,6 +14,7 @@ import { BaseRepository } from '../repositories/base-repository';
 import {PaginationResponse} from '../models/pagination-response-model';
 import {ErrorService} from './error-service';
 import {Injectable} from '@angular/core';
+import { AuthService } from "../../features/auth/services/auth-service";
 
 /**
  * BaseService provides a generic abstraction for managing entities, with functionalities
@@ -32,12 +33,16 @@ export abstract class BaseService<T> {
   private errorService: ErrorService = new ErrorService();
   private searchSubject = new Subject<{ search: string; page?: number; size?: number }>();
 
-  protected constructor(protected repository: BaseRepository<T>,) {
+  protected constructor(protected repository: BaseRepository<T>) {
     this.setupSearchPipeline();
   }
 
   protected setLoading(state: boolean) {
     this._loading.next(state);
+  }
+
+  protected setPagedData(data: PaginationResponse<T> | null) {
+    this._pagedData.next(data);
   }
 
   /**
@@ -48,12 +53,20 @@ export abstract class BaseService<T> {
    * @return {Observable<PaginationResponse<T>>} An observable emitting the paginated response containing the data.
    */
   getAllPaged(page?: number, size?: number): Observable<PaginationResponse<T>> {
-    this.setLoading(true);
-    return this.repository.getAllPaged(page, size).pipe(
-      tap(data => this._pagedData.next(data)), // mise à jour du cache
-      finalize(() => this.setLoading(false)),
-      catchError(err => throwError(() => this.errorService.handleError(err)))
-    );
+    this.setLoading(true);const currentSupervisor = AuthService.getCurrentUser();
+    if (currentSupervisor.profile === "ADMINISTRATOR") {
+      return this.repository.getAllPaged(page, size).pipe(
+        tap(data => this._pagedData.next(data)), // mise à jour du cache
+        finalize(() => this.setLoading(false)),
+        catchError(err => throwError(() => this.errorService.handleError(err)))
+      );
+    } else {
+      return this.repository.getAllPagedByUserId(page, size, currentSupervisor.id).pipe(
+        tap(data => this._pagedData.next(data)), // mise à jour du cache
+        finalize(() => this.setLoading(false)),
+        catchError(err => throwError(() => this.errorService.handleError(err)))
+      );
+    }
   }
 
   /**
@@ -90,7 +103,7 @@ export abstract class BaseService<T> {
         return this.repository.search(params.search, params.page, params.size).pipe(
           tap(data => {
             this._pagedData.next(data);
-            console.log('Search results:', data);
+            // console.log('Search results:', data);
           }),
           catchError(err => throwError(() => this.errorService.handleError(err))),
           finalize(() => this.setLoading(false))
@@ -160,6 +173,40 @@ export abstract class BaseService<T> {
   update(id: number | string, payload: Partial<T>): Observable<T> {
     this.setLoading(true);
     return this.repository.update(payload).pipe(
+      tap(updatedItem => {
+        if (this._data.value) {
+          this._data.next([
+            ...this._data.value.map(item =>
+              (item as any).id === id ? updatedItem : item
+            )
+          ]);
+        }
+        if (this._pagedData.value) {
+          this._pagedData.next({
+            ...this._pagedData.value,
+            data: [
+              ...this._pagedData.value.data.map(item =>
+                (item as any).id === id ? updatedItem : item
+              )
+            ],
+          });
+        }
+      }),
+      finalize(() => this.setLoading(false)),
+      catchError(err => throwError(() => this.errorService.handleError(err)))
+    );
+  }
+
+  /**
+   * Partially updates an item with the provided payload and updates the local state accordingly.
+   *
+   * @param {number | string} id - The unique identifier of the item to update.
+   * @param {Partial<T>} payload - The partial payload containing properties to update.
+   * @return {Observable<T>} An observable that emits the updated item.
+   */
+  partialUpdate(id: number | string, payload: Partial<T>): Observable<T> {
+    this.setLoading(true);
+    return this.repository.partialUpdate(payload).pipe(
       tap(updatedItem => {
         if (this._data.value) {
           this._data.next([

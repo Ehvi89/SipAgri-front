@@ -3,8 +3,8 @@ name: Build and Deploy Sipagri
 on:
   push:
     branches: [ "develop", "main" ]
-  pull_request:
-    branches: [ "main" ]
+#  pull_request:
+#    branches: [ "main" ]
 
 jobs:
   # Job de build pour la branche develop
@@ -113,7 +113,7 @@ jobs:
       - name: Restart nginx (production)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
-          sudo nginx -t
-          sudo systemctl reload nginx
-          echo "Déploiement terminé avec succès sur le serveur de production"
+          C:\nginx\nginx -t
+          C:\nssm\win64\nssm.exe restart
+          Write-Output "Déploiement terminé avec succès sur le serveur de production"
 

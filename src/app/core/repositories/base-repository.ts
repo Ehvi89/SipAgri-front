@@ -39,6 +39,18 @@ export abstract class BaseRepository<T> {
     );
   }
 
+  getAllPagedByUserId(page?: number, size?: number, userId?: number): Observable<PaginationResponse<T>> {
+    const params: any = {};
+    if (page !== undefined) params.page = page;
+    if (size !== undefined) params.size = size;
+    if (userId !== undefined) params.supervisorId = userId;
+
+    return this.http.get<PaginationResponse<T>>(
+      `${this.apiUrl}/${this.endpoint}/by_supervisor`,
+      { params }
+    )
+  }
+
   /**
    * Performs a search request to the API and retrieves a paginated response.
    *
@@ -97,6 +109,16 @@ export abstract class BaseRepository<T> {
    */
   update(payload: Partial<T>): Observable<T> {
     return this.http.put<T>(`${this.apiUrl}/${this.endpoint}`, payload);
+  }
+
+  /**
+   * Partially updates an entity on the server.
+   *
+   * @param {Partial<T>} payload - An object with the properties to update. Only the specified fields will be updated.
+   * @return {Observable<T>} An observable that emits the updated entity after the partial update is applied.
+   */
+  partialUpdate(payload: Partial<T>): Observable<T> {
+    return this.http.patch<T>(`${this.apiUrl}/${this.endpoint}`, payload);
   }
 
   /**

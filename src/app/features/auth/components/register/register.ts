@@ -75,7 +75,7 @@ export class Register implements OnInit, OnDestroy {
     this.passwordCtrl = this.formBuilder.control('', [
       Validators.required,
       Validators.minLength(8),
-      this.passwordStrengthValidator
+      this.registerService.passwordStrengthValidator
     ]);
 
     this.confirmPasswordCtrl = this.formBuilder.control('', [
@@ -134,35 +134,6 @@ export class Register implements OnInit, OnDestroy {
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(control.value) ? null : { invalidEmail: true };
-  }
-
-  private passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
-    if (!control.value) return null;
-
-    const password = control.value;
-    const errors: ValidationErrors = {};
-
-    // Au moins une minuscule
-    if (!/[a-z]/.test(password)) {
-      errors['noLowercase'] = true;
-    }
-
-    // Au moins une majuscule
-    if (!/[A-Z]/.test(password)) {
-      errors['noUppercase'] = true;
-    }
-
-    // Au moins un chiffre
-    if (!/[0-9]/.test(password)) {
-      errors['noNumber'] = true;
-    }
-
-    // Au moins un caractère spécial
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      errors['noSpecialChar'] = true;
-    }
-
-    return Object.keys(errors).length > 0 ? errors : null;
   }
 
   private passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
@@ -233,6 +204,7 @@ export class Register implements OnInit, OnDestroy {
       firstname: formValue.firstname.trim(),
       lastname: formValue.lastname.trim(),
       email: formValue.email.trim().toLowerCase(),
+      phone: formValue.phone.trim(),
       password: formValue.password
     };
 
