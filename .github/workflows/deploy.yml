@@ -108,12 +108,3 @@ jobs:
               Write-Output "Erreur lors du déploiement: $($_.Exception.Message)"
               exit 1
           }
-
-
-      - name: Restart nginx (production)
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          C:\nginx\nginx -t
-          C:\nssm\win64\nssm.exe restart
-          Write-Output "Déploiement terminé avec succès sur le serveur de production"
-
