@@ -6,9 +6,9 @@ import { AuthService } from "../../auth/services/auth-service";
 import {Observable} from 'rxjs';
 import { PaginationResponse } from "../../../core/models/pagination-response-model";
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class ProductionService extends BaseService<Production>{
-  constructor(private productionRepository: ProductionRepository) {
+  constructor(private readonly productionRepository: ProductionRepository) {
     super(productionRepository);
   }
 }

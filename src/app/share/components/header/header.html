@@ -32,11 +32,15 @@
 
   <span class="spacer"></span>
 
+  @if (export) {
+    <button routerLink="/export" class="export-btn">
+      <mat-icon>backup</mat-icon>
+      <span>Exporter</span>
+    </button>
+  }
   <!-- Utilisateur connecté -->
-  <div class="user" *ngIf="user" [matMenuTriggerFor]="userMenu">
+  <div class="user" [ngClass]="{'withSearch': !breadcrumb}" *ngIf="user" [matMenuTriggerFor]="userMenu">
     <mat-icon class="avatar-icon" aria-hidden="true">person</mat-icon>
-    <!-- Si tu veux l’avatar image à la place -->
-    <!-- <img src="assets/images/avatar.png" [alt]="user.lastname" class="avatar-img"> -->
     <span>{{ user.firstname }} {{ user.lastname }}</span>
   </div>
 

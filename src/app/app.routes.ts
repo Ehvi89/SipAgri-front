@@ -2,9 +2,11 @@ import { Routes } from '@angular/router';
 import { AuthGuard } from './features/auth/guards/auth-guard';
 import {Dashboard} from './core/components/dashbord/dashboard';
 import {ErrorComponent} from './core/components/error/error.component';
+import {DataExport} from './share/components/data-export/data-export';
 
 export const routes: Routes = [
   { path: "dashboard", component: Dashboard, canActivate: [AuthGuard], runGuardsAndResolvers: "always" },
+  { path: "export", component: DataExport},
   { path: "auth", loadChildren: () => import('./features/auth/auth-module')
       .then(m => m.AuthModule) },
   { path: "planters", loadChildren: () => import("./features/planter/planter-module")

@@ -14,6 +14,7 @@ import {Router} from '@angular/router';
 export class Header implements OnInit {
   @Input({ required: true }) placeholder!: string;
   @Input() breadcrumb!: boolean;
+  @Input() export: boolean = true;
   @Output() textChange = new EventEmitter<string>();
 
   user!: Supervisor;
