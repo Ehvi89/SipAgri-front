@@ -1,6 +1,9 @@
-# SipAgri
+# SipAgri 🌱
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.2.
+[![Angular](https://img.shields.io/badge/Angular-20.0.2-red.svg)](https://angular.io)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+SipAgri is a comprehensive agricultural management system that helps track planters, plantations, and production data. The application provides intuitive dashboards and analytics tools for agricultural operations.
 
 ## Development server
 
