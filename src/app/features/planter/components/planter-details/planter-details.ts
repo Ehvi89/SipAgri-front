@@ -59,7 +59,6 @@ export class PlanterDetails implements OnInit {
           .subscribe(planter => this.planter = planter);
       }
     });
-
     this.loadingUpdate = this.planterService.loading$;
     if (this.planter?.plantations) {
       this.loading = true;
@@ -168,7 +167,7 @@ export class PlanterDetails implements OnInit {
     }).subscribe((result: boolean) => {
       if (result) {
         this.planterService.delete(this.planter.id!).subscribe({
-          next:() => this.router.navigateByUrl('/planters')
+          next:() => this.router.navigateByUrl('/planters').then()
         });
       }
     });

@@ -20,10 +20,9 @@ export interface ChartData {
   color?: string;
 }
 
-export interface ProductionData {
+export interface ProductionTrendData {
   period: string;
   value: number;
-  culture: string;
 }
 
 @Component({
@@ -44,19 +43,21 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
 
   resumes$!: Observable<Resume[]>;
   productionByPeriod: ChartData[] = [];
-  culturalDistribution: ChartData[] = [];
-  productionTrend: ProductionData[] = [];
+  productionByPlantation: ChartData[] = [];
+  productionTrend: ProductionTrendData[] = [];
 
-  selectedPeriodFilter: string = 'mois';
+  selectedPeriodFilter: string = 'month';
   periodFilters = [
-    { value: 'semaine', label: 'Par semaine' },
-    { value: 'mois', label: 'Par mois' },
-    { value: 'trimestre', label: 'Par trimestre' },
-    { value: 'annee', label: 'Par année' }
+    { value: 'week', label: 'Par semaine' },
+    { value: 'month', label: 'Par mois' },
+    { value: 'quarter', label: 'Par trimestre' },
+    { value: 'year', label: 'Par année' }
   ];
 
-  constructor(private dashboardService: DashboardService,
-              private cdr: ChangeDetectorRef,) {}
+  constructor(
+    private readonly dashboardService: DashboardService,
+    private readonly cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.loadDashboardData();
@@ -78,19 +79,18 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
     // Charger les statistiques de résumé
     this.resumes$ = this.dashboardService.getResumesData();
 
-    // Charger les données de production par période
+    // Charger toutes les données en parallèle
     forkJoin([
       this.dashboardService.getProductionByPeriod(this.selectedPeriodFilter),
-      this.dashboardService.getCulturalDistribution(),
+      this.dashboardService.getProductionByPlantation(),
       this.dashboardService.getProductionTrend()
     ]).subscribe({
-      next: (data) => {
-        this.culturalDistribution = data[0];
-        this.productionByPeriod = data[1];
-        this.productionTrend = data[2];
+      next: ([periodData, plantationData, trendData]) => {
+        this.productionByPeriod = periodData;
+        this.productionByPlantation = plantationData;
+        this.productionTrend = trendData;
 
         this.updateAllCharts();
-
         this.cdr.detectChanges();
       },
       error: (error) => {
@@ -100,9 +100,9 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private updateAllCharts(): void {
+    this.updateBarChart();
     this.updatePieChart();
     this.updateLineChart();
-    this.updateBarChart();
   }
 
   onPeriodFilterChange(): void {
@@ -162,7 +162,7 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
             cornerRadius: 8,
             callbacks: {
               label: (context) => {
-                return `Production: ${context.parsed.y} tonnes`;
+                return `Production: ${context.parsed.y.toFixed(2)} kg`;
               }
             }
           }
@@ -176,7 +176,8 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
             ticks: {
               font: {
                 size: 12
-              }
+              },
+              callback: (value) => `${value} kg`
             }
           },
           x: {
@@ -209,12 +210,14 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
         datasets: [{
           data: [],
           backgroundColor: [
-            '#8B4513',
-            '#6F4E37',
-            '#228B22',
-            '#2F4F4F',
-            '#696969',
-            '#FF6347'
+            '#3b82f6',
+            '#10b981',
+            '#f59e0b',
+            '#ef4444',
+            '#8b5cf6',
+            '#06b6d4',
+            '#ec4899',
+            '#14b8a6'
           ],
           borderColor: '#ffffff',
           borderWidth: 3
@@ -246,7 +249,7 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
                 const value = context.parsed;
                 const total = context.dataset.data.reduce((a: any, b: any) => a + b, 0);
                 const percentage = ((value / total) * 100).toFixed(1);
-                return `${label}: ${percentage}%`;
+                return `${label}: ${value.toFixed(2)} kg (${percentage}%)`;
               }
             }
           }
@@ -269,7 +272,7 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
       data: {
         labels: [],
         datasets: [{
-          label: 'Production (tonnes)',
+          label: 'Production (kg)',
           data: [],
           borderColor: '#10b981',
           backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -296,7 +299,7 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
             cornerRadius: 8,
             callbacks: {
               label: (context) => {
-                return `Production: ${context.parsed.y} tonnes`;
+                return `Production: ${context.parsed.y.toFixed(2)} kg`;
               }
             }
           }
@@ -310,7 +313,8 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
             ticks: {
               font: {
                 size: 12
-              }
+              },
+              callback: (value) => `${value} kg`
             }
           },
           x: {
@@ -344,10 +348,10 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private updatePieChart(): void {
-    if (!this.pieChart || this.culturalDistribution.length === 0) return;
+    if (!this.pieChart || this.productionByPlantation.length === 0) return;
 
-    this.pieChart.data.labels = this.culturalDistribution.map(item => item.name);
-    this.pieChart.data.datasets[0].data = this.culturalDistribution.map(item => item.value);
+    this.pieChart.data.labels = this.productionByPlantation.map(item => item.name);
+    this.pieChart.data.datasets[0].data = this.productionByPlantation.map(item => item.value);
     this.pieChart.update('none');
   }
 
