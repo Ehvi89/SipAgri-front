@@ -6,10 +6,10 @@ import {Observable} from 'rxjs';
 import { PaginationResponse } from "../../../core/models/pagination-response-model";
 import { AuthService } from "../../auth/services/auth-service";
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class PlantationService extends BaseService<Plantation> {
 
-  constructor(private plantationRepository: PlantationRepository) {
+  constructor(private readonly plantationRepository: PlantationRepository) {
     super(plantationRepository);
   }
 }

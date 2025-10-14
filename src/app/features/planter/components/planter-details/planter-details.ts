@@ -39,16 +39,16 @@ export class PlanterDetails implements OnInit {
   ];
   gender = Gender;
 
-  constructor(private geocodingService: GeocodingService,
-              private planterService: PlanterService,
-              private cdr: ChangeDetectorRef,
-              private notifService: NotificationService,
-              private router: Router,
-              private dialogService: DialogService,
-              private supervisorService: SupervisorService,
-              private dialog: MatDialog,
-              private formBuilder: FormBuilder,
-              private route: ActivatedRoute) {
+  constructor(private readonly geocodingService: GeocodingService,
+              private readonly planterService: PlanterService,
+              private readonly cdr: ChangeDetectorRef,
+              private readonly notifService: NotificationService,
+              private readonly router: Router,
+              private readonly dialogService: DialogService,
+              private readonly supervisorService: SupervisorService,
+              private readonly dialog: MatDialog,
+              private readonly formBuilder: FormBuilder,
+              private readonly route: ActivatedRoute) {
   }
 
   ngOnInit() {
@@ -59,7 +59,6 @@ export class PlanterDetails implements OnInit {
           .subscribe(planter => this.planter = planter);
       }
     });
-
     this.loadingUpdate = this.planterService.loading$;
     if (this.planter?.plantations) {
       this.loading = true;
@@ -76,7 +75,6 @@ export class PlanterDetails implements OnInit {
         take(1),
         tap(results => {
           this.plantationsWithVillage = results;
-          // console.log(this.plantationsWithVillage);
         }),
         finalize(() => {
           this.loading = false;
@@ -124,7 +122,7 @@ export class PlanterDetails implements OnInit {
   getTotalSurface(): number {
     let total = 0;
     if (this.planter?.plantations != null && this.planter?.plantations?.length > 0) {
-      for (let plantation of this.planter?.plantations!) {
+      for (let plantation of this.planter.plantations) {
         total += plantation.farmedArea;
       }
     }
@@ -133,22 +131,30 @@ export class PlanterDetails implements OnInit {
   }
 
   getAnnualProduction(): number {
-    let annualProduction = 0;
+    if (!this.planter?.plantations?.length) return 0;
 
-    if (this.planter?.plantations != null && this.planter?.plantations?.length > 0) {
-      for (let plantation of this.planter?.plantations!) {
-        let totalProduction = 0;
-        for (let production of plantation.productions!) {
-          // if (production.year.getFullYear() == Date.now()) {
-          totalProduction += production.productionInKg;
-          // }
-        }
+    const yearlyTotals: { [year: number]: number } = {};
 
-        annualProduction += totalProduction;
+    for (const plantation of this.planter.plantations) {
+      if (!plantation.productions?.length) continue;
+
+      for (const production of plantation.productions) {
+        // Normaliser l'année en number
+        const year = production.year instanceof Date
+          ? production.year.getFullYear()
+          : +production.year;
+
+        if (!yearlyTotals[year]) yearlyTotals[year] = 0;
+        yearlyTotals[year] += production.productionInKg;
       }
     }
 
-    return annualProduction;
+    // Calcul de la moyenne annuelle
+    const years = Object.keys(yearlyTotals);
+    if (years.length === 0) return 0;
+
+    const total = years.reduce((sum, y) => sum + yearlyTotals[+y], 0);
+    return total / years.length;
   }
 
   deletePlanter() {
@@ -160,8 +166,8 @@ export class PlanterDetails implements OnInit {
       deletion: true
     }).subscribe((result: boolean) => {
       if (result) {
-        this.planterService.delete(this.planter!.id!).subscribe({
-          next: () => this.router.navigateByUrl('/planters')
+        this.planterService.delete(this.planter.id!).subscribe({
+          next:() => this.router.navigateByUrl('/planters').then()
         });
       }
     });
@@ -183,14 +189,9 @@ export class PlanterDetails implements OnInit {
         return '';
     }
   }
-
-  comingSoon() {
-    this.notifService.comingSoon();
-  }
-
   addPlantation() {
     this.router.navigate(['/plantations/add'], {
-      queryParams: { planter: this.planter!.id }
+      queryParams: { planter: this.planter.id }
     }).then();
   }
 }

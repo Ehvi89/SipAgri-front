@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of, map, delay } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
-import { Resume, ChartData, ProductionData } from '../components/dashbord/dashboard';
+import { Resume, ChartData, ProductionTrendData } from '../components/dashbord/dashboard';
+import { Planter } from '../models/planter-model';
+import { Production } from '../models/production-model';
+import {environment} from '../../../environments/environment';
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -14,140 +17,157 @@ export interface ApiResponse<T> {
   providedIn: 'root'
 })
 export class DashboardService {
-  private readonly baseUrl = '/api/dashboard'; // Remplacez par votre URL d'API
+  private readonly baseUrl = `${environment.apiUrl}/dashboard`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   /**
    * Récupère les statistiques de résumé du dashboard
+   * - Nombre total de planteurs
+   * - Production totale (somme de toutes les productions en kg)
+   * - Revenus générés (somme de productionInKg * purchasePrice)
+   * - Nombre de plantations actives
    */
   getResumesData(): Observable<Resume[]> {
-    // return this.http.get<ApiResponse<Resume[]>>(`${this.baseUrl}/resumes`)
-    //   .pipe(
-    //     map(response => response.data)
-    //   );
-
-    // Données mockées pour le développement
-    return of([
-      {
-        name: 'Nombre de planteurs',
-        value: '1,234',
-        monthlyValue: '+12% ce mois'
-      },
-      {
-        name: 'Production totale',
-        value: '45.2T',
-        monthlyValue: '+8% ce mois'
-      },
-      {
-        name: 'Revenus générés',
-        value: '€125,430',
-        monthlyValue: '+15% ce mois'
-      },
-      {
-        name: 'Cultures actives',
-        value: '23',
-        monthlyValue: '+2 nouvelles'
-      }
-    ]).pipe(delay(500));
-  }
-
-  /**
-   * Récupère les données de production par période
-   */
-  getProductionByPeriod(period: string = 'mois'): Observable<ChartData[]> {
-    // const params = new HttpParams().set('period', period);
-
-    // return this.http.get<ApiResponse<ChartData[]>>(`${this.baseUrl}/production-by-period`, { params })
-    //   .pipe(
-    //     map(response => response.data)
-    //   );
-
-    // Données mockées basées sur la période sélectionnée
-    const mockData = this.generateMockProductionData(period);
-    return of(mockData).pipe(delay(300));
-  }
-
-  /**
-   * Récupère la répartition par culture
-   */
-  getCulturalDistribution(): Observable<ChartData[]> {
-    // return this.http.get<ApiResponse<ChartData[]>>(`${this.baseUrl}/cultural-distribution`)
-    //   .pipe(
-    //     map(response => response.data)
-    //   );
-
-    // Données mockées
-    return of([
-      { name: 'Cacao', value: 45, color: '#8B4513' },
-      { name: 'Café', value: 25, color: '#6F4E37' },
-      { name: 'Palmier à huile', value: 15, color: '#228B22' },
-      { name: 'Hévéa', value: 10, color: '#2F4F4F' },
-      { name: 'Autres', value: 5, color: '#696969' }
-    ]).pipe(delay(400));
-  }
-
-  /**
-   * Récupère les données de tendance de production
-   */
-  getProductionTrend(months: number = 12): Observable<ProductionData[]> {
-    // const params = new HttpParams().set('months', months.toString());
-
-    // return this.http.get<ApiResponse<ProductionData[]>>(`${this.baseUrl}/production-trend`, { params })
-    //   .pipe(
-    //     map(response => response.data)
-    //   );
-
-    // Données mockées
-    return of(this.generateMockTrendData(months)).pipe(delay(600));
-  }
-
-  /**
-   * Récupère les statistiques détaillées d'un planteur
-   */
-  getPlanterDetails(planterId: string): Observable<any> {
-    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/planter/${planterId}`)
+    return this.http.get<ApiResponse<Resume[]>>(`${this.baseUrl}/resumes`)
       .pipe(
         map(response => response.data)
       );
   }
 
   /**
-   * Récupère les données de production par région
+   * Récupère les données de production groupées par période
+   * @param period - 'week', 'month', 'quarter', ou 'year'
+   * Agrège les productions par période selon le champ year de Production
    */
-  getProductionByRegion(): Observable<ChartData[]> {
-    // return this.http.get<ApiResponse<ChartData[]>>(`${this.baseUrl}/production-by-region`)
-    //   .pipe(
-    //     map(response => response.data)
-    //   );
+  getProductionByPeriod(period: string = 'month'): Observable<ChartData[]> {
+    const params = new HttpParams().set('period', period);
 
-    // Données mockées
-    return of([
-      { name: 'Abidjan', value: 28 },
-      { name: 'Bouaké', value: 22 },
-      { name: 'Yamoussoukro', value: 18 },
-      { name: 'San-Pédro', value: 15 },
-      { name: 'Korhogo', value: 12 },
-      { name: 'Autres', value: 5 }
-    ]).pipe(delay(400));
+    return this.http.get<ApiResponse<ChartData[]>>(`${this.baseUrl}/production-by-period`, { params })
+      .pipe(
+        map(response => response.data)
+      );
   }
 
   /**
-   * Récupère les données de performance mensuelle
+   * Récupère la répartition de production par plantation
+   * Retourne le nom de chaque plantation avec sa production totale
    */
-  getMonthlyPerformance(): Observable<any[]> {
-    return of([
-      { month: 'Jan', production: 3.2, revenue: 8500, planters: 45 },
-      { month: 'Fév', production: 3.8, revenue: 9200, planters: 48 },
-      { month: 'Mar', production: 4.1, revenue: 10100, planters: 52 },
-      { month: 'Avr', production: 3.9, revenue: 9800, planters: 50 },
-      { month: 'Mai', production: 4.5, revenue: 11200, planters: 55 },
-      { month: 'Juin', production: 4.2, revenue: 10800, planters: 53 }
-    ]).pipe(delay(500));
+  getProductionByPlantation(): Observable<ChartData[]> {
+    return this.http.get<ApiResponse<ChartData[]>>(`${this.baseUrl}/production-by-plantation`)
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  /**
+   * Récupère les données de tendance de production dans le temps
+   * Basé sur le champ year des productions
+   * @param months - Nombre de mois à afficher (par défaut 12)
+   */
+  getProductionTrend(months: number = 12): Observable<ProductionTrendData[]> {
+    const params = new HttpParams().set('months', months.toString());
+
+    return this.http.get<ApiResponse<ProductionTrendData[]>>(`${this.baseUrl}/production-trend`, { params })
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  /**
+   * Récupère les détails d'un planteur avec ses plantations et productions
+   */
+  getPlanterDetails(planterId: number): Observable<Planter> {
+    return this.http.get<ApiResponse<Planter>>(`${this.baseUrl}/planter/${planterId}`)
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  /**
+   * Récupère les planteurs avec le plus de production
+   * @param limit - Nombre de planteurs à retourner
+   */
+  getTopPlanters(limit: number = 10): Observable<ChartData[]> {
+    const params = new HttpParams().set('limit', limit.toString());
+
+    return this.http.get<ApiResponse<ChartData[]>>(`${this.baseUrl}/top-planters`, { params })
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  /**
+   * Récupère les plantations avec le plus de surface cultivée
+   * @param limit - Nombre de plantations à retourner
+   */
+  getTopPlantationsByArea(limit: number = 10): Observable<ChartData[]> {
+    const params = new HttpParams().set('limit', limit.toString());
+
+    return this.http.get<ApiResponse<ChartData[]>>(`${this.baseUrl}/top-plantations-by-area`, { params })
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  /**
+   * Récupère les statistiques de paiement
+   * Nombre de productions payées vs non payées basé sur mustBePaid
+   */
+  getPaymentStatistics(): Observable<{ paid: number; unpaid: number; total: number }> {
+    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/payment-statistics`)
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  /**
+   * Récupère la répartition des planteurs par village
+   */
+  getPlantersByVillage(): Observable<ChartData[]> {
+    return this.http.get<ApiResponse<ChartData[]>>(`${this.baseUrl}/planters-by-village`)
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  /**
+   * Récupère la production moyenne par hectare
+   * Calculé comme : production totale / surface cultivée totale
+   */
+  getAverageProductionPerHectare(): Observable<number> {
+    return this.http.get<ApiResponse<number>>(`${this.baseUrl}/avg-production-per-hectare`)
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  /**
+   * Récupère le prix d'achat moyen par kg
+   */
+  getAveragePurchasePrice(): Observable<number> {
+    return this.http.get<ApiResponse<number>>(`${this.baseUrl}/avg-purchase-price`)
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  /**
+   * Récupère les productions récentes
+   * @param limit - Nombre de productions à retourner
+   */
+  getRecentProductions(limit: number = 10): Observable<Production[]> {
+    const params = new HttpParams().set('limit', limit.toString());
+
+    return this.http.get<ApiResponse<Production[]>>(`${this.baseUrl}/recent-productions`, { params })
+      .pipe(
+        map(response => response.data)
+      );
   }
 
   /**
    * Exporte les données du dashboard
+   * @param format - Format d'export: 'excel', 'pdf', ou 'csv'
    */
   exportDashboardData(format: 'excel' | 'pdf' | 'csv'): Observable<Blob> {
     const params = new HttpParams().set('format', format);
@@ -157,65 +177,19 @@ export class DashboardService {
     });
   }
 
-  // Méthodes privées pour générer des données mockées
-
-  private generateMockProductionData(period: string): ChartData[] {
-    const baseData: Record<string, ChartData[]> = {
-      semaine: [
-        { name: 'Sem 1', value: 2.1 },
-        { name: 'Sem 2', value: 2.5 },
-        { name: 'Sem 3', value: 1.8 },
-        { name: 'Sem 4', value: 3.2 }
-      ],
-      mois: [
-        { name: 'Jan', value: 8.5 },
-        { name: 'Fév', value: 9.2 },
-        { name: 'Mar', value: 7.8 },
-        { name: 'Avr', value: 10.1 },
-        { name: 'Mai', value: 11.3 },
-        { name: 'Juin', value: 9.7 }
-      ],
-      trimestre: [
-        { name: 'T1 2024', value: 25.5 },
-        { name: 'T2 2024', value: 31.1 },
-        { name: 'T3 2024', value: 28.9 },
-        { name: 'T4 2023', value: 22.3 }
-      ],
-      annee: [
-        { name: '2021', value: 89.2 },
-        { name: '2022', value: 95.8 },
-        { name: '2023', value: 102.5 },
-        { name: '2024', value: 108.1 }
-      ]
-    };
-
-    return baseData[period] || baseData["mois"];
-  }
-
-  private generateMockTrendData(months: number): ProductionData[] {
-    const data: ProductionData[] = [];
-    const currentDate = new Date();
-
-    for (let i = months; i >= 1; i--) {
-      const date = new Date(currentDate);
-      date.setMonth(date.getMonth() - i);
-
-      const monthNames = [
-        'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
-        'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'
-      ];
-
-      // Simulation d'une tendance avec variations saisonnières
-      const baseValue = 8 + Math.sin((date.getMonth() / 12) * 2 * Math.PI) * 2;
-      const randomVariation = (Math.random() - 0.5) * 1.5;
-
-      data.push({
-        period: `${monthNames[date.getMonth()]} ${date.getFullYear()}`,
-        value: Math.round((baseValue + randomVariation) * 10) / 10,
-        culture: 'Toutes cultures'
-      });
-    }
-
-    return data;
+  /**
+   * Récupère les statistiques démographiques des planteurs
+   * Répartition par genre, statut marital, etc.
+   */
+  getPlanterDemographics(): Observable<{
+    byGender: ChartData[];
+    byMaritalStatus: ChartData[];
+    averageAge: number;
+    averageChildren: number;
+  }> {
+    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/planter-demographics`)
+      .pipe(
+        map(response => response.data)
+      );
   }
 }

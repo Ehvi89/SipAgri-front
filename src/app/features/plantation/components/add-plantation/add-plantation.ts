@@ -28,7 +28,7 @@ import { AuthService } from "../../../auth/services/auth-service";
   styleUrl: './add-plantation.scss'
 })
 export class AddPlantation implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   loading$!: Observable<boolean>;
 
   //FormGroup & FormControl
@@ -45,23 +45,22 @@ export class AddPlantation implements OnInit, OnDestroy {
   isGoogleMapsReady = false;
 
   // datas fields
-  private regionsSubject = new BehaviorSubject<string[]>([]);
+  private readonly regionsSubject = new BehaviorSubject<string[]>([]);
   regions$ = this.regionsSubject.asObservable();
   planters$!: Observable<Planter[]>;
   kits$!: Observable<Kit[]>;
 
   // Constructor
   constructor(
-    private fb: FormBuilder,
-    private planterService: PlanterService,
-    private plantationService: PlantationService,
-    private notifService: NotificationService,
-    private kitService: KitService,
-    private googleMapsService: GoogleMapsService,
-    private cdr: ChangeDetectorRef,
-    private geocodingService: GeocodingService,
-    private route: ActivatedRoute,
-    private authService: AuthService
+    private readonly fb: FormBuilder,
+    private readonly planterService: PlanterService,
+    private readonly plantationService: PlantationService,
+    private readonly notifService: NotificationService,
+    private readonly kitService: KitService,
+    private readonly googleMapsService: GoogleMapsService,
+    private readonly cdr: ChangeDetectorRef,
+    private readonly geocodingService: GeocodingService,
+    private readonly route: ActivatedRoute
   ) {}
 
   ngOnInit() {
@@ -145,7 +144,7 @@ export class AddPlantation implements OnInit, OnDestroy {
     this.route.queryParams.subscribe(params => {
       const planterId:string = params['planter'];
       if (planterId) {
-        this.plantationForm.patchValue({ planterId: parseInt(planterId) });
+        this.plantationForm.patchValue({ planterId: Number.parseInt(planterId) });
       }
     });
 
@@ -160,10 +159,10 @@ export class AddPlantation implements OnInit, OnDestroy {
       tap((value: string) => {
         if (value && this.isValidGpsFormat(value)) {
           const coordinates = value.split(",");
-          const lat = parseFloat(coordinates[0].trim());
-          const lng = parseFloat(coordinates[1].trim());
+          const lat = Number.parseFloat(coordinates[0].trim());
+          const lng = Number.parseFloat(coordinates[1].trim());
 
-          if (!isNaN(lat) && !isNaN(lng)) {
+          if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
             this.geocodingService.getPlaceName({
               latitude: lat,
               longitude: lng,
@@ -212,10 +211,10 @@ export class AddPlantation implements OnInit, OnDestroy {
         return { invalidFormat: true };
       }
 
-      const lat = parseFloat(coordinates[0].trim());
-      const lng = parseFloat(coordinates[1].trim());
+      const lat = Number.parseFloat(coordinates[0].trim());
+      const lng = Number.parseFloat(coordinates[1].trim());
 
-      if (isNaN(lat) || isNaN(lng)) {
+      if (Number.isNaN(lat) || Number.isNaN(lng)) {
         return { invalidCoordinates: true };
       }
 
@@ -233,10 +232,10 @@ export class AddPlantation implements OnInit, OnDestroy {
     const coordinates = value.split(',');
     if (coordinates.length !== 2) return false;
 
-    const lat = parseFloat(coordinates[0].trim());
-    const lng = parseFloat(coordinates[1].trim());
+    const lat = Number.parseFloat(coordinates[0].trim());
+    const lng = Number.parseFloat(coordinates[1].trim());
 
-    return !isNaN(lat) && !isNaN(lng) &&
+    return !Number.isNaN(lat) && !Number.isNaN(lng) &&
       lat >= -90 && lat <= 90 &&
       lng >= -180 && lng <= 180;
   }

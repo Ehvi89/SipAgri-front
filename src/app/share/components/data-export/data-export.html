@@ -1,0 +1,234 @@
+<div class="export-container">
+  <app-header placeholder="" [breadcrumb]="true" [export]="false"></app-header>
+
+  <div class="content">
+    <div class="export-header">
+      <h2>Export de Données</h2>
+      <p>Sélectionnez le type de données et le format d'export</p>
+    </div>
+
+    <div class="export-content">
+      <!-- Sélection du type de données -->
+      <div class="section">
+        <label class="section-label">Type de données à exporter</label>
+        <div class="data-type-grid">
+          <button
+            class="data-type-btn"
+            [class.active]="dataType === 'planters'"
+            (click)="selectDataType('planters')">
+            <div class="btn-title">Planteurs</div>
+            <div class="btn-subtitle">Avec plantations et productions</div>
+          </button>
+
+          <button
+            class="data-type-btn"
+            [class.active]="dataType === 'plantations'"
+            (click)="selectDataType('plantations')">
+            <div class="btn-title">Plantations</div>
+            <div class="btn-subtitle">Avec planteurs et productions</div>
+          </button>
+
+          <button
+            class="data-type-btn"
+            [class.active]="dataType === 'productions'"
+            (click)="selectDataType('productions')">
+            <div class="btn-title">Productions</div>
+            <div class="btn-subtitle">Avec plantations et planteurs</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sélection du format d'export -->
+      <div class="section">
+        <label class="section-label">Format d'export</label>
+        <div class="format-grid">
+          <button
+            class="format-btn"
+            [class.active]="exportFormat === 'csv'"
+            (click)="selectExportFormat('csv')">
+            <div class="btn-title">CSV</div>
+            <div class="btn-extension">.csv</div>
+          </button>
+
+          <button
+            class="format-btn"
+            [class.active]="exportFormat === 'json'"
+            (click)="selectExportFormat('json')">
+            <div class="btn-title">JSON</div>
+            <div class="btn-extension">.json</div>
+          </button>
+
+          <button
+            class="format-btn"
+            [class.active]="exportFormat === 'pdf'"
+            (click)="selectExportFormat('pdf')">
+            <div class="btn-title">PDF</div>
+            <div class="btn-extension">.pdf</div>
+          </button>
+
+          <button
+            class="format-btn"
+            [class.active]="exportFormat === 'excel'"
+            (click)="selectExportFormat('excel')">
+            <div class="btn-title">Excel</div>
+            <div class="btn-extension">.xlsx</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Boutons Filtres -->
+      <div class="filter-controls">
+        <button class="btn-secondary" (click)="toggleFilters()">
+          <span class="icon">🔍</span>
+          {{ showFilters ? 'Masquer les filtres' : 'Afficher les filtres' }}
+        </button>
+
+        <button *ngIf="showFilters" class="btn-danger" (click)="resetFilters()">
+          <mat-icon class="icon">cancel</mat-icon>
+          Réinitialiser les filtres
+        </button>
+      </div>
+
+      <!-- Section Filtres - Planteurs -->
+      <div *ngIf="showFilters && dataType === 'planters'" class="filters-section">
+        <h3>Filtres - Planteurs</h3>
+
+        <div class="filter-grid-2">
+          <mat-form-field appearance="outline">
+            <mat-label>Genre</mat-label>
+            <mat-select [(ngModel)]="planterFilters.gender">
+              <mat-option [value]="undefined">Tous</mat-option>
+              <mat-option value="MALE">Homme</mat-option>
+              <mat-option value="FEMALE">Femme</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Statut marital</mat-label>
+            <mat-select [(ngModel)]="planterFilters.maritalStatus">
+              <mat-option [value]="undefined">Tous</mat-option>
+              <mat-option value="SINGLE">Célibataire</mat-option>
+              <mat-option value="MARRIED">Marié(e)</mat-option>
+              <mat-option value="DIVORCED">Divorcé(e)</mat-option>
+              <mat-option value="WIDOWED">Veuf/Veuve</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Village</mat-label>
+          <input matInput [(ngModel)]="planterFilters.village" placeholder="Nom du village">
+        </mat-form-field>
+
+        <div class="filter-grid-2">
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre d'enfants (min)</mat-label>
+            <input matInput type="number" [(ngModel)]="planterFilters.minChildrenNumber" placeholder="0">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre d'enfants (max)</mat-label>
+            <input matInput type="number" [(ngModel)]="planterFilters.maxChildrenNumber" placeholder="10">
+          </mat-form-field>
+        </div>
+
+        <div class="filter-grid-2">
+          <mat-form-field appearance="outline">
+            <mat-label>Âge minimum</mat-label>
+            <input matInput type="number" [(ngModel)]="planterFilters.minAge" placeholder="18">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Âge maximum</mat-label>
+            <input matInput type="number" [(ngModel)]="planterFilters.maxAge" placeholder="65">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Section Filtres - Plantations -->
+      <div *ngIf="showFilters && dataType === 'plantations'" class="filters-section">
+        <h3>Filtres - Plantations</h3>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Village</mat-label>
+          <input matInput type="text" [(ngModel)]="plantationFilters.village" placeholder="Nom du village">
+        </mat-form-field>
+
+        <div class="filter-grid-2">
+          <mat-form-field appearance="outline">
+            <mat-label>Surface cultivée min (ha)</mat-label>
+            <input matInput type="number" step="0.1" [(ngModel)]="plantationFilters.minFarmedArea" placeholder="0">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Surface cultivée max (ha)</mat-label>
+            <input matInput type="number" step="0.1" [(ngModel)]="plantationFilters.maxFarmedArea" placeholder="100">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Section Filtres - Productions -->
+      <div *ngIf="showFilters && dataType === 'productions'" class="filters-section">
+        <h3>Filtres - Productions</h3>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Année</mat-label>
+          <input matInput type="number" [(ngModel)]="productionFilters.year" placeholder="2024">
+        </mat-form-field>
+
+        <div class="filter-grid-2">
+          <mat-form-field appearance="outline">
+            <mat-label>Production min (kg)</mat-label>
+            <input matInput type="number" [(ngModel)]="productionFilters.minProductionInKg" placeholder="0">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Production max (kg)</mat-label>
+            <input matInput type="number" [(ngModel)]="productionFilters.maxProductionInKg" placeholder="10000">
+          </mat-form-field>
+        </div>
+
+        <div class="filter-grid-2">
+          <mat-form-field appearance="outline">
+            <mat-label>Prix d'achat min (FCFA)</mat-label>
+            <input matInput type="number" [(ngModel)]="productionFilters.minPurchasePrice" placeholder="0">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Prix d'achat max (FCFA)</mat-label>
+            <input matInput type="number" [(ngModel)]="productionFilters.maxPurchasePrice" placeholder="1000000">
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Statut de paiement</mat-label>
+          <mat-select [(ngModel)]="productionFilters.mustBePaid">
+            <mat-option [value]="undefined">Tous</mat-option>
+            <mat-option [value]="true">À payer</mat-option>
+            <mat-option [value]="false">Déjà payé</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Bouton d'export -->
+      <div class="export-action">
+        <button class="btn-export" (click)="handleExport()">
+          <mat-icon>download</mat-icon>
+          Exporter en {{ exportFormat.toUpperCase() }}
+        </button>
+      </div>
+
+      <!-- Informations -->
+      <div class="info-box">
+        <div class="info-icon">ℹ️</div>
+        <div class="info-content">
+          <p class="info-title">Informations sur l'export :</p>
+          <ul>
+            <li>Les données exportées incluent toutes les relations</li>
+            <li>Les filtres permettent de sélectionner des données spécifiques</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,5 @@
 <div class="dashboard-container">
-  <app-header placeholder="" [breadcrumb]="true"></app-header>
+  <app-header placeholder="" [breadcrumb]="true" [export]="true"></app-header>
 
   <div class="content">
     <div class="overview-card">
@@ -13,15 +13,15 @@
     </div>
 
     <div class="actions-buttons">
-      <button routerLink="/planters/add" class="action-button">
+      <button routerLink="/planters/new" class="action-button">
         <mat-icon class="button-icon">person_add</mat-icon>
         <span>Ajouter un planteur</span>
       </button>
-      <button routerLink="/equipment/add" class="action-button">
+      <button routerLink="/plantations/add" class="action-button">
         <i class="fas fa-tractor button-icon"></i>
         <span>Ajouter une plantation</span>
       </button>
-      <button routerLink="/crops/add" class="action-button">
+      <button routerLink="/productions/add" class="action-button">
         <i class="fas fa-wheat-awn button-icon"></i>
         <span>Ajouter une production</span>
       </button>
@@ -55,13 +55,13 @@
 
         <div class="card">
           <div class="card-header">
-            <span class="card-title">Répartition par culture</span>
+            <span class="card-title">Production par plantation</span>
           </div>
           <div class="chart">
             <!-- Canvas toujours présent -->
-            <canvas #pieCanvas [style.display]="culturalDistribution.length > 0 ? 'block' : 'none'"></canvas>
+            <canvas #pieCanvas [style.display]="productionByPlantation.length > 0 ? 'block' : 'none'"></canvas>
 
-            @if (culturalDistribution.length === 0) {
+            @if (productionByPlantation.length === 0) {
               <div class="chart-loading">
                 <mat-spinner diameter="24"></mat-spinner>
                 <span>Chargement des données...</span>
@@ -87,41 +87,6 @@
                 <span>Chargement des données...</span>
               </div>
             }
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section supplémentaire pour d'autres statistiques -->
-    <div class="additional-stats">
-      <div class="stats-row">
-        <div class="mini-card">
-          <div class="mini-card-icon">
-            <mat-icon>trending_up</mat-icon>
-          </div>
-          <div class="mini-card-content">
-            <span class="mini-card-title">Croissance</span>
-            <span class="mini-card-value">+15.3%</span>
-          </div>
-        </div>
-
-        <div class="mini-card">
-          <div class="mini-card-icon">
-            <mat-icon>location_on</mat-icon>
-          </div>
-          <div class="mini-card-content">
-            <span class="mini-card-title">Régions actives</span>
-            <span class="mini-card-value">8</span>
-          </div>
-        </div>
-
-        <div class="mini-card">
-          <div class="mini-card-icon">
-            <mat-icon>schedule</mat-icon>
-          </div>
-          <div class="mini-card-content">
-            <span class="mini-card-title">Dernière mise à jour</span>
-            <span class="mini-card-value">Il y a 2h</span>
           </div>
         </div>
       </div>
