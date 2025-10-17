@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { combineLatest, Observable, Subject, BehaviorSubject } from 'rxjs';
+import {Observable, Subject, BehaviorSubject } from 'rxjs';
 import { map, startWith, takeUntil, shareReplay, tap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Plantation } from '../../../../core/models/plantation-model';
 import { PlantationService } from '../../services/plantation-service';
@@ -52,7 +52,7 @@ export class PlantationList implements OnInit, OnDestroy {
   plantations$!: Observable<PaginationResponse<Plantation> | null>;
   filteredPlantations$!: Observable<ExtendedPlantation[]>;
 
-  cultureFilter = new FormControl('');
+  listSizeCtrl = new FormControl(10);
   villageFilter = new FormControl('');
 
   selectedPlantation: ExtendedPlantation | null = null;
@@ -62,8 +62,7 @@ export class PlantationList implements OnInit, OnDestroy {
   mapCenter!: Observable<google.maps.LatLngLiteral>;
   selectedMarkerOptions!: google.maps.marker.AdvancedMarkerElementOptions;
 
-  cultures: string[] = ['Cacao', 'Café', 'Palmier à huile', 'Hévéa', 'Anacardier'];
-  villages: string[] = ['Bonoua', 'Samo', 'Anyama', 'Kokondékro', 'Nangassérégué'];
+  villages: { id: undefined|number, value: string }[]= [];
 
   private readonly destroy$ = new Subject<void>();
 
@@ -96,7 +95,7 @@ export class PlantationList implements OnInit, OnDestroy {
    * Initializes the necessary data for the component.
    *
    * This method sets up the loading stream and subscribes to the service
-   * to load paged data. It also prepares the observable for plantations data.
+   * to load paged data. It also prepares the observable for plantation data.
    *
    * @return {void} Does not return any value.
    */
@@ -105,7 +104,7 @@ export class PlantationList implements OnInit, OnDestroy {
 
     // Charger les données initiales
     this.plantationService.getAllPaged().pipe(
-      takeUntil(this.destroy$)
+      takeUntil(this.destroy$),
     ).subscribe();
 
     this.plantations$ = this.plantationService.pagedData$;
@@ -113,7 +112,7 @@ export class PlantationList implements OnInit, OnDestroy {
 
   /**
    * Initializes the search setup by subscribing to value changes from the search control.
-   * Applies debounce, distinct value filtering, and ensures cleanup when the component is destroyed.
+   * Applies debouncing, distinct value filtering, and ensures cleanup when the component is destroyed.
    * The processed search term is emitted to the searchSubject and the plantationService for handling.
    *
    * @return {void} No return value.
@@ -134,7 +133,7 @@ export class PlantationList implements OnInit, OnDestroy {
    * Initializes the Google Maps service and sets up related configurations
    * such as map zoom, center, options, and marker options. Also updates
    * the state to indicate Google Maps readiness and triggers change detection.
-   * Utilizes observables for tracking the lifecycle of the component.
+   * Uses observables for tracking the lifecycle of the component.
    *
    * @return {Promise<void>} A promise that resolves when the Google Maps
    * initialization process is initiated.
@@ -158,60 +157,48 @@ export class PlantationList implements OnInit, OnDestroy {
   }
 
   /**
-   * Sets up filters for the plantations data by combining observables for plantations,
-   * village filter, and search input. Filters and processes the plantations data based
+   * Sets up filters for the plantation data by combining observables for plantations,
+   * village filter, and search input. Filters and processes the plantation data based
    * on provided criteria, enriching the plantations with additional observables.
    * Also triggers centering of the map based on processed plantations.
    *
    * @return {void} This method does not return a value.
    */
   private setupFilters(): void {
-    this.filteredPlantations$ = combineLatest([
-      this.plantations$.pipe(map(p => p?.data || [])),
-      this.villageFilter.valueChanges.pipe(startWith('')),
-      this.searchSubject.asObservable().pipe(startWith(''))
-    ]).pipe(
-      map(([plantations, villageFilter, search]) => {
-        return plantations
-          .filter(plantation => this.matchesSearchFilter(plantation, search))
-          .filter(plantation => this.matchesVillageFilter(plantation, villageFilter))
-          .map(plantation => this.enrichPlantationWithObservables(plantation));
+    this.filteredPlantations$ = this.plantations$.pipe(
+      map(data => data?.data || []),
+      map(plantations => {
+        return plantations.map(plantation => this.enrichPlantationWithObservables(plantation));
       }),
       shareReplay(1),
       takeUntil(this.destroy$)
     );
 
-    this.centrerCarteSelonPlantations();
+    this.villageFilter.valueChanges.pipe(
+      startWith(''),
+      tap(value => this.plantationService.search(value!, 0, 10, true))
+    ).subscribe();
+
+    this.searchSubject.asObservable().pipe(
+      startWith(''),
+      tap(value => this.plantationService.search(value, 0, 10))
+    ).subscribe();
+
+    this.listSizeCtrl.valueChanges.pipe(
+      startWith(10),
+      tap(value => this.plantationService.getAllPaged(0, value!).pipe(
+        takeUntil(this.destroy$),
+        tap(data => {
+          this.villages = data.data.map(plantation => ({
+            id: plantation.id,
+            value: plantation.gpsLocation.displayName
+          })).filter((village, index, self) =>
+            index === self.findIndex(v => v.value.toLowerCase() === village.value.toLowerCase())
+          );
+        })).subscribe()
+      )
+    ).subscribe()
   }
-
-  /**
-   * Determines whether a given plantation matches the specified search filter.
-   *
-   * @param {Plantation} plantation - The plantation object to evaluate.
-   * @param {string} search - The search string used for filtering. If empty or null, the method returns true.
-   * @return {boolean} - Returns true if the plantation matches the search filter; otherwise, false.
-   */
-  private matchesSearchFilter(plantation: Plantation, search: string): boolean {
-    if (!search) return true;
-
-    const searchLower = search.toLowerCase();
-    return plantation.name.toLowerCase().includes(searchLower) ||
-      plantation.gpsLocation?.display_name?.toLowerCase().includes(searchLower)
-  }
-
-  /**
-   * Determines if a plantation matches the given village filter.
-   *
-   * @param {Plantation} plantation - The plantation object to check against the village filter.
-   * @param {string | null} villageFilter - The village filter string to match or null if no filter is applied.
-   * @return {boolean} Returns true if the plantation matches the village filter or if the filter is null; otherwise, false.
-   */
-  private matchesVillageFilter(plantation: Plantation, villageFilter: string | null): boolean {
-    if (!villageFilter) return true;
-    return plantation.gpsLocation?.display_name?.toLowerCase().includes(villageFilter.toLowerCase()) ||
-      plantation.name.toLowerCase().includes(villageFilter.toLowerCase());
-  }
-
   /**
    * Enriches the given plantation object with additional observable properties.
    *
@@ -244,31 +231,7 @@ export class PlantationList implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Adjusts the map view to center around plantation locations based on their GPS coordinates.
-   * Retrieves plantation data, filters for valid latitude and longitude values, and adjusts the map bounds accordingly.
-   * The map is recentered only if there are valid locations and no plantation is currently selected.
-   *
-   * @return {void} No return value.
-   */
-  private centrerCarteSelonPlantations(): void {
-    this.plantations$.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(plantations => {
-      if (plantations?.data) {
-        const validLocations = plantations.data
-          .filter(p => p.gpsLocation?.latitude && p.gpsLocation?.longitude)
-          .map(p => ({
-            lat: p.gpsLocation!.latitude,
-            lng: p.gpsLocation!.longitude
-          }));
 
-        if (validLocations.length > 0 && !this.selectedPlantation) {
-          this.googleMapsService.calculateMapBounds(validLocations);
-        }
-      }
-    });
-  }
 
   /**
    * Loads the data for the previous page by invoking the respective
@@ -277,7 +240,7 @@ export class PlantationList implements OnInit, OnDestroy {
    *
    * @return {void} Does not return a value.
    */
-  loadPreviousPage() {
+  loadPreviousPage(): void {
     this.plantationService.loadPreviousData();
   }
 
@@ -292,6 +255,9 @@ export class PlantationList implements OnInit, OnDestroy {
 
   /**
    * Handles the search functionality by setting the search term in the control.
+   * This method is triggered when the user enters a search term in the search input.
+   * The search term is passed to the searchSubject and the plantationService for handling.
+   * Search plantation by his name.
    *
    * @param {string} searchTerm - The term to search for.
    * @return {void} This method does not return a value.
@@ -308,7 +274,7 @@ export class PlantationList implements OnInit, OnDestroy {
    */
   viewPlanter(planter: Planter): void {
     this.router.navigate(['/planters/profile'], {
-      queryParams: { planter: planter.id }
-    });
+      queryParams: {planter: planter.id}
+    }).then();
   }
 }

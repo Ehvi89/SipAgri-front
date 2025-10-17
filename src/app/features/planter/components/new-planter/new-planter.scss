@@ -1,6 +1,10 @@
 @use "../../../../../styles";
 
 .new-planter-container {
+  @extend .container;
+  @extend .container--lg;
+  @extend .container--without-top;
+
   .title {
     @extend .flex;
     @extend .flex--column;

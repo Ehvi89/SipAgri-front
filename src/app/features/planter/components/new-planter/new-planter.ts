@@ -28,10 +28,10 @@ export class NewPlanter implements OnInit {
   ];
   gender = Gender;
 
-  constructor(private formBuilder: FormBuilder,
-              private planterService: PlanterService,
-              private notifService: NotificationService,
-              private supervisorService: SupervisorService) {}
+  constructor(private readonly formBuilder: FormBuilder,
+              private readonly planterService: PlanterService,
+              private readonly notifService: NotificationService,
+              private readonly supervisorService: SupervisorService) {}
 
   ngOnInit(): void {
     this.loading$ = this.planterService.loading$;

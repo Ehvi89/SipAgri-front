@@ -1,4 +1,3 @@
-// core/services/base-service.ts
 import {
   BehaviorSubject,
   Observable,
@@ -24,14 +23,14 @@ import { AuthService } from "../../features/auth/services/auth-service";
  */
 @Injectable({providedIn: 'root'})
 export abstract class BaseService<T> {
-  private _loading = new BehaviorSubject<boolean>(false);
+  private readonly _loading = new BehaviorSubject<boolean>(false);
   public readonly loading$: Observable<boolean> = this._loading.asObservable();
 
-  private _data = new BehaviorSubject<T[] | null>(null);
-  private _pagedData = new BehaviorSubject<PaginationResponse<T> | null>(null);
+  private readonly _data = new BehaviorSubject<T[] | null>(null);
+  private readonly _pagedData = new BehaviorSubject<PaginationResponse<T> | null>(null);
   public readonly pagedData$: Observable<PaginationResponse<T> | null> = this._pagedData.asObservable();
-  private errorService: ErrorService = new ErrorService();
-  private searchSubject = new Subject<{ search: string; page?: number; size?: number }>();
+  private readonly errorService: ErrorService = new ErrorService();
+  private readonly searchSubject = new Subject<{ search: string; page?: number; size?: number, village?:boolean }>();
 
   protected constructor(protected repository: BaseRepository<T>) {
     this.setupSearchPipeline();
@@ -96,14 +95,14 @@ export abstract class BaseService<T> {
       distinctUntilChanged((prev, curr) =>
         prev.search === curr.search &&
         prev.page === curr.page &&
-        prev.size === curr.size
+        prev.size === curr.size &&
+        prev.village === curr.village
       ),
       switchMap(params => {
         this.setLoading(true);
-        return this.repository.search(params.search, params.page, params.size).pipe(
+        return this.repository.search(params.search, params.page, params.size, params.village).pipe(
           tap(data => {
             this._pagedData.next(data);
-            // console.log('Search results:', data);
           }),
           catchError(err => throwError(() => this.errorService.handleError(err))),
           finalize(() => this.setLoading(false))
@@ -113,14 +112,16 @@ export abstract class BaseService<T> {
   }
 
   /**
-   * Executes a search operation with debouncing and cancellation.
+   * Performs a search operation and updates the searchSubject with the provided parameters.
    *
-   * @param {string} search - The search term or query to filter the data.
-   * @param {number} [page] - The page number to fetch (optional).
-   * @param {number} [size] - The number of items per page (optional).
+   * @param {string} search - The search query string used to filter results.
+   * @param {number} [page] - The optional parameter specifying the page number for paginated results.
+   * @param {number} [size] - The optional parameter specifying the number of results per page.
+   * @param {boolean} [village] - The optional parameter to include village-specific results.
+   * @return {void} This method does not return any value.
    */
-  search(search: string, page?: number, size?: number): void {
-    this.searchSubject.next({ search, page, size });
+  search(search: string, page?: number, size?: number, village?:boolean): void {
+    this.searchSubject.next({ search, page, size, village });
   }
 
   /**
@@ -175,20 +176,15 @@ export abstract class BaseService<T> {
     return this.repository.update(payload).pipe(
       tap(updatedItem => {
         if (this._data.value) {
-          this._data.next([
-            ...this._data.value.map(item =>
-              (item as any).id === id ? updatedItem : item
-            )
-          ]);
+          this._data.next(this._data.value.map(item =>
+            (item as any).id === id ? updatedItem : item
+          ));
         }
         if (this._pagedData.value) {
           this._pagedData.next({
             ...this._pagedData.value,
-            data: [
-              ...this._pagedData.value.data.map(item =>
-                (item as any).id === id ? updatedItem : item
-              )
-            ],
+            data: this._pagedData.value.data.map(item =>
+              (item as any).id === id ? updatedItem : item),
           });
         }
       }),
@@ -209,20 +205,16 @@ export abstract class BaseService<T> {
     return this.repository.partialUpdate(payload).pipe(
       tap(updatedItem => {
         if (this._data.value) {
-          this._data.next([
-            ...this._data.value.map(item =>
-              (item as any).id === id ? updatedItem : item
-            )
-          ]);
+          this._data.next(this._data.value.map(item =>
+            (item as any).id === id ? updatedItem : item)
+          );
         }
         if (this._pagedData.value) {
           this._pagedData.next({
             ...this._pagedData.value,
-            data: [
-              ...this._pagedData.value.data.map(item =>
-                (item as any).id === id ? updatedItem : item
-              )
-            ],
+            data: this._pagedData.value.data.map(item =>
+              (item as any).id === id ? updatedItem : item
+            ),
           });
         }
       }),

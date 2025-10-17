@@ -93,7 +93,7 @@ export class PlanterDetails implements OnInit {
       maritalStatus: [this.planter?.maritalStatus, Validators.required],
       childrenNumber: [this.planter?.childrenNumber, [Validators.required, Validators.min(0)]],
       village: [this.planter?.village, Validators.required],
-      supervisor: [this.planter?.supervisor, Validators.required]
+      supervisor: [this.planter.supervisor, Validators.required]
     });
   }
 
@@ -106,7 +106,7 @@ export class PlanterDetails implements OnInit {
           id: this.planter?.id,
           ...this.planterForm.value,
         }
-        this.planterService.update(planter.id, planter).pipe(
+        this.planterService.partialUpdate(planter.id, planter).pipe(
           tap((planter: Planter) => {
             this.planter = planter;
             this.cdr.detectChanges();
@@ -167,7 +167,7 @@ export class PlanterDetails implements OnInit {
     }).subscribe((result: boolean) => {
       if (result) {
         this.planterService.delete(this.planter.id!).subscribe({
-          next:() => this.router.navigateByUrl('/planters').then()
+          next:() => this.router.navigateByUrl('/planters').then(r => null)
         });
       }
     });

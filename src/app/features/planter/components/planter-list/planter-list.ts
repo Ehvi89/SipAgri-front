@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {BehaviorSubject, combineLatest, map, Observable} from 'rxjs';
+import {BehaviorSubject, map, Observable} from 'rxjs';
 import {Planter} from '../../../../core/models/planter-model';
 import {PlanterService} from '../../services/planter-service';
 import {PaginationResponse} from '../../../../core/models/pagination-response-model';
 import {FormBuilder, FormControl} from '@angular/forms';
-import {startWith, tap} from 'rxjs/operators';
+import {tap} from 'rxjs/operators';
 import {Router} from '@angular/router';
 
 @Component({
@@ -21,14 +21,14 @@ export class PlanterList implements OnInit {
   listSizeCtrl!: FormControl<number | null>;
   listFiltersCtrl!: FormControl<string | null>;
 
-  constructor(private planterService: PlanterService,
-              private formBuilder: FormBuilder,
-              private router: Router,) {}
+  constructor(private readonly planterService: PlanterService,
+              private readonly formBuilder: FormBuilder,
+              private readonly router: Router,) {}
 
   ngOnInit() {
     this.listSizeCtrl = this.formBuilder.control(10);
     this.listSizeCtrl.valueChanges.pipe(
-      tap(size => this.planterService.getAllPaged(0, size!))
+      tap(size => this.planterService.getAllPaged(0, size!).subscribe())
     ).subscribe();
 
     this.listFiltersCtrl = this.formBuilder.control('Toutes les régions');
@@ -38,17 +38,9 @@ export class PlanterList implements OnInit {
 
     this.plantersPaged$ = this.planterService.pagedData$;
 
-    this.planters$ = combineLatest([
-      this.planterService.getAll(),
-      this.listFiltersCtrl.valueChanges.pipe(startWith(''))
-    ]).pipe(
-      map(([planters, filter]) => {
-        return planters.filter(planter => {
-          return !filter || filter === 'Toutes les régions' ||
-            planter.village.toLowerCase().includes(filter.toLowerCase());
-        });
-      })
-    );
+    this.listFiltersCtrl.valueChanges.pipe(
+      tap(value => this.planterService.search(value!, 0, this.listSizeCtrl.value!, true))
+    ).subscribe()
   }
 
   loadNextPage(): void {
@@ -60,7 +52,6 @@ export class PlanterList implements OnInit {
   }
 
   onSearch(text: any): void {
-    // console.log(text);
     this.planterService.search(text, undefined, this.listSizeCtrl.value!);
   }
 
@@ -68,7 +59,17 @@ export class PlanterList implements OnInit {
     // Cette méthode devrait idéalement être un Observable
     // Pour simplifier, on retourne un tableau vide ici.
     // Vous devriez l'implémenter selon vos besoins.
-    return ['Toutes les régions'];
+
+    let villages: string[] = [];
+    this.planterService.getAll().pipe(
+      map(planters => {
+        return planters.map(planter => planter.village).filter((village, index, self) =>
+          index === self.findIndex(v => v.toLowerCase() === village.toLowerCase())
+        );
+      }),
+      tap(v => villages = v)
+    ).subscribe();
+    return ['Toutes les régions', ...villages];
   }
 
   viewProfile(planter: Planter): void {

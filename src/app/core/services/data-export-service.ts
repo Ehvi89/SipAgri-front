@@ -86,9 +86,9 @@ export interface ExportProduction extends Production {
  * This interface defines a set of optional properties that can be used to filter planter data based on demographics, supervisory relationships, and personal attributes.
  *
  * Properties:
- * - gender: Specifies the gender of the planter, if filtering by gender is required. The value must be of the type `Gender`.
- * - maritalStatus: Specifies the marital status of the planter, if filtering by marital status is required. The value must be of the type `MaritalStatus`.
- * - village: Specifies the village of the planter, if filtering by geographic location is required. The value must be a string.
+ * - gender: Specifies the gender of the planter if filtering by gender is required. The value must be of the type `Gender`.
+ * - maritalStatus: Specifies the marital status of the planter if filtering by marital status is required. The value must be of the type `MaritalStatus`.
+ * - village: Specifies the village of the planter if filtering by geographic location is required. The value must be a string.
  * - minChildrenNumber: Specifies the minimum number of children the planter must have to be included in the filter. The value must be a number.
  * - maxChildrenNumber: Specifies the maximum number of children the planter may have to be included in the filter. The value must be a number.
  * - supervisorId: Specifies the ID of the supervisor associated with the planter, if filtering by supervisor is required. The value must be a number.
@@ -457,7 +457,7 @@ export class DataExportService {
      * Checks if a planter's age falls within the specified age range defined in the filters.
      *
      * @param {Planter} planter - The planter object containing the birthday information.
-     * @param {PlanterFilters} filters - The filters object containing minimum and maximum age values.
+     * @param {PlanterFilters} filters - The filter object containing minimum and maximum age values.
      * @return {boolean} Returns true if the planter's age matches the specified age range, otherwise false.
      */
     private matchesAgeRange(planter: Planter, filters: PlanterFilters): boolean {
@@ -594,7 +594,7 @@ export class DataExportService {
    * @param {string} [prefix=""] - Optional prefix used to build the keys of the flattened object representing the path.
    * @return {any} A new object with flattened keys and corresponding values based on the input object.
    */
-  private flattenObject(obj: any, prefix = ''): any {
+  private flattenObject(obj: any, prefix: string = ''): any {
     const flattened: any = {};
 
     for (const key in obj) {
@@ -620,7 +620,7 @@ export class DataExportService {
   }
 
   /**
-   * Prépare les données des planteurs pour un export lisible (PDF, Excel, CSV)
+   * Prépare les données des planteurs pour un export lisible (PDF, Excel, CSV).
    * - Fusionne le prénom et le nom du superviseur
    * - Résume les plantations sous forme de texte
    * - Supprime les champs inutiles
@@ -629,8 +629,8 @@ export class DataExportService {
     return planters.map(planter => ({
       id: planter.id,
       nom: `${planter.firstname} ${planter.lastname}`,
-      genre: planter.gender,
-      statutMatrimonial: planter.maritalStatus,
+      genre: this.getGender(planter.gender),
+      statutMatrimonial: this.getMaritalStatus(planter.maritalStatus),
       village: planter.village,
       telephone: planter.phoneNumber,
       superviseur: planter.supervisor
@@ -646,13 +646,13 @@ export class DataExportService {
 
   /**
    * Prépare les données de production pour export (PDF, Excel, CSV)
-   * Colonnes : Production en KG, Prix d'achat, A payer, Date, Id plantation, Nom plantation, Superficie, Nom planteur
+   * Colonnes : Production en KG, Prix d'achat, À payer, Date, Id plantation, Nom plantation, Superficie, Nom planteur
    */
   private prepareProductionExport(productions: ExportProduction[]): any[] {
     return productions.map(prod => ({
       'Production (kg)': prod.productionInKg,
       "Prix d'achat": prod.purchasePrice,
-      'À payer': prod.mustBePaid ? 'Oui' : 'Non',
+      'A payer': prod.mustBePaid ? 'Oui' : 'Non',
       'Date de production': prod.year
         ? new Date(prod.year).toLocaleDateString('fr-FR', {
           year: 'numeric',
@@ -660,7 +660,6 @@ export class DataExportService {
           day: '2-digit'
         })
         : '',
-      'ID plantation': prod.plantation?.id ?? '',
       'Nom plantation': prod.plantation?.name ?? '',
       'Superficie (ha)': prod.plantation?.farmedArea ?? '',
       'Nom planteur': prod.plantation?.planterName ?? '',
@@ -712,7 +711,7 @@ export class DataExportService {
       ...data.map(row =>
         headers.map(header => {
           const value = row[header];
-          const escaped = ('' + value).replace(/"/g, '""');
+          const escaped = ('' + value).replaceAll('"', '""');
           return `"${escaped}"`;
         }).join(',')
       )
@@ -739,7 +738,7 @@ export class DataExportService {
 
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    link.remove();
   }
 
   /**
@@ -760,7 +759,7 @@ export class DataExportService {
 
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    link.remove();
   }
 
   /**
@@ -793,12 +792,32 @@ export class DataExportService {
 
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
+      link.remove();
 
       // Nettoyer l'URL
       setTimeout(() => URL.revokeObjectURL(url), 100);
     } catch (error) {
       console.error('Erreur lors du téléchargement du fichier Excel:', error);
     }
+  }
+
+  private getMaritalStatus(status: MaritalStatus){
+    const maritalStatusOptions = [
+      { value: MaritalStatus.SINGLE, label: 'Célibataire' },
+      { value: MaritalStatus.MARRIED, label: 'Marié(e)' },
+      { value: MaritalStatus.DIVORCED, label: 'Divorcé(e)' },
+      { value: MaritalStatus.WIDOWED, label: 'Veuf/Veuve' }
+    ];
+
+    return maritalStatusOptions.find(option => option.value === status)?.label;
+  }
+
+  private getGender(gender: Gender) {
+    const genderOptions = [
+      { value: Gender.MALE, label: 'Homme' },
+      { value: Gender.FEMALE, label: 'Femme' },
+    ]
+
+    return genderOptions.find(option => option.value === gender)?.label;
   }
 }
