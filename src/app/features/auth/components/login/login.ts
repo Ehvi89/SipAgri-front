@@ -19,17 +19,18 @@ export class Login implements OnInit {
   passwordCtrl!: FormControl;
   rememberCtrl!: FormControl;
 
-  constructor(private loginService: LoginService,
-              private formBuilder: FormBuilder,
-              private router: Router,
-              private notifService: NotificationService) {}
+  constructor(private readonly loginService: LoginService,
+              private readonly formBuilder: FormBuilder,
+              private readonly router: Router,
+              private readonly notifService: NotificationService) {}
 
   ngOnInit() {
     this.loading$ = this.loginService.loading$;
+    const userEmail = this.loginService.getEmailToRemember();
 
-    this.emailCtrl = this.formBuilder.control(this.loginService.getEmailToRemember(), Validators.required);
+    this.emailCtrl = this.formBuilder.control(userEmail, Validators.required);
     this.passwordCtrl = this.formBuilder.control('', Validators.required);
-    this.rememberCtrl = this.formBuilder.control(false);
+    this.rememberCtrl = this.formBuilder.control(userEmail !== null,);
 
     this.loginForm = this.formBuilder.group({
       email: this.emailCtrl,
@@ -41,7 +42,7 @@ export class Login implements OnInit {
     this.loginService.login(this.emailCtrl.value, this.passwordCtrl.value, this.rememberCtrl.value).subscribe({
       next: data => {
         if (data.token) {
-          const urlParams = new URLSearchParams(window.location.search);
+          const urlParams = new URLSearchParams(location.search);
           const redirectUrl = urlParams.get('redirectUrl') || localStorage.getItem('previousUrl');
 
           if (urlParams.has('sessionExpired') && redirectUrl !== '/dashboard') {

@@ -63,7 +63,7 @@
                 height="100%"
                 width="100%"
                 [zoom]="mapZoom"
-                [center]="(mapCenter$ | async)!"
+                [center]="mapCenter!"
                 [options]="mapOptions">
 
                 @if ((plantation$ | async)?.gpsLocation?.latitude && (plantation$ | async)?.gpsLocation?.longitude) {

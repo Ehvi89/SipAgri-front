@@ -1,10 +1,11 @@
-import {ChangeDetectorRef, Component, OnInit, OnDestroy} from '@angular/core';
-import {map, Observable, startWith, takeUntil, Subject, BehaviorSubject} from 'rxjs';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
+import {BehaviorSubject, map, Observable, startWith, Subject, takeUntil} from 'rxjs';
 import {
   AbstractControl,
   FormBuilder,
   FormControl,
-  FormGroup, ValidationErrors,
+  FormGroup,
+  ValidationErrors,
   ValidatorFn,
   Validators
 } from '@angular/forms';
@@ -14,12 +15,13 @@ import {PlanterService} from '../../../planter/services/planter-service';
 import {NotificationService} from '../../../../core/services/notification-service';
 import {KitService} from '../../../setting/modules/kit/services/kit-service';
 import {GoogleMapsService} from '../../services/google-maps-service';
-import {tap, catchError} from 'rxjs/operators';
+import {catchError, tap} from 'rxjs/operators';
 import {PlantationService} from '../../services/plantation-service';
 import {GeocodingService} from '../../../../core/services/geocoding-service';
 import {Location} from '../../../../core/models/location-model';
 import {ActivatedRoute} from '@angular/router';
-import { AuthService } from "../../../auth/services/auth-service";
+import {AuthService} from "../../../auth/services/auth-service";
+import {SupervisorProfile} from '../../../../core/enums/supervisor-profile';
 
 @Component({
   selector: 'app-add-plantation',
@@ -83,7 +85,7 @@ export class AddPlantation implements OnInit, OnDestroy {
 
     // get planters data
     const currentUser = AuthService.getCurrentUser();
-    if (currentUser.profile === "ADMINISTRATOR") {
+    if (currentUser.profile === SupervisorProfile.ADMINISTRATOR) {
       this.planters$ = this.planterService.getAll();
     } else {
       this.planters$ = this.planterService.getAllPaged(undefined, 50).pipe(
@@ -135,7 +137,7 @@ export class AddPlantation implements OnInit, OnDestroy {
     this.plantationForm = this.fb.group({
       name: [''],
       description: [''],
-      farmedArea: [1.0, [Validators.required, Validators.min(0.1)]],
+      farmedArea: [1, [Validators.required, Validators.min(0.1)]],
       kit: [null, Validators.required],
       planterId: [null, Validators.required],
     });
@@ -166,20 +168,20 @@ export class AddPlantation implements OnInit, OnDestroy {
             this.geocodingService.getPlaceName({
               latitude: lat,
               longitude: lng,
-              display_name: '',
+              displayName: '',
             }).pipe(
               takeUntil(this.destroy$),
               map((placeName: string) => ({
                 latitude: lat,
                 longitude: lng,
-                display_name: placeName,
+                displayName: placeName,
               })),
               tap(location => {
                 this.gpsLocation = location;
                 if (!this.plantationForm.get('name')?.value) {
-                  this.plantationForm.patchValue({ name: location.display_name });
+                  this.plantationForm.patchValue({ name: location.displayName });
                 }
-                const names = String(location.display_name).split(',');
+                const names = String(location.displayName).split(',');
 
                 this.addressCtrl.setValue(names[0].trim());
                 if (!this.regionsSubject.value.includes(names[1].trim())) {
@@ -226,7 +228,7 @@ export class AddPlantation implements OnInit, OnDestroy {
     };
   }
   /**
-   * Check if GPS format is valid
+   * Check if a GPS format is valid
    */
   private isValidGpsFormat(value: string): boolean {
     const coordinates = value.split(',');
@@ -288,7 +290,7 @@ export class AddPlantation implements OnInit, OnDestroy {
       name: '',
       description: '',
       planter: null,
-      farmedArea: 1.0,
+      farmedArea: 1,
       kit: null,
       planterId: null,
     });

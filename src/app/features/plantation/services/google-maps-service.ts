@@ -5,23 +5,73 @@ import { environment } from '../../../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class GoogleMapsService {
 
-  /** Observable qui émet quand Google Maps est prêt */
+  /**
+   *
+   */
   private loader$?: ReplaySubject<void>;
+  /**
+   * A boolean variable that indicates whether a certain process, task, or state is ready or completed.
+   * The default value is `false`, suggesting that the readiness is not achieved.
+   */
   private ready = false;
 
-  private _mapCenter = new BehaviorSubject<google.maps.LatLngLiteral>({
-    lat: 5.3600,
+  /**
+   * A BehaviorSubject holding the central geographical coordinates of the map,
+   * represented as a `google.maps.LatLngLiteral` object.
+   *
+   * The object contains latitude (`lat`) and longitude (`lng`) values
+   * and is initialized with a default location.
+   *
+   * Example coordinate values:
+   * lat: 5.36
+   * lng: -4.0083
+   */
+  private readonly _mapCenter = new BehaviorSubject<google.maps.LatLngLiteral>({
+    lat: 5.36,
     lng: -4.0083
   });
+  /**
+   * Observable that emits the current center coordinates of the map.
+   *
+   * @return {Observable<google.maps.LatLngLiteral>} An observable emitting the map's center as a LatLngLiteral object.
+   */
   get mapCenter$(): Observable<google.maps.LatLngLiteral> {
     return this._mapCenter.asObservable();
   }
 
-  mapZoom = 16;
+  /**
+   * Represents the zoom level for a map display.
+   * This value determines the scale of the map, where a higher number provides a closer, more detailed view,
+   * and a lower number provides a wider, less detailed view.
+   *
+   * @type {number}
+   */
+  mapZoom: number = 15;
+  /**
+   * Configuration options for initializing a Google Maps instance.
+   * This variable holds an object specifying map initialization settings such as center, zoom level,
+   * mapType, and other map features supported by the Google Maps API.
+   *
+   * @type {google.maps.MapOptions}
+   */
   mapOptions!: google.maps.MapOptions;
+  /**
+   * Represents the options for a selected marker in a Google Maps implementation.
+   * It is used to configure the appearance, behavior, and functionality of an advanced marker element.
+   *
+   * @type {google.maps.marker.AdvancedMarkerElementOptions}
+   */
   selectedMarkerOptions!: google.maps.marker.AdvancedMarkerElementOptions;
 
-  /** Charge le SDK Google Maps une seule fois */
+  /**
+   * Loads the Google Maps SDK and ensures it is ready for use. If the SDK is already loaded,
+   * it will immediately return a completed Observable. If the SDK is currently in the process
+   * of loading, it will return the in-progress Observable. Otherwise, it will initiate loading
+   * the SDK and return an Observable that emits when loading is complete or an error occurs.
+   *
+   * @return {Observable<void>} An Observable that emits when the Google Maps SDK is fully loaded
+   * or emits an error if loading fails.
+   */
   load(): Observable<void> {
     if (this.ready) {
       // Déjà chargé → on renvoie un Observable qui a déjà émis
@@ -38,7 +88,7 @@ export class GoogleMapsService {
     this.loader$ = new ReplaySubject<void>(1);
 
     // Vérifie si Google Maps est déjà dispo dans la fenêtre
-    if ((window as any).google?.maps) {
+    if ((globalThis as any).google?.maps) {
       this.ready = true;
       this.setupDefaultMapOptions();
       this.loader$.next();
@@ -52,7 +102,7 @@ export class GoogleMapsService {
     script.defer = true;
 
     script.onload = () => {
-      if ((window as any).google?.maps) {
+      if ((globalThis as any).google?.maps) {
         this.ready = true;
         this.setupDefaultMapOptions();
         this.loader$?.next();
@@ -71,16 +121,15 @@ export class GoogleMapsService {
     return this.loader$;
   }
 
-  /** Vérifie si Google Maps est dispo */
-  isReady(): boolean {
-    return this.ready && !!(window as any).google?.maps;
-  }
-
-  /** Configure les options par défaut */
+  /**
+   * Configures and sets up the default map options for rendering a Google Maps.
+   * The options include controls, zoom behavior, map type, and gesture handling.
+   *
+   * @return {void} No return value as the method initializes the mapOptions property.
+   */
   private setupDefaultMapOptions(): void {
     this.mapOptions = {
       mapTypeId: google.maps.MapTypeId.HYBRID,
-      scrollwheel: true,
       disableDoubleClickZoom: false,
       mapTypeControl: true,
       streetViewControl: false,
@@ -92,28 +141,17 @@ export class GoogleMapsService {
     };
   }
 
-  /** Sélection d’une plantation → recadrage + marker animé */
+  /**
+   * Updates the map center, zoom level, and selected marker options based on the provided coordinates and title.
+   *
+   * @param {number} lat - The latitude coordinate of the plantation to select.
+   * @param {number} lng - The longitude coordinate of the plantation to select.
+   * @param {string} title - The title or label for the selected plantation marker.
+   * @return {void} This method does not return a value.
+   */
   selectPlantation(lat: number, lng: number, title: string): void {
     this._mapCenter.next({ lat, lng });
-    this.mapZoom = 16;
+    this.mapZoom = 15;
     this.selectedMarkerOptions = { title };
-  }
-
-  /** Réinitialisation de la carte */
-  resetMapView(): void {
-    this._mapCenter.next({ lat: 5.3600, lng: -4.0083 });
-    this.mapZoom = 16;
-    this.selectedMarkerOptions = {};
-  }
-
-  /** Calculer bounds et recentrer la carte */
-  calculateMapBounds(locations: google.maps.LatLngLiteral[]): void {
-    if (!this.isReady() || locations.length === 0) return;
-
-    const bounds = new google.maps.LatLngBounds();
-    locations.forEach(location => bounds.extend(location));
-
-    this._mapCenter.next(bounds.getCenter().toJSON());
-    this.mapZoom = locations.length === 1 ? 16 : 15;
   }
 }

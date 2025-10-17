@@ -9,13 +9,13 @@ export class LoginService {
   private readonly TOKEN_KEY = 'sipagri_auth_token';
   private readonly USER_KEY = 'user';
 
-  private _loading = new BehaviorSubject<boolean>(false);
+  private readonly _loading = new BehaviorSubject<boolean>(false);
   get loading$(): Observable<boolean> {
     return this._loading.asObservable();
   }
 
-  constructor(private loginRepository: LoginRepository,
-              private errorService: ErrorService) {}
+  constructor(private readonly loginRepository: LoginRepository,
+              private readonly errorService: ErrorService) {}
 
   private setLoading(loading: boolean) {
     this._loading.next(loading);

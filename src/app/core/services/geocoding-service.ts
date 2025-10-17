@@ -5,12 +5,11 @@ import {Location} from '../models/location-model';
 
 @Injectable({ providedIn: 'root' })
 export class GeocodingService {
-  constructor(private repo: GeocodingRepository) {}
+  constructor(private readonly repo: GeocodingRepository) {}
 
   getPlaceName(location: Location): Observable<string> {
     return this.repo.reverseGeocode(location).pipe(
       map((response) => {
-        // console.log(response);
         return response.display_name.split(',').slice(0, -1).join(',')
       }),
       catchError((error) => {

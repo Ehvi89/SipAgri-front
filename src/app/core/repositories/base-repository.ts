@@ -17,7 +17,7 @@ export abstract class BaseRepository<T> {
   protected abstract endpoint: string;
   private readonly apiUrl: string;
 
-  constructor(private http: HttpClient) {
+  constructor(private readonly http: HttpClient) {
     this.apiUrl = environment.apiUrl;
   }
 
@@ -32,7 +32,6 @@ export abstract class BaseRepository<T> {
     const params: any = {};
     if (page !== undefined) params.page = page;
     if (size !== undefined) params.size = size;
-
     return this.http.get<PaginationResponse<T>>(
       `${this.apiUrl}/${this.endpoint}`,
       { params }
@@ -52,17 +51,19 @@ export abstract class BaseRepository<T> {
   }
 
   /**
-   * Performs a search request to the API and retrieves a paginated response.
+   * Searches for items based on the provided criteria.
    *
-   * @param {string} search - The search term or query to be used for filtering results.
-   * @param {number} [page] - Optional. The page number for pagination of the results.
-   * @param {number} [size] - Optional. The number of items per page for pagination.
-   * @return {Observable<PaginationResponse<T>>} An observable containing the paginated response with the search results.
+   * @param {string} search - The search query.
+   * @param {number} [page] - The page number for pagination (optional).
+   * @param {number} [size] - The number of items per page (optional).
+   * @param {boolean} [village] - A flag indicating whether to filter by village (optional).
+   * @return {Observable<PaginationResponse<T>>} An observable of the paginated response.
    */
-  search(search: string, page?: number, size?:number): Observable<PaginationResponse<T>> {
+  search(search: string, page?: number, size?:number, village?:boolean): Observable<PaginationResponse<T>> {
     const params: any = {};
     if (page !== undefined) params.page = page;
     if (size !== undefined) params.size = size;
+    if (village !== undefined) params.village = village;
     params.search = search;
 
     return this.http.get<PaginationResponse<T>>(

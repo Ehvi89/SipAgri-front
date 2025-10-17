@@ -17,22 +17,22 @@
     <div class="list">
       <div class="list-header">
         <mat-form-field appearance="outline">
-          <mat-label>Filtrer par culture</mat-label>
-          <mat-select [formControl]="cultureFilter">
-            <mat-option value="">Toutes les cultures</mat-option>
-            <mat-option *ngFor="let culture of cultures" [value]="culture">
-              {{ culture }}
-            </mat-option>
+          <mat-label>Filtrer par village</mat-label>
+          <mat-select [formControl]="villageFilter">
+            <mat-option value="">Tous les villages</mat-option>
+            @for (village of villages; track village.id) {
+              <mat-option [value]="village.value">{{village.value}}</mat-option>
+            }
           </mat-select>
         </mat-form-field>
         <div class="spacer"></div>
         <mat-form-field appearance="outline">
-          <mat-label>Filtrer par village</mat-label>
-          <mat-select [formControl]="villageFilter">
-            <mat-option value="">Tous les villages</mat-option>
-            <mat-option *ngFor="let village of villages" [value]="village">
-              {{ village }}
-            </mat-option>
+          <mat-label>Afficher</mat-label>
+          <mat-select [formControl]="listSizeCtrl">
+            <mat-option [value]="10">10</mat-option>
+            <mat-option [value]="25">25</mat-option>
+            <mat-option [value]="50">50</mat-option>
+            <mat-option [value]="100">100</mat-option>
           </mat-select>
         </mat-form-field>
       </div>
@@ -54,55 +54,58 @@
                   <span>Chargement des plantations...</span>
                 </div>
               }
-
-              @if (!(loading$ | async) && (filteredPlantations$ | async)?.length === 0) {
+              @else if (!(loading$ | async) && (filteredPlantations$ | async)?.length === 0) {
                 <div class="empty-state">
                   <mat-icon>grass</mat-icon>
                   <span>Aucune plantation trouvée</span>
                 </div>
-              }
-
-              @for (plantation of (filteredPlantations$ | async); track plantation.id) {
-                <div class="table-row"
-                     [class.selected]="selectedPlantation?.id === plantation.id"
-                     (click)="selectPlantation(plantation)">
-                  <div class="column">
-                    <span class="village">{{ (plantation.name!)}}</span>
+              } @else {
+                @for (plantation of (filteredPlantations$ | async); track plantation.id) {
+                  <div class="table-row"
+                       [class.selected]="selectedPlantation?.id === plantation.id"
+                       (click)="selectPlantation(plantation)" (keydown)="selectPlantation(plantation)">
+                    <div class="column">
+                      <span class="village">{{ (plantation.name!)}}</span>
+                    </div>
+                    <div class="column">
+                      <span class="surface">{{ plantation.farmedArea | number:'1.2-2' }} ha</span>
+                    </div>
+                    <div class="planter-info">
+                      @if (plantation.planter$ | async; as planter) {
+                        <span class="name btn--link" (click)="viewPlanter(planter)" (keydown)="viewPlanter(planter)">
+                          {{ planter.firstname }} {{ planter.lastname }}
+                        </span>
+                      } @else {
+                        <span class="loading">Chargement...</span>
+                      }
+                    </div>
+                    <div class="column actions">
+                      <button mat-icon-button [routerLink]="['details']"
+                              [queryParams]="{ plantation: plantation.id }"
+                              matTooltip="Voir">
+                        <mat-icon matIconPrefix>open_in_new</mat-icon>
+                        <span>Voir</span>
+                      </button>
+                    </div>
                   </div>
-                  <div class="column">
-                    <span class="surface">{{ plantation.farmedArea | number:'1.2-2' }} ha</span>
-                  </div>
-                  <div class="planter-info">
-                    @if (plantation.planter$ | async; as planter) {
-                      <span class="name btn--link" (click)="viewPlanter(planter)">{{ planter.firstname }} {{ planter.lastname }}</span>
-                    } @else {
-                      <span class="loading">Chargement...</span>
-                    }
-                  </div>
-                  <div class="column actions">
-                    <button mat-icon-button [routerLink]="['details']"
-                            [queryParams]="{ plantation: plantation.id }"
-                            matTooltip="Voir">
-                      <mat-icon matIconPrefix>open_in_new</mat-icon>
-                      <span>Voir</span>
-                    </button>
-                  </div>
-                </div>
+                }
               }
             </div>
           </div>
         </div>
       </div>
 
-      <div class="list-footer row" *ngIf="(plantations$ | async)?.totalPages! > 1">
-        <button (click)="loadPreviousPage()" [disabled]="(plantations$ | async)?.currentPage === 0">
-          <mat-icon>chevron_left</mat-icon>
-        </button>
-        <span>Page: {{ ((plantations$ | async)?.currentPage || 0) + 1 }} / {{ (plantations$ | async)?.totalPages || 1 }}</span>
-        <button (click)="loadNextPage()" [disabled]="((plantations$ | async)?.currentPage || 0) >= ((plantations$ | async)?.totalPages || 1) - 1">
-          <mat-icon>chevron_right</mat-icon>
-        </button>
-      </div>
+      @if ((plantations$ | async)?.totalPages! > 1) {
+        <div class="list-footer row">
+          <button (click)="loadPreviousPage()" [disabled]="(plantations$ | async)?.currentPage === 0">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <span>Page: {{ ((plantations$ | async)?.currentPage || 0) + 1 }} / {{ (plantations$ | async)?.totalPages || 1 }}</span>
+          <button (click)="loadNextPage()" [disabled]="((plantations$ | async)?.currentPage || 0) >= ((plantations$ | async)?.totalPages || 1) - 1">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      }
     </div>
   </div>
 </div>

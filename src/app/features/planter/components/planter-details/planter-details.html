@@ -4,11 +4,14 @@
   <div class="content">
     @if (loadingUpdate | async) {
       <!-- Overlay de chargement -->
-      <div class="overlay" *ngIf="loadingUpdate | async">
-        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-      </div>
+      @if (loadingUpdate | async) {
+        <div class="overlay">
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        </div>
+      }
     } @else {
-      <div  *ngIf="planter != null; else noContent">
+      @if (planter != null) {
+
         <div class="row mb-2">
           <div class="planter col">
             <span class="title">{{ planter!.firstname }} {{ planter!.lastname }}</span>
@@ -42,10 +45,12 @@
                 <span>Production annuelle:</span>
                 <span>{{ getAnnualProduction() }} kg</span>
               </div>
-              <div class="row flex--between" *ngIf="planter?.supervisor">
-                <span>Encadreur:</span>
-                <span>{{ planter!.supervisor.firstname }} {{planter!.supervisor.lastname}}</span>
-              </div>
+              @if (planter.supervisor) {
+                <div class="row flex--between">
+                  <span>Encadreur:</span>
+                  <span>{{ planter!.supervisor.firstname }} {{planter!.supervisor.lastname}}</span>
+                </div>
+              }
             </div>
           </div>
           <div class="card">
@@ -105,18 +110,17 @@
             }
           </div>
         </div>
-      </div>
+      } @else {
+        <!--Erreur de chargement des données du planteur-->
+        <app-no-content-error
+          title="Erreur de chargement"
+          description="Les informations du planteur n'ont pas été correctement récupérés"
+          link="/planters"
+        ></app-no-content-error>
+      }
     }
   </div>
 
-  <!--Erreur de chargement des données du planteur-->
-  <ng-template #noContent>
-    <app-no-content-error
-        title="Erreur de chargement"
-        description="Les informations du planteur n'ont pas été correctement récupérés"
-        link="/planters"
-    ></app-no-content-error>
-  </ng-template>
 
   <!--Modal de modification du planteur-->
   <ng-template #modificationDialog>
@@ -128,9 +132,9 @@
           <mat-form-field class="field" appearance="outline">
             <mat-label>Nom</mat-label>
             <input matInput formControlName="lastname" required />
-            <mat-error *ngIf="planterForm.get('lastname')?.hasError('required')">
-              Ce champ est requis
-            </mat-error>
+            @if (planterForm.get('lastname')?.hasError('required')){
+              <mat-error>Ce champ est requis</mat-error>
+            }
           </mat-form-field>
         </div>
 
@@ -138,9 +142,9 @@
           <mat-form-field class="field" appearance="outline">
             <mat-label>Prénoms</mat-label>
             <input matInput formControlName="firstname" required />
-            <mat-error *ngIf="planterForm.get('firstname')?.hasError('required')">
-              Ce champ est requis
-            </mat-error>
+            @if (planterForm.get('firstname')?.hasError('required')) {
+              <mat-error>Ce champ est requis</mat-error>
+            }
           </mat-form-field>
         </div>
 
@@ -151,9 +155,9 @@
               <mat-option [value]="gender.MALE">Masculin</mat-option>
               <mat-option [value]="gender.FEMALE">Féminin</mat-option>
             </mat-select>
-            <mat-error *ngIf="planterForm.get('gender')?.hasError('required')">
-              Ce champ est requis
-            </mat-error>
+            @if (planterForm.get('gender')?.hasError('required')) {
+              <mat-error>Ce champ est requis</mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field class="field" appearance="outline">
@@ -161,9 +165,9 @@
             <input matInput [matDatepicker]="picker" formControlName="birthday" required />
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
-            <mat-error *ngIf="planterForm.get('birthday')?.hasError('required')">
-              Ce champ est requis
-            </mat-error>
+            @if (planterForm.get('birthday')?.hasError('required')){
+              <mat-error>Ce champ est requis</mat-error>
+            }
           </mat-form-field>
         </div>
 
@@ -171,24 +175,24 @@
           <mat-form-field class="field" appearance="outline">
             <mat-label>Statut Matrimonial</mat-label>
             <mat-select formControlName="maritalStatus" required>
-              <mat-option *ngFor="let status of maritalStatusOptions" [value]="status.value">
-                {{ status.label }}
-              </mat-option>
+              @for (status of maritalStatusOptions; track status.value) {
+                <mat-option [value]="status.value">{{status.label}}</mat-option>
+              }
             </mat-select>
-            <mat-error *ngIf="planterForm.get('maritalStatus')?.hasError('required')">
-              Ce champ est requis
-            </mat-error>
+            @if (planterForm.get('maritalStatus')?.hasError('required')) {
+              <mat-error>Ce champ est requis</mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field class="field" appearance="outline">
             <mat-label>Nombre d'enfants</mat-label>
             <input matInput type="number" formControlName="childrenNumber" min="0" required />
-            <mat-error *ngIf="planterForm.get('childrenNumber')?.hasError('required')">
-              Ce champ est requis
-            </mat-error>
-            <mat-error *ngIf="planterForm.get('childrenNumber')?.hasError('min')">
-              Le nombre doit être positif
-            </mat-error>
+            @if (planterForm.get('childrenNumber')?.hasError('required')) {
+              <mat-error>Ce champ est requis</mat-error>
+            }
+            @else if (planterForm.get('childrenNumber')?.hasError('min')) {
+              <mat-error>Le nombre doit être positif</mat-error>
+            }
           </mat-form-field>
         </div>
 
@@ -196,25 +200,27 @@
           <mat-form-field class="field" appearance="outline">
             <mat-label>Village</mat-label>
             <mat-select formControlName="village" required>
-              <mat-option *ngFor="let village of villages" [value]="village">
-                {{ village }}
-              </mat-option>
+              @for (village of villages; track village) {
+                <mat-option [value]="village">{{ village }}</mat-option>
+              }
             </mat-select>
-            <mat-error *ngIf="planterForm.get('village')?.hasError('required')">
-              Ce champ est requis
-            </mat-error>
+            @if (planterForm.get('village')?.hasError('required')){
+              <mat-error>Ce champ est requis</mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field class="field" appearance="outline">
             <mat-label>Encadreur</mat-label>
             <mat-select formControlName="supervisor" required>
-              <mat-option *ngFor="let supervisor of (supervisors$ | async)" [value]="supervisor">
-                {{ supervisor.firstname }} {{ supervisor.lastname }}
-              </mat-option>
+              @for (supervisor of (supervisors$ | async); track supervisor.id) {
+                <mat-option [value]="supervisor">{{ supervisor.firstname }} {{ supervisor.lastname }}</mat-option>
+              }
             </mat-select>
-            <mat-error *ngIf="planterForm.get('supervisor')?.hasError('required')">
-              Ce champ est requis
-            </mat-error>
+            @if (planterForm.get('supervisor')?.hasError('required')){
+              <mat-error>
+                Ce champ est requis
+              </mat-error>
+            }
           </mat-form-field>
         </div>
       </form>
