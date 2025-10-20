@@ -18,7 +18,7 @@ import { NotificationService } from "../../../../../../core/services/notificatio
 export class AddKit implements OnInit{
   loading$!: Observable<boolean>;
 
-  private destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
 
   // Form controls
   nameCtrl!: FormControl<string | null>;
@@ -41,12 +41,12 @@ export class AddKit implements OnInit{
   productQuantity!: FormControl;
 
   constructor(
-    private kitService: KitService,
-    private productService: ProductService,
-    private formBuilder: FormBuilder,
-    private router: Router,
-    private route: ActivatedRoute,
-    private notifService: NotificationService,
+    private readonly kitService: KitService,
+    private readonly productService: ProductService,
+    private readonly formBuilder: FormBuilder,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly notifService: NotificationService,
   ) {}
 
   ngOnInit(): void {
@@ -54,11 +54,6 @@ export class AddKit implements OnInit{
     this.initializeForm();
     this.loadProducts();
     this.checkEditMode();
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   /**
@@ -112,7 +107,7 @@ export class AddKit implements OnInit{
       const id = params['kit'];
 
       if (id) {
-        this.kitId = parseInt(id);
+        this.kitId = Number.parseInt(id);
         this.editMode = true;
         this.loadKit(this.kitId);
       }
@@ -134,13 +129,13 @@ export class AddKit implements OnInit{
           });
 
           // Ajoute les produits existants
-          kit.kitProducts.forEach(kp => {
+          for (const kp of kit.kitProducts) {
             this.addKitProduct(kp);
-          });
+          }
         },
         error: (error) => {
           console.error('Erreur lors du chargement du kit:', error);
-          this.router.navigate(['/settings/kits']);
+          this.router.navigate(['/settings/kits']).then();
         }
       });
   }
@@ -158,13 +153,13 @@ export class AddKit implements OnInit{
   filterProducts(): void {
     const search = this.searchProduct.value.trim().toLowerCase().trim();
 
-    if (!search) {
-      this.filteredProducts = this.availableProducts;
-    } else {
+    if (search) {
       this.filteredProducts = this.availableProducts.filter(p =>
         p.name.toLowerCase().includes(search) ||
         p.description.toLowerCase().includes(search)
       );
+    } else {
+      this.filteredProducts = this.availableProducts;
     }
   }
 
@@ -195,7 +190,7 @@ export class AddKit implements OnInit{
       const newQuantity = existingControl.value.quantity + this.productQuantity;
       existingControl.patchValue({
         quantity: newQuantity,
-        totalCost: this.selectedProduct!.price * newQuantity
+        totalCost: this.selectedProduct.price * newQuantity
       });
     } else {
       // Ajout d'un nouveau produit
@@ -336,9 +331,9 @@ export class AddKit implements OnInit{
           name: this.currentKit.name,
           description: this.currentKit.description
         });
-        this.currentKit.kitProducts.forEach(kp => {
+        for (const kp of this.currentKit.kitProducts) {
           this.addKitProduct(kp);
-        });
+        }
       } else {
         this.kitForm.reset();
       }

@@ -52,7 +52,7 @@ export class General implements OnInit, OnDestroy {
    * This variable is used to handle lifecycle-specific unsubscriptions in RxJS pipelines,
    * ensuring proper memory management and preventing potential memory leaks.
    */
-  private destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
 
   // Form controls
   /**
@@ -131,13 +131,13 @@ export class General implements OnInit, OnDestroy {
    *
    */
   constructor(
-    private generalSettingService: GeneralSettingService,
-    private formBuilder: FormBuilder
+    private readonly generalSettingService: GeneralSettingService,
+    private readonly formBuilder: FormBuilder
   ) {}
 
   /**
    * Lifecycle hook called after Angular has initialized all data-bound properties of a directive.
-   * Sets up initial properties and performs any required side-effects, such as initializing observables and forms.
+   * Sets up initial properties and performs any required side effects, such as initializing observables and forms.
    *
    * @return {void} This method does not return any value.
    */
@@ -265,6 +265,7 @@ export class General implements OnInit, OnDestroy {
     if (param.codeParams === "BACKEND") {
       this.settingForm.get('name')?.disable();
       this.settingForm.get('codeParams')?.disable();
+      this.settingForm.get('encrypted')?.disable();
     }
   }
 

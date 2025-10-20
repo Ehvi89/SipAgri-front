@@ -15,7 +15,7 @@ import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 export class AddProduct implements OnInit{
   loading$!: Observable<boolean>;
 
-  private destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
 
   // Form controls
   nameCtrl!: FormControl<string | null>;
@@ -30,22 +30,17 @@ export class AddProduct implements OnInit{
   currentProduct: Product | null = null;
 
   constructor(
-    private productService: ProductService,
-    private formBuilder: FormBuilder,
-    private router: Router,
-    private route: ActivatedRoute,
-    private notifService: NotificationService,
+    private readonly productService: ProductService,
+    private readonly formBuilder: FormBuilder,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly notifService: NotificationService,
   ) {}
 
   ngOnInit(): void {
     this.loading$ = this.productService.loading$;
     this.initializeForm();
     this.checkEditMode();
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   /**
@@ -125,7 +120,7 @@ export class AddProduct implements OnInit{
 
     const productData: Product = {
       ...this.productForm.value,
-      price: parseFloat(this.priceCtrl.value?.toString() || '0')
+      price: Number.parseFloat(this.priceCtrl.value?.toString() || '0')
     };
 
     const request$ = this.editMode && this.productId
@@ -163,15 +158,36 @@ export class AddProduct implements OnInit{
   resetForm(): void {
     if (confirm('Voulez-vous vraiment réinitialiser le formulaire ?')) {
       if (this.editMode && this.currentProduct) {
-        this.productForm.patchValue({
-          name: this.currentProduct.name,
-          description: this.currentProduct.description,
-          price: this.currentProduct.price
-        });
+        this.productForm.reset(
+          {
+            name: this.currentProduct.name,
+            description: this.currentProduct.description,
+            price: this.currentProduct.price
+          },
+          { emitEvent: false }
+        );
       } else {
-        this.productForm.reset();
+        this.productForm.reset(
+          {
+            name: '',
+            description: '',
+            price: null
+          },
+          { emitEvent: false }
+        );
       }
+
+      // Réinitialiser complètement le statut
+      this.productForm.markAsPristine();
       this.productForm.markAsUntouched();
+
+      // Nettoyer les erreurs de chaque control
+      Object.keys(this.productForm.controls).forEach(key => {
+        const control = this.productForm.get(key);
+        control?.setErrors(null);
+        control?.markAsUntouched();
+        control?.markAsPristine();
+      });
     }
   }
 

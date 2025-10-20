@@ -34,9 +34,9 @@
                     </mat-option>
                   }
                 </mat-select>
-                <mat-error *ngIf="plantationForm.get('planterId')?.hasError('required')">
-                  Veuillez sélectionner un planteur
-                </mat-error>
+                @if (plantationForm.get('planterId')?.hasError('required')) {
+                  <mat-error>Veuillez sélectionner un planteur</mat-error>
+                }
               </mat-form-field>
             </div>
 
@@ -48,9 +48,9 @@
                     <mat-option [value]="kit">{{kit.name}}</mat-option>
                   }
                 </mat-select>
-                <mat-error *ngIf="plantationForm.get('kit')?.hasError('required')">
-                  Veuillez sélectionner un crédit kit
-                </mat-error>
+                @if (plantationForm.get('kit')?.hasError('required')){
+                  <mat-error>Veuillez sélectionner un crédit kit</mat-error>
+                }
               </mat-form-field>
             </div>
 
@@ -58,12 +58,11 @@
               <mat-form-field appearance="outline" suffix="ha">
                 <mat-label>Superficie (ha)</mat-label>
                 <input matInput type="number" step="0.1" min="0.1" formControlName="farmedArea" required>
-                <mat-error *ngIf="plantationForm.get('farmedArea')?.hasError('required')">
-                  La superficie est requise
-                </mat-error>
-                <mat-error *ngIf="plantationForm.get('farmedArea')?.hasError('min')">
-                  La superficie doit être supérieure à 0,1 ha
-                </mat-error>
+                @if (plantationForm.get('farmedArea')?.hasError('required')){
+                  <mat-error>La superficie est requise</mat-error>
+                } @else if (plantationForm.get('farmedArea')?.hasError('min')) {
+                  <mat-error>La superficie doit être supérieure à 0,1 ha</mat-error>
+                }
               </mat-form-field>
             </div>
           </div>
@@ -87,18 +86,17 @@
               <mat-label>Coordonnées GPS</mat-label>
               <input matInput type="text" [formControl]="gpsCtrl" placeholder="Latitude, Longitude" required>
               <mat-hint>Format: latitude, longitude (ex: 5.3600, -4.0083)</mat-hint>
-              <mat-error *ngIf="gpsCtrl.hasError('required')">
-                Les coordonnées GPS sont requises
-              </mat-error>
-              <mat-error *ngIf="gpsCtrl.hasError('invalidFormat')">
-                Format invalide. Utilisez: latitude, longitude
-              </mat-error>
-              <mat-error *ngIf="gpsCtrl.hasError('invalidCoordinates')">
-                Coordonnées invalides
-              </mat-error>
-              <mat-error *ngIf="gpsCtrl.hasError('outOfRange')">
-                Coordonnées hors limites (-90 à 90 pour latitude, -180 à 180 pour longitude)
-              </mat-error>
+              @if (gpsCtrl.hasError('required')){
+                <mat-error>Les coordonnées GPS sont requises</mat-error>
+              } @else if (gpsCtrl.hasError('invalidFormat')){
+                <mat-error>
+                  Format invalide. Utilisez: latitude, longitude
+                </mat-error>
+              } @else if (gpsCtrl.hasError('invalidCoordinates')){
+                <mat-error>Coordonnées invalides</mat-error>
+              } @else if (gpsCtrl.hasError('outOfRange')){
+                <mat-error>Coordonnées hors limites (-90 à 90 pour latitude, -180 à 180 pour longitude)</mat-error>
+              }
             </mat-form-field>
           </div>
 

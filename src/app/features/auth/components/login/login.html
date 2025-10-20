@@ -59,23 +59,25 @@
   </div>
 
   <!-- Connexion rapide -->
-  <div class="card express-login">
-    <div class="card-header">
-      <h2 class="card-title">Connexion rapide</h2>
-    </div>
-    <div class="card-content">
-      <div class="form-row">
-        <button class="btn btn--outline btn--full-width"
-        (click)="comingSoon()">
-          <mat-icon>sms</mat-icon>
-          Code par SMS
-        </button>
-        <button class="btn btn--outline btn--full-width"
-        (click)="comingSoon()">
-          <mat-icon>mail</mat-icon>
-          Lien magique
-        </button>
+  @if (expressLogin) {
+    <div class="card express-login">
+      <div class="card-header">
+        <h2 class="card-title">Connexion rapide</h2>
+      </div>
+      <div class="card-content">
+        <div class="form-row">
+          <button class="btn btn--outline btn--full-width"
+                  (click)="comingSoon()">
+            <mat-icon>sms</mat-icon>
+            Code par SMS
+          </button>
+          <button class="btn btn--outline btn--full-width"
+                  (click)="comingSoon()">
+            <mat-icon>mail</mat-icon>
+            Lien magique
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  }
 </div>

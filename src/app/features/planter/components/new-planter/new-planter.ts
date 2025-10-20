@@ -77,23 +77,34 @@ export class NewPlanter implements OnInit {
   }
 
   private resetForm(): void {
-    this.planterForm.reset();
-    // Réinitialiser également l'état "touched" pour éviter les bordures rouges
-    this.markFormGroupUntouched();
-    this.planterForm.patchValue({
-      childrenNumber: 0
+    // Reset avec des valeurs par défaut pour éviter les champs vides
+    this.planterForm.reset({
+      firstname: '',
+      lastname: '',
+      birthday: '',
+      gender: '',
+      maritalStatus: '',
+      childrenNumber: 0,
+      village: '',
+      supervisor: ''
+    });
+
+    // Marquer le formulaire comme pristine et untouched
+    this.planterForm.markAsPristine();
+    this.planterForm.markAsUntouched();
+
+    // Important : réinitialiser l'état de chaque control individuellement
+    Object.keys(this.planterForm.controls).forEach(key => {
+      const control = this.planterForm.get(key);
+      control?.setErrors(null); // Enlever les erreurs
+      control?.markAsUntouched();
+      control?.markAsPristine();
     });
   }
 
   private markFormGroupTouched(): void {
     Object.keys(this.planterForm.controls).forEach(key => {
       this.planterForm.get(key)?.markAsTouched();
-    });
-  }
-
-  private markFormGroupUntouched(): void {
-    Object.keys(this.planterForm.controls).forEach(key => {
-      this.planterForm.get(key)?.markAsUntouched();
     });
   }
 }

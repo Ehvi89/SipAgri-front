@@ -17,7 +17,7 @@ import {RegisterService} from '../../../../../auth/services/register-service';
 export class AddSupervisor implements OnInit {
   loading$!: Observable<boolean>;
 
-  private destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
 
   // Form controls
   firstnameCtrl!: FormControl<string | null>;
@@ -36,7 +36,6 @@ export class AddSupervisor implements OnInit {
   currentSupervisor: Supervisor | null = null;
 
   // Enum et données
-  SupervisorProfile = SupervisorProfile;
   profiles = Object.values(SupervisorProfile);
 
   // Visibilité des mots de passe
@@ -44,23 +43,18 @@ export class AddSupervisor implements OnInit {
   hideConfirmPassword: boolean = true;
 
   constructor(
-    private supervisorService: SupervisorService,
-    private formBuilder: FormBuilder,
-    private router: Router,
-    private route: ActivatedRoute,
-    private notifService: NotificationService,
-    private registerService: RegisterService
+    private readonly supervisorService: SupervisorService,
+    private readonly formBuilder: FormBuilder,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly notifService: NotificationService,
+    private readonly registerService: RegisterService
   ) {}
 
   ngOnInit(): void {
     this.loading$ = this.supervisorService.loading$;
     this.initializeForm();
     this.checkEditMode();
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   /**
@@ -86,7 +80,7 @@ export class AddSupervisor implements OnInit {
 
     this.phoneCtrl = this.formBuilder.control('', [
       Validators.required,
-      Validators.pattern(/^[0-9]{10}$/)
+      Validators.pattern(/^\d{10}$/)
     ]);
 
     this.profileCtrl = this.formBuilder.control(SupervisorProfile.SUPERVISOR, [
@@ -133,7 +127,7 @@ export class AddSupervisor implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
 
     if (id) {
-      this.supervisorId = parseInt(id);
+      this.supervisorId = Number.parseInt(id);
       this.editMode = true;
       this.loadSupervisor(this.supervisorId);
 
@@ -226,21 +220,44 @@ export class AddSupervisor implements OnInit {
   resetForm(): void {
     if (confirm('Voulez-vous vraiment réinitialiser le formulaire ?')) {
       if (this.editMode && this.currentSupervisor) {
-        this.supervisorForm.patchValue({
-          firstname: this.currentSupervisor.firstname,
-          lastname: this.currentSupervisor.lastname,
-          email: this.currentSupervisor.email,
-          phone: this.currentSupervisor.phone,
-          profile: this.currentSupervisor.profile,
-          password: '',
-          confirmPassword: ''
-        });
+        this.supervisorForm.reset(
+          {
+            firstname: this.currentSupervisor.firstname,
+            lastname: this.currentSupervisor.lastname,
+            email: this.currentSupervisor.email,
+            phone: this.currentSupervisor.phone,
+            profile: this.currentSupervisor.profile,
+            password: '',
+            confirmPassword: ''
+          },
+          { emitEvent: false }
+        );
       } else {
-        this.supervisorForm.reset({
-          profile: SupervisorProfile.SUPERVISOR
-        });
+        this.supervisorForm.reset(
+          {
+            firstname: '',
+            lastname: '',
+            email: '',
+            phone: '',
+            profile: SupervisorProfile.SUPERVISOR,
+            password: '',
+            confirmPassword: ''
+          },
+          { emitEvent: false }
+        );
       }
+
+      // Réinitialiser complètement le statut
+      this.supervisorForm.markAsPristine();
       this.supervisorForm.markAsUntouched();
+
+      // Nettoyer les erreurs de chaque control
+      Object.keys(this.supervisorForm.controls).forEach(key => {
+        const control = this.supervisorForm.get(key);
+        control?.setErrors(null);
+        control?.markAsUntouched();
+        control?.markAsPristine();
+      });
     }
   }
 
