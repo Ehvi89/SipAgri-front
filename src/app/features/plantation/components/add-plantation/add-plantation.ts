@@ -48,7 +48,6 @@ export class AddPlantation implements OnInit, OnDestroy {
 
   // datas fields
   private readonly regionsSubject = new BehaviorSubject<string[]>([]);
-  regions$ = this.regionsSubject.asObservable();
   planters$!: Observable<Planter[]>;
   kits$!: Observable<Kit[]>;
 
@@ -102,7 +101,7 @@ export class AddPlantation implements OnInit, OnDestroy {
   }
 
   /**
-   * Initialize Google Maps call load method of ../plantation/services/googleMapsService
+   * Initialize Google Maps call load method of ./plantation/services/googleMapsService
    * @return void
    * */
   private initGoogleMaps(): void {
@@ -279,24 +278,57 @@ export class AddPlantation implements OnInit, OnDestroy {
     Object.keys(this.plantationForm.controls).forEach(key => {
       this.plantationForm.get(key)?.markAsTouched();
     });
-    this.gpsCtrl.markAsTouched();
+    // Marquer aussi les controls GPS comme touched
+    [this.gpsCtrl, this.addressCtrl, this.regionCtrl].forEach(ctrl => {
+      ctrl.markAsTouched();
+    });
   }
 
   /**
    * Reset form after successful creation
    */
   private resetForm() {
-    this.plantationForm.reset({
-      name: '',
-      description: '',
-      planter: null,
-      farmedArea: 1,
-      kit: null,
-      planterId: null,
-    });
-    this.gpsCtrl.reset();
-    this.addressCtrl.reset();
-    this.regionCtrl.reset();
+    // Reset avec setTimeout pour éviter les problèmes de cycle de détection
+    setTimeout(() => {
+      // Reset du formulaire principal
+      this.plantationForm.reset({
+        name: '',
+        description: '',
+        farmedArea: 1,
+        kit: null,
+        planterId: null,
+      });
+
+      // Reset des controls séparés
+      this.gpsCtrl.reset('');
+      this.addressCtrl.reset('');
+      this.regionCtrl.reset('');
+
+      // Nettoyer tous les états
+      Object.keys(this.plantationForm.controls).forEach(key => {
+        const control = this.plantationForm.get(key);
+        control?.setErrors(null);
+        control?.markAsUntouched();
+        control?.markAsPristine();
+      });
+
+      // Nettoyer les controls GPS
+      [this.gpsCtrl, this.addressCtrl, this.regionCtrl].forEach(ctrl => {
+        ctrl.setErrors(null);
+        ctrl.markAsUntouched();
+        ctrl.markAsPristine();
+      });
+
+      // Réinitialiser le formulaire complet
+      this.plantationForm.markAsPristine();
+      this.plantationForm.markAsUntouched();
+
+      // Réinitialiser la variable gpsLocation
+      this.gpsLocation = { latitude: 0, longitude: 0, displayName: '' };
+
+      // Forcer la détection des changements
+      this.cdr.detectChanges();
+    }, 0);
   }
 
   /**

@@ -140,9 +140,7 @@ export class PlanterDetails implements OnInit {
 
       for (const production of plantation.productions) {
         // Normaliser l'année en number
-        const year = production.year instanceof Date
-          ? production.year.getFullYear()
-          : +production.year;
+        const year = production.year.getFullYear();
 
         if (!yearlyTotals[year]) yearlyTotals[year] = 0;
         yearlyTotals[year] += production.productionInKg;
@@ -167,7 +165,8 @@ export class PlanterDetails implements OnInit {
     }).subscribe((result: boolean) => {
       if (result) {
         this.planterService.delete(this.planter.id!).subscribe({
-          next:() => this.router.navigateByUrl('/planters').then(r => null)
+          next:() => this.router.navigateByUrl('/planters').then(() => null),
+          error:() => this.notifService.showError("Une erreur est survenue lors de la suppression du planteur")
         });
       }
     });
