@@ -140,7 +140,9 @@ export class PlanterDetails implements OnInit {
 
       for (const production of plantation.productions) {
         // Normaliser l'année en number
-        const year = production.year.getFullYear();
+        const year = production.year instanceof Date
+          ? production.year.getFullYear()
+          : +production.year;
 
         if (!yearlyTotals[year]) yearlyTotals[year] = 0;
         yearlyTotals[year] += production.productionInKg;
