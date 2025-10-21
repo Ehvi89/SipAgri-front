@@ -1,0 +1,377 @@
+import {Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy, ChangeDetectorRef} from '@angular/core';
+import { Chart, ChartConfiguration, registerables } from 'chart.js';
+
+import { DashboardService } from '../../services/dashboard-service';
+import {forkJoin, Observable} from 'rxjs';
+
+// Enregistrer les composants Chart.js
+Chart.register(...registerables);
+
+export interface Resume {
+  name: string;
+  value: string;
+  monthlyValue: string;
+}
+
+export interface ChartData {
+  name: string;
+  value: number;
+  period?: string;
+  color?: string;
+}
+
+export interface ProductionTrendData {
+  period: string;
+  value: number;
+}
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: false,
+  templateUrl: './dashboard.html',
+  styleUrls: ['./dashboard.scss']
+})
+export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('barCanvas') barCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('pieCanvas') pieCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('lineCanvas') lineCanvas!: ElementRef<HTMLCanvasElement>;
+
+  // Instances des graphiques
+  private barChart?: Chart;
+  private pieChart?: Chart;
+  private lineChart?: Chart;
+
+  resumes$!: Observable<Resume[]>;
+  productionByPeriod: ChartData[] = [];
+  productionByPlantation: ChartData[] = [];
+  productionTrend: ProductionTrendData[] = [];
+
+  selectedPeriodFilter: string = 'month';
+  periodFilters = [
+    { value: 'week', label: 'Par semaine' },
+    { value: 'month', label: 'Par mois' },
+    { value: 'quarter', label: 'Par trimestre' },
+    { value: 'year', label: 'Par année' }
+  ];
+
+  constructor(
+    private readonly dashboardService: DashboardService,
+    private readonly cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.loadDashboardData();
+  }
+
+  ngAfterViewInit(): void {
+    // Initialiser les graphiques après que la vue soit prête
+    setTimeout(() => {
+      this.initializeCharts();
+    }, 100);
+  }
+
+  ngOnDestroy(): void {
+    // Nettoyer les graphiques
+    this.destroyCharts();
+  }
+
+  private loadDashboardData(): void {
+    // Charger les statistiques de résumé
+    this.resumes$ = this.dashboardService.getResumesData();
+
+    // Charger toutes les données en parallèle
+    forkJoin([
+      this.dashboardService.getProductionByPeriod(this.selectedPeriodFilter),
+      this.dashboardService.getProductionByPlantation(),
+      this.dashboardService.getProductionTrend()
+    ]).subscribe({
+      next: ([periodData, plantationData, trendData]) => {
+        this.productionByPeriod = periodData;
+        this.productionByPlantation = plantationData;
+        this.productionTrend = trendData;
+
+        this.updateAllCharts();
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des données:', error);
+      }
+    });
+  }
+
+  private updateAllCharts(): void {
+    this.updateBarChart();
+    this.updatePieChart();
+    this.updateLineChart();
+  }
+
+  onPeriodFilterChange(): void {
+    this.dashboardService.getProductionByPeriod(this.selectedPeriodFilter).subscribe({
+      next: (data) => {
+        this.productionByPeriod = data;
+        this.updateBarChart();
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement de la production:', error);
+      }
+    });
+  }
+
+  private initializeCharts(): void {
+    this.createBarChart();
+    this.createPieChart();
+    this.createLineChart();
+  }
+
+  private createBarChart(): void {
+    if (!this.barCanvas) return;
+
+    const ctx = this.barCanvas.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const config: ChartConfiguration<'bar'> = {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          data: [],
+          backgroundColor: [
+            '#3b82f6',
+            '#10b981',
+            '#f59e0b',
+            '#ef4444',
+            '#8b5cf6',
+            '#06b6d4'
+          ],
+          borderColor: '#ffffff',
+          borderWidth: 2,
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            cornerRadius: 8,
+            callbacks: {
+              label: (context) => {
+                return `Production: ${context.parsed.y.toFixed(2)} kg`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: '#f3f4f6'
+            },
+            ticks: {
+              font: {
+                size: 12
+              },
+              callback: (value) => `${value} kg`
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              font: {
+                size: 12
+              }
+            }
+          }
+        }
+      }
+    };
+
+    this.barChart = new Chart(ctx, config);
+  }
+
+  private createPieChart(): void {
+    if (!this.pieCanvas) return;
+
+    const ctx = this.pieCanvas.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const config: ChartConfiguration<'doughnut'> = {
+      type: 'doughnut',
+      data: {
+        labels: [],
+        datasets: [{
+          data: [],
+          backgroundColor: [
+            '#3b82f6',
+            '#10b981',
+            '#f59e0b',
+            '#ef4444',
+            '#8b5cf6',
+            '#06b6d4',
+            '#ec4899',
+            '#14b8a6'
+          ],
+          borderColor: '#ffffff',
+          borderWidth: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 20,
+              font: {
+                size: 12
+              },
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            cornerRadius: 8,
+            callbacks: {
+              label: (context) => {
+                const label = context.label || '';
+                const value = context.parsed;
+                const total = context.dataset.data.reduce((a: any, b: any) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${label}: ${value.toFixed(2)} kg (${percentage}%)`;
+              }
+            }
+          }
+        },
+        cutout: '50%'
+      }
+    };
+
+    this.pieChart = new Chart(ctx, config);
+  }
+
+  private createLineChart(): void {
+    if (!this.lineCanvas) return;
+
+    const ctx = this.lineCanvas.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const config: ChartConfiguration<'line'> = {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Production (kg)',
+          data: [],
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#10b981',
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          pointHoverRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            cornerRadius: 8,
+            callbacks: {
+              label: (context) => {
+                return `Production: ${context.parsed.y.toFixed(2)} kg`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: '#f3f4f6'
+            },
+            ticks: {
+              font: {
+                size: 12
+              },
+              callback: (value) => `${value} kg`
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              font: {
+                size: 12
+              }
+            }
+          }
+        },
+        elements: {
+          point: {
+            hoverBackgroundColor: '#10b981'
+          }
+        }
+      }
+    };
+
+    this.lineChart = new Chart(ctx, config);
+  }
+
+  private updateBarChart(): void {
+    if (!this.barChart || this.productionByPeriod.length === 0) return;
+
+    this.barChart.data.labels = this.productionByPeriod.map(item => item.name);
+    this.barChart.data.datasets[0].data = this.productionByPeriod.map(item => item.value);
+    this.barChart.update('none');
+  }
+
+  private updatePieChart(): void {
+    if (!this.pieChart || this.productionByPlantation.length === 0) return;
+
+    this.pieChart.data.labels = this.productionByPlantation.map(item => item.name);
+    this.pieChart.data.datasets[0].data = this.productionByPlantation.map(item => item.value);
+    this.pieChart.update('none');
+  }
+
+  private updateLineChart(): void {
+    if (!this.lineChart || this.productionTrend.length === 0) return;
+
+    this.lineChart.data.labels = this.productionTrend.map(item => item.period);
+    this.lineChart.data.datasets[0].data = this.productionTrend.map(item => item.value);
+    this.lineChart.update('none');
+  }
+
+  private destroyCharts(): void {
+    if (this.barChart) {
+      this.barChart.destroy();
+    }
+    if (this.pieChart) {
+      this.pieChart.destroy();
+    }
+    if (this.lineChart) {
+      this.lineChart.destroy();
+    }
+  }
+}

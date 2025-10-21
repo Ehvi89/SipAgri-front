@@ -1,0 +1,149 @@
+<div class="production-list-container">
+  <app-header placeholder="Rechercher par production"></app-header>
+
+  <div class="content">
+    <div class="page-header">
+      <div class="section-title">Productions</div>
+      <button routerLink="add" class="btn btn--primary">
+        <mat-icon>add</mat-icon>
+        <span>Ajouter une production</span>
+      </button>
+    </div>
+    <div class="stats">
+      <div class="stat-card">
+        <div>
+          <div class="helper"></div>
+          <div class="value"></div>
+        </div>
+        <mat-icon></mat-icon>
+      </div>
+      <div class="stat-card">
+        <div>
+          <div class="helper"></div>
+          <div class="value"></div>
+        </div>
+        <mat-icon></mat-icon>
+      </div>
+      <div class="stat-card">
+        <div>
+          <div class="helper"></div>
+          <div class="value"></div>
+        </div>
+        <mat-icon></mat-icon>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table">
+        <div class="table-row header">
+          <div class="column center">Date</div>
+          <div class="column center">Planteur • Plantation</div>
+          <div class="column center">Quantité (kg)</div>
+          <div class="column center">Prix d'achat</div>
+          <div class="column center">Status</div>
+          <div class="column center">Actions</div>
+        </div>
+
+        <div class="table-body">
+          @if (loading$ | async) {
+            <div class="loading-state">
+              <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+              <span>Chargement des productions...</span>
+            </div>
+          }
+
+          @if (!(loading$ | async) && (productionsPaged$ | async)?.data?.length === 0) {
+            <div class="empty-state">
+              <i class="fas fa-wheat-alt"></i>
+              <span>Aucune production trouvée</span>
+            </div>
+          }
+
+          @for (production of (productionsPaged$ | async)?.data; track production.id) {
+            <div class="table-row">
+              <div class="column center">
+                <span class="date">{{ production.year | date }}</span>
+              </div>
+              <div class="column center" *ngIf="(plantationsMap$ | async)?.get(production.plantationId) as plantation; else loadingPlantation">
+                <div *ngIf="(plantersMap$ | async)?.get(plantation.planterId) as planter">
+                  <span>{{ planter.firstname }} {{ planter.lastname }} • {{ plantation.name }}</span>
+                </div>
+              </div>
+
+              <ng-template #loadingPlantation>
+                <div>Chargement des informations</div>
+              </ng-template>
+              <div class="column center">
+                <span class="production">{{ production.productionInKg | number:'1.2-2' }} </span>
+              </div>
+              <div class="column center">
+                <span class="production">{{ production.purchasePrice | currency:'XOF':'symbol':'1.0-0' }} </span>
+              </div>
+              <div class="column center">
+                <span class="production">{{ production.mustBePaid ? 'Bénéficiaire' : 'Déficitaire' }} </span>
+              </div>
+              <div class="column actions center">
+                <button mat-icon-button (click)="modifyProduction(production)"
+                        matTooltip="Modifier">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="deleteProduction(production.id!); $event.stopPropagation()"
+                        matTooltip="Supprimer">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Modal de modification de la production-->
+<ng-template #modificationDialog>
+  <h2 class="mb-2" mat-dialog-title>Modifier un planteur</h2>
+
+  <mat-dialog-content>
+    <form [formGroup]="prodForm">
+      <div class="form">
+        <div class="field">
+          <mat-form-field appearance="outline">
+            <mat-label>Plantation</mat-label>
+            <mat-select formControlName="plantationId" required>
+              @for (plantation of plantations$ | async; track plantation.id) {
+                <mat-option [value]="plantation.id">{{plantation.name}}</mat-option>
+              }
+            </mat-select>
+            <mat-error>Veuillez choisir la plantation</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <mat-form-field appearance="outline">
+              <mat-label>Date de production</mat-label>
+              <input matInput [matDatepicker]="picker" formControlName="year" required />
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+              <mat-error>Ce champ est requis</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="field">
+            <mat-form-field appearance="outline">
+              <mat-label>Production (Kg)</mat-label>
+              <input matInput type="number" step="0.1" min="0.1" formControlName="productionInKg" required>
+              <mat-error>Veuillez définir la production</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button [mat-dialog-close]="false">Annuler</button>
+    <button mat-raised-button color="primary" [disabled]="prodForm.invalid" [mat-dialog-close]="true">
+      <mat-icon>save</mat-icon>
+      <span>Enregistrer</span>
+    </button>
+  </mat-dialog-actions>
+</ng-template>

@@ -1,0 +1,206 @@
+<div class="register-container">
+  <!-- Header avec logo et navigation -->
+  <header class="header">
+    <app-logo margin="none"></app-logo>
+    <div class="chip-actions">
+      <button class="chip-btn" (click)="goToLogin()">Connexion</button>
+      <button class="chip-btn active">Créer un compte</button>
+    </div>
+  </header>
+
+  <!-- Card principale d'inscription -->
+  <div class="card main-card">
+    <div class="card-header">
+      <h1 class="card-title">Créer votre compte</h1>
+      <p class="card-subtitle">
+        Renseignez vos informations pour commencer à gérer vos planteurs, leurs plantations et leurs productions
+      </p>
+    </div>
+
+    <div class="card-content">
+      <form class="form register-form" [formGroup]="registerForm" (ngSubmit)="register()">
+
+        <!-- Erreur générale du formulaire -->
+        <div class="form-error" *ngIf="getFormErrorMessage() && registerForm.touched">
+          <mat-icon>error</mat-icon>
+          <span>{{ getFormErrorMessage() }}</span>
+        </div>
+
+        <!-- Nom et Prénoms -->
+        <div class="full-width grid--two">
+          <mat-form-field appearance="outline">
+            <mat-label>Nom</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="lastname"
+              name="lastname"
+              placeholder="Votre nom de famille"
+              [class.error]="lastnameCtrl.invalid && lastnameCtrl.touched"
+              autocomplete="family-name">
+            <mat-error *ngIf="lastnameCtrl.touched">
+              {{ getFieldErrorMessage('lastname') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Prénoms</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="firstname"
+              placeholder="Vos prénoms"
+              name="firstname"
+              [class.error]="firstnameCtrl.invalid && firstnameCtrl.touched"
+              autocomplete="given-name">
+            <mat-error *ngIf="firstnameCtrl.touched">
+              {{ getFieldErrorMessage('firstname') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Email -->
+        <div class="full-width">
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input
+              matInput
+              type="email"
+              formControlName="email"
+              placeholder="votreemail@sipra.ci"
+              [class.error]="emailCtrl.invalid && emailCtrl.touched"
+              autocomplete="email">
+            <mat-icon matSuffix *ngIf="emailCtrl.valid && emailCtrl.value">check_circle</mat-icon>
+            <mat-error *ngIf="emailCtrl.touched">{{ getFieldErrorMessage('email') }}</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Numéro de téléphone</mat-label>
+            <input
+              matInput
+              type="tel"
+              formControlName="phone"
+              placeholder="000123400"
+              [class.error]="phoneCtrl.invalid && phoneCtrl.touched"
+              autocomplete="email">
+            <mat-error *ngIf="phoneCtrl.touched">{{ getFieldErrorMessage('phone') }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Mots de passe -->
+        <div class="full-width">
+          <mat-form-field appearance="outline">
+            <mat-label>Mot de passe</mat-label>
+            <input
+              matInput
+              type="password"
+              formControlName="password"
+              placeholder="••••••••"
+              [class.error]="passwordCtrl.invalid && passwordCtrl.touched"
+              autocomplete="new-password">
+            <mat-error *ngIf="passwordCtrl.touched">
+              {{ getFieldErrorMessage('password') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Confirmer le mot de passe</mat-label>
+            <input
+              matInput
+              type="password"
+              formControlName="confirmPassword"
+              placeholder="••••••••"
+              [class.error]="confirmPasswordCtrl.invalid && confirmPasswordCtrl.touched"
+              autocomplete="new-password">
+            <mat-error *ngIf="confirmPasswordCtrl.touched">
+              {{ getFieldErrorMessage('confirmPassword') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Indicateur de force du mot de passe -->
+        <div class="password-strength" *ngIf="passwordCtrl.value">
+          <div class="password-strength-label">
+            Force du mot de passe :
+            <span [class]="'strength-' + passwordStrength.color">
+              {{ passwordStrength.label }}
+            </span>
+          </div>
+          <div class="password-strength-bar">
+            <div
+              class="strength-indicator"
+              [style.width.%]="(passwordStrength.score || 0) * 16.66"
+              [class]="'strength-' + passwordStrength.color">
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-row actions">
+          <div class="btn-group">
+            <a routerLink="#" (click)="goToLogin()">  Retour à la connexion</a>
+
+            <button
+              type="submit"
+              class="btn btn--primary"
+              [disabled]="!isFormValid || (loading$ | async)"
+              [class.loading]="loading$ | async">
+              <mat-spinner diameter="20" *ngIf="loading$ | async"></mat-spinner>
+              <mat-icon *ngIf="!(loading$ | async)">person_add</mat-icon>
+              {{ (loading$ | async) ? 'Création...' : 'Créer mon compte' }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Footer avec conditions -->
+    <div class="card-footer">
+      <small>
+        En créant un compte, vous acceptez nos
+        <strong>
+          <a routerLink="#" class="link link--muted">Conditions d'utilisation</a>
+        </strong>
+        et notre
+        <strong>
+          <a routerLink="#" class="link link--muted">Politique de confidentialité</a>
+        </strong>
+      </small>
+    </div>
+
+    <!-- Barre de progression -->
+    <mat-progress-bar
+      *ngIf="loading$ | async"
+      mode="indeterminate"
+      class="loading-bar">
+    </mat-progress-bar>
+  </div>
+
+  <!-- Connexion rapide -->
+  <div class="card express-register">
+    <div class="card-header">
+      <h2 class="card-title">Et ensuite ?</h2>
+    </div>
+
+    <div class="card-content flex flex--column flex--center">
+      <mat-icon class="rocket-icon">rocket_launch</mat-icon>
+      <p class="text--center">
+        Votre compte sera créé automatiquement. Vous pourrez ensuite compléter
+        votre profil et accéder directement au tableau de bord.
+      </p>
+
+      <div class="form-row quick-buttons">
+        <button class="btn--sm">
+          <mat-icon>person</mat-icon>
+          <span class="btn-title" (click)="comingSoon()">Compléter le profil</span>
+        </button>
+
+        <button>
+          <mat-icon>dashboard</mat-icon>
+          <span class="btn-title" (click)="comingSoon()">Aller au tableau de bord</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

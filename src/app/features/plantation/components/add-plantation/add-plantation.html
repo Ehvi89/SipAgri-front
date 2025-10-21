@@ -1,0 +1,155 @@
+<div class="add-plantation-container">
+  <app-header placeholder="" [breadcrumb]="true" [export]="false"></app-header>
+
+  <div class="content">
+    <div class="page-header">
+      <span>Ajouter une plantation</span>
+    </div>
+
+    <form [formGroup]="plantationForm">
+      <div class="grid grid--two-fs">
+
+        <!-- Informations de la parcelle -->
+        <div class="card">
+          <div class="section-title">
+            Informations de la parcelle
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <mat-form-field appearance="outline">
+                <mat-label>Village de la parcelle</mat-label>
+                <input matInput type="text" formControlName="name">
+                <mat-hint>Si aucune information n'est saisie, le nom récupéré par les coordonnées sera utilisé</mat-hint>
+              </mat-form-field>
+            </div>
+
+            <div class="field">
+              <mat-form-field appearance="outline">
+                <mat-label>Planteur</mat-label>
+                <mat-select formControlName="planterId" (selectionChange)="onPlanterChange($event.value)" required>
+                  @for (planter of (planters$ | async); track planter.id) {
+                    <mat-option [value]="planter.id">
+                      {{planter.firstname}} {{planter.lastname}}
+                    </mat-option>
+                  }
+                </mat-select>
+                @if (plantationForm.get('planterId')?.hasError('required')) {
+                  <mat-error>Veuillez sélectionner un planteur</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <div class="field">
+              <mat-form-field appearance="outline">
+                <mat-label>Crédit Kit</mat-label>
+                <mat-select formControlName="kit" required>
+                  @for (kit of (kits$ | async); track kit.id) {
+                    <mat-option [value]="kit">{{kit.name}}</mat-option>
+                  }
+                </mat-select>
+                @if (plantationForm.get('kit')?.hasError('required')){
+                  <mat-error>Veuillez sélectionner un crédit kit</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <div class="field">
+              <mat-form-field appearance="outline" suffix="ha">
+                <mat-label>Superficie (ha)</mat-label>
+                <input matInput type="number" step="0.1" min="0.1" formControlName="farmedArea" required>
+                @if (plantationForm.get('farmedArea')?.hasError('required')){
+                  <mat-error>La superficie est requise</mat-error>
+                } @else if (plantationForm.get('farmedArea')?.hasError('min')) {
+                  <mat-error>La superficie doit être supérieure à 0,1 ha</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="field">
+            <mat-form-field appearance="outline">
+              <mat-label>Description</mat-label>
+              <textarea matInput formControlName="description" rows="6"></textarea>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Localisation -->
+        <div class="card">
+          <div class="section-title">
+            Localisation
+          </div>
+
+          <div class="field">
+            <mat-form-field appearance="outline">
+              <mat-label>Coordonnées GPS</mat-label>
+              <input matInput type="text" [formControl]="gpsCtrl" placeholder="Latitude, Longitude" required>
+              <mat-hint>Format: latitude, longitude (ex: 5.3600, -4.0083)</mat-hint>
+              @if (gpsCtrl.hasError('required')){
+                <mat-error>Les coordonnées GPS sont requises</mat-error>
+              } @else if (gpsCtrl.hasError('invalidFormat')){
+                <mat-error>
+                  Format invalide. Utilisez: latitude, longitude
+                </mat-error>
+              } @else if (gpsCtrl.hasError('invalidCoordinates')){
+                <mat-error>Coordonnées invalides</mat-error>
+              } @else if (gpsCtrl.hasError('outOfRange')){
+                <mat-error>Coordonnées hors limites (-90 à 90 pour latitude, -180 à 180 pour longitude)</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Région</mat-label>
+              <input matInput type="text" [formControl]="regionCtrl" name="region">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Adresse</mat-label>
+              <input matInput type="text" [formControl]="addressCtrl" placeholder="Village/Commune">
+            </mat-form-field>
+          </div>
+
+          @if (isGoogleMapsReady) {
+            <div class="map-container">
+              <google-map
+                width="100%"
+                height="300px"
+                [zoom]="mapZoom"
+                [center]="(mapCenter | async)!"
+                [options]="mapOptions"
+                (mapClick)="onMapClick($event)">
+                @if (gpsLocation) {
+                  <map-marker
+                    [position]="{lat: gpsLocation.latitude, lng: gpsLocation.longitude}"
+                    [options]="{title: gpsLocation.displayName}">
+                  </map-marker>
+                }
+              </google-map>
+            </div>
+          } @else {
+            <div class="map-loading">
+              <mat-spinner diameter="40"></mat-spinner>
+              <span>Chargement de la carte...</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn--primary" type="submit"
+                [disabled]="plantationForm.invalid || gpsCtrl.invalid || (loading$ | async)"
+                (click)="createPlantation()">
+          @if (loading$ | async) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            <mat-icon>add</mat-icon>
+          }
+          <span>Créer la plantation</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

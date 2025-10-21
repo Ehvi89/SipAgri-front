@@ -1,0 +1,42 @@
+@use "../../../../styles";
+
+.sidebar-container {
+  @extend .padding--md;
+  background-color: var(--bg-sidebar);
+  min-width: 200px;
+  min-height: calc(100vh - 60px - 2rem);
+  height: 100%;
+  max-height: 100vh;
+  position: sticky;
+  top: 0;
+  left: 0;
+
+  nav > ul {
+    padding: 0;
+  }
+
+  .nav-link {
+    @extend .mb-1;
+    @extend .padding--sm-50;
+    list-style: none;
+
+    .nav-link-item {
+      @extend .flex;
+      @extend .gap--sm;
+      text-decoration: none;
+      color: var(--sidebar-text-color);
+
+      .icon {
+        width: 1.5rem;
+      }
+    }
+
+    &.active {
+      background-color: var(--active-nav);
+      @extend .radius-md;
+      color: white !important;
+
+      a { color: white }
+    }
+  }
+}

@@ -1,0 +1,110 @@
+name: Build and Deploy Sipagri
+
+on:
+  push:
+    branches: [ "develop", "main" ]
+#  pull_request:
+#    branches: [ "main" ]
+
+jobs:
+  # Job de build pour la branche develop
+  build-develop:
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+        with:
+          angular-env: 'development'
+          build-config: 'development'
+          api-url: ${{ secrets.DEV_API_URL }}
+          google-maps-api-key: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+
+      - name: Build application
+        shell: bash
+        env:
+          NODE_ENV: development
+        run: |
+            npx ng build --configuration=development
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sipagri-build-develop
+          path: dist/
+          retention-days: 7
+
+  # Job de build et déploiement pour la branche main
+  build-deploy-main:
+    if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+        with:
+          angular-env: 'production'
+          build-config: 'production'
+          api-url: ${{ secrets.PROD_API_URL }}
+          google-maps-api-key: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+
+      - name: Build application
+        run: npm run build -- --configuration=production
+        env:
+          NODE_ENV: production
+
+      - name: Deploy to production directory
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        shell: powershell
+        run: |
+          try {
+            $DEPLOY_DIR   = "${{ secrets.PROD_DEPLOY_PATH }}"
+            $ARCHIVE_DIR  = "$DEPLOY_DIR\MAJ"
+            $DATE         = Get-Date -Format "yyyy.MM.dd"
+            $TODAY_ARCHIVE = "$ARCHIVE_DIR\$DATE"
+
+            Write-Output "Creation des dossiers d'archive..."
+            New-Item -ItemType Directory -Path $TODAY_ARCHIVE -Force -ErrorAction SilentlyContinue
+
+            Write-Output "Archivage des anciens fichiers..."
+            $OLD_FILES = Get-ChildItem -Path $DEPLOY_DIR -ErrorAction SilentlyContinue | Where-Object { $_.FullName -ne $ARCHIVE_DIR }
+            foreach ($FILE in $OLD_FILES) {
+              Move-Item -Path $FILE.FullName -Destination "$TODAY_ARCHIVE\$($FILE.Name)" -Force
+            }
+
+            Write-Output "Deploiement des nouveaux fichiers..."
+            $NEW_FILES = Get-ChildItem -Path "dist/**/*" -ErrorAction SilentlyContinue
+            foreach ($FILE in $NEW_FILES) {
+              Move-Item -Path $FILE.FullName -Destination $DEPLOY_DIR -Force
+            }
+              Write-Output "`nDéploiement terminé avec succes!"
+          }
+          catch {
+              Write-Output "Erreur lors du déploiement: $($_.Exception.Message)"
+              exit 1
+          }

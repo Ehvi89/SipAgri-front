@@ -1,0 +1,58 @@
+@use '@angular/material' as mat;
+@use 'variables' as *;
+@use "sass:color";
+
+// Version simplifiée qui fonctionne à coup sûr
+$my-theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$green-palette,
+    tertiary: mat.$orange-palette,
+  ),
+  typography: (
+    brand-family: $font-family-base,
+  )
+));
+
+// Application du thème
+@include mat.all-component-themes($my-theme);
+
+// Variables CSS custom pour vos couleurs spécifiques
+:root {
+  --color-background: #{$color-background};
+  --color-border: #{$color-border};
+  --color-primary: #{$color-primary};
+  --color-secondary: #{$color-secondary};
+  --color-accent: #{$color-accent};
+  --color-warn: #{$color-warning};
+  --color-error: #{$color-error};
+  --success-color: #4caf50;
+  --info-color: #2196f3;
+  --font-family-base: #{$font-family-base};
+  --font-primary-color: #{$text-primary};
+  --radius-sm: #{$radius-sm};
+  --radius-md: #{$radius-md};
+  --radius-lg: #{$radius-lg};
+  --radius-xl: #{$radius-xl};
+  --shadow-card: #{$shadow-card};
+  --shadow-button: #{$shadow-button};
+  --bg-sidebar: #{$color-sidebar};
+  --active-nav: #{$color-sidebar-primary};
+  --sidebar-text-color: #{$text-sidebar};
+
+  //Color Shade
+  --primary-light-50: #{color.adjust($color-primary, $lightness: 50%)};
+  --primary-light-60: #{color.adjust($color-primary, $lightness: 60%)};
+  --primary-light-45: #{color.adjust($color-primary, $lightness: 45%)};
+
+  --secondary-light-50: #{color.adjust($color-secondary, $lightness: 50%)};
+  --secondary-light-25: #{color.adjust($color-secondary, $lightness: 25%)};
+  --secondary-light-10: #{color.adjust($color-secondary, $lightness: 10%)};
+
+  --warning-light-40: #{color.adjust($color-warning, $lightness: 40%)};
+  --accent-light-10: #{color.adjust($color-accent, $lightness: 10%)};
+  --error-light-10: #{color.adjust($color-error, $lightness: 10%)};
+  // Override des couleurs Material avec vos couleurs custom
+  --mdc-theme-primary: #{$color-primary};
+  --mat-app-background-color: #{$color-background};
+}

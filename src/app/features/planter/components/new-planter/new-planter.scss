@@ -1,0 +1,32 @@
+@use "../../../../../styles";
+
+.new-planter-container {
+  @extend .container;
+  @extend .container--lg;
+  @extend .container--without-top;
+
+  .title {
+    @extend .flex;
+    @extend .flex--column;
+    @extend .mb-2;
+  }
+
+  .form {
+    .row {
+      @extend .flex;
+      @extend .gap--md;
+    }
+
+    .form-actions {
+      @extend .flex;
+
+      button {
+        @extend .flex;
+        @extend .gap--sm;
+        @extend .btn;
+        @extend .btn--primary;
+        margin-left: auto;
+      }
+    }
+  }
+}

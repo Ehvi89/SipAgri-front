@@ -1,0 +1,95 @@
+<div class="new-planter-container">
+  <app-header placeholder="" [breadcrumb]="true" [export]="false"></app-header>
+  <div class="content">
+    <div class="row">
+      <div class="title">
+        <span class="text--lg text--bold">Nouveau planteur</span>
+        <span>Ajoutez les informations du planteur puis enregistrez.</span>
+      </div>
+    </div>
+    <form class="form" [formGroup]="planterForm" (ngSubmit)="create()">
+      <div class="row">
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Nom</mat-label>
+          <input matInput type="text" name="lastname" formControlName="lastname" required/>
+          <mat-error *ngIf="planterForm.get('lastname')!.hasError('required')">Ce champ est requis</mat-error>
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Prénoms</mat-label>
+          <input matInput type="text" name="firstname" formControlName="firstname" required/>
+          <mat-error *ngIf="planterForm.get('firstname')!.hasError('required')">Ce champ est requis</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row">
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Genre</mat-label>
+          <mat-select formControlName="gender">
+            <mat-option value="{{gender.MALE}}">Masculin</mat-option>
+            <mat-option value="{{gender.FEMALE}}">Féminin</mat-option>
+          </mat-select>
+          <mat-error *ngIf="planterForm.get('gender')!.hasError('required')">Ce champ est requis</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Date de naissance</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="birthday" required>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="planterForm.get('birthday')!.hasError('required')">Ce champ est requis</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row">
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Statut Matrimonial</mat-label>
+          <mat-select formControlName="maritalStatus">
+            <mat-option *ngFor="let status of maritalStatusOptions" [value]="status.value">
+              {{ status.label }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="planterForm.get('maritalStatus')!.hasError('required')">Ce champ est requis</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row">
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Village</mat-label>
+          <mat-select formControlName="village" required>
+            <mat-option *ngFor="let village of villages" [value]="village">{{ village }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="planterForm.get('village')!.hasError('required')">Ce champ est requis</mat-error>
+        </mat-form-field>
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Nombre d'enfants</mat-label>
+          <input matInput type="number" formControlName="childrenNumber" min="0" required/>
+          <mat-error *ngIf="planterForm.get('childrenNumber')!.hasError('required')">Ce champ est requis</mat-error>
+          <mat-error *ngIf="planterForm.get('childrenNumber')!.hasError('min')">Le nombre doit être positif</mat-error>
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Encadreur</mat-label>
+          <mat-select formControlName="supervisor" required>
+            <mat-option *ngFor="let supervisor of (supervisors$ | async)" [value]="supervisor">
+              {{ supervisor.firstname }} {{ supervisor.lastname }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="planterForm.get('supervisor')!.hasError('required')">Ce champ est requis</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" mat-raised-button color="primary" [disabled]="planterForm.invalid || (loading$ | async)">
+          <mat-icon *ngIf="!(loading$ | async)" matIconPrefix>person_add</mat-icon>
+          <mat-progress-spinner matPrefix *ngIf="loading$ | async" diameter="20"
+                                mode="indeterminate"></mat-progress-spinner>
+          <span *ngIf="!(loading$ | async)">Créer le planteur</span>
+          <span *ngIf="loading$ | async">Création en cours...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

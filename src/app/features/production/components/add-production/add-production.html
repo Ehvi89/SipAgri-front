@@ -1,0 +1,56 @@
+<div class="add-production-container">
+  <app-header placeholder="" [breadcrumb]="true" [export]="false"></app-header>
+
+  <div class="content">
+    <div class="section-title">
+      Créer une nouvelle production
+    </div>
+    <form class="grid grid--two-fs" [formGroup]="prodForm">
+      <div class="card flex">
+        <div class="form">
+          <div class="field">
+            <mat-form-field appearance="outline">
+              <mat-label>Plantation</mat-label>
+              <mat-select [formControl]="plantationCtrl" required>
+                @for (plantation of plantations$ | async; track plantation.id) {
+                  <mat-option [value]="plantation.id">{{plantation.name}}</mat-option>
+                }
+              </mat-select>
+              <mat-error>Veuillez choisir la plantation</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <mat-form-field appearance="outline">
+                <mat-label>Date de production</mat-label>
+                <input matInput [matDatepicker]="picker" [formControl]="dateCtrl" required />
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                <mat-error>Ce champ est requis</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="field">
+              <mat-form-field appearance="outline">
+                <mat-label>Production (Kg)</mat-label>
+                <input matInput type="number" step="0.1" min="0.1" [formControl]="prodCtrl" required>
+                <mat-error>Veuillez définir la production</mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="actions">
+            <button  class="btn btn--primary" type="submit" (click)="addProduction()"
+                     [disabled]="prodForm.invalid || (loading$ | async)">
+              @if (loading$ | async) { <mat-spinner diameter="20" mode="indeterminate"></mat-spinner> }
+              @else { <mat-icon>add</mat-icon> }
+              Ajouter la production
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <img src="https://media.sudouest.fr/5982759/1200x-1/20210920172016-copiedebi3899.jpg?v=1632237758" alt="maïs">
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,73 @@
+@use "../../../../styles";
+
+.header-container {
+  @extend .flex;
+  @extend .flex--between;
+
+  width: 100%;
+  align-items: center;
+
+  mat-form-field {
+    flex: 2.5;
+  }
+  // Remove field space under mat-form-field
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+  }
+
+  .breadcrumb {
+    @extend .flex;
+    @extend .flex--center;
+    @extend .gap--sm;
+    @extend .text--lg;
+    @extend .text--medium;
+  }
+
+  .spacer { flex: 2; }
+
+  .export-btn {
+    @extend .gap--sm;
+    @extend .flex--center;
+    @extend .btn;
+    @extend .btn--secondary;
+    border: 1px solid var(--color-border);
+    flex: .25;
+    padding: .75rem 1rem;
+  }
+
+  .user {
+    @extend .flex;
+    @extend .gap--md;
+    @extend .radius-md;
+    @extend .text--xl;
+
+    flex: .75;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &.withSearch {
+      flex: 1.25;
+    }
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .avatar-icon {
+      @extend .radius-full;
+      @extend .padding--sm-50;
+      @extend .border;
+
+      width: 1.5rem;
+      height: 1.5rem;
+      font-size: 1.5rem;
+    }
+
+    span {
+      @extend .text--base;
+    }
+  }
+}

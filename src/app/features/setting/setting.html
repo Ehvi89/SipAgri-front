@@ -1,0 +1,16 @@
+<div class="setting-container">
+  <app-header placeholder="" [breadcrumb]="true"></app-header>
+  <div class="content">
+    @if (supervisor.profile === 'ADMINISTRATOR') {
+      <div class="chip">
+        @for (chip of menus; track chip) {
+          <button [routerLink]="chip.link"
+                  routerLinkActive="active" [routerLinkActiveOptions]="{'exact': chip.exact}">
+            {{chip.label}}
+          </button>
+        }
+      </div>
+    }
+    <router-outlet></router-outlet>
+  </div>
+</div>
