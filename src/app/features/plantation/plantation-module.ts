@@ -10,6 +10,7 @@ import {PlantationRepository} from './repository/plantation-repository';
 import {PlanterModule} from '../planter/planter-module';
 import { AddPlantation } from './components/add-plantation/add-plantation';
 import { PlantationDetails } from './components/planation-details/plantation-details';
+import {ProductModule} from '../setting/modules/product/product-module';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { PlantationDetails } from './components/planation-details/plantation-det
     PlantationRoutingModule,
     ShareModule,
     CoreModule,
-    PlanterModule
+    PlanterModule,
+    ProductModule
   ],
   providers: [
     PlantationService,

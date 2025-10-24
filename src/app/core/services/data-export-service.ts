@@ -11,6 +11,7 @@ import {ProductionService} from '../../features/production/services/production-s
 import * as XLSX from 'xlsx'
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import {Kit} from '../models/kit-model';
 
 
 /**
@@ -77,6 +78,7 @@ export interface ExportProduction extends Production {
     name: string;
     farmedArea: number;
     planterName: string;
+    kit: Kit
   };
 }
 
@@ -247,7 +249,8 @@ export class DataExportService {
           id: plantation.id!,
           name: plantation.name,
           farmedArea: plantation.farmedArea,
-          planterName: planter ? `${planter.firstname} ${planter.lastname}` : 'Inconnu'
+          planterName: planter ? `${planter.firstname} ${planter.lastname}` : 'Inconnu',
+          kit: plantation.kit
         }
       }));
 
@@ -290,7 +293,8 @@ export class DataExportService {
           id: plantation.id!,
           name: plantation.name,
           farmedArea: plantation.farmedArea,
-          planterName: `${planter.firstname} ${planter.lastname}`
+          planterName: `${planter.firstname} ${planter.lastname}`,
+          kit: plantation.kit
         } : undefined
       };
     }));
@@ -567,7 +571,8 @@ export class DataExportService {
         id: plantation.id!,
         name: plantation.name,
         farmedArea: plantation.farmedArea,
-        planterName: `${planter.firstname} ${planter.lastname}`
+        planterName: `${planter.firstname} ${planter.lastname}`,
+        kit: plantation.kit
       }
     }));
 
@@ -627,18 +632,17 @@ export class DataExportService {
    */
   private preparePlanterExport(planters: ExportPlanter[]): any[] {
     return planters.map(planter => ({
-      id: planter.id,
-      nom: `${planter.firstname} ${planter.lastname}`,
-      genre: this.getGender(planter.gender),
-      statutMatrimonial: this.getMaritalStatus(planter.maritalStatus),
-      village: planter.village,
-      telephone: planter.phoneNumber,
-      superviseur: planter.supervisor
+      'Nom': `${planter.firstname} ${planter.lastname}`,
+      'Genre': this.getGender(planter.gender),
+      'Statut matrimonial': this.getMaritalStatus(planter.maritalStatus),
+      'Village': planter.village,
+      'Telephone': planter.phoneNumber,
+      'Superviseur': planter.supervisor
         ? `${planter.supervisor.firstname} ${planter.supervisor.lastname}`
         : 'Aucun',
-      nombreEnfants: planter.childrenNumber ?? 0,
-      age: this.calculateAge(planter.birthday),
-      plantations: planter.plantations && planter.plantations.length > 0
+      "Nombre d'enfants": planter.childrenNumber ?? 0,
+      "Age": this.calculateAge(planter.birthday),
+      'Plantations': planter.plantations && planter.plantations.length > 0
         ? planter.plantations.map(p => `${p.name} (${p.farmedArea} ha)`).join(', ')
         : 'Aucune',
     }));
@@ -650,9 +654,10 @@ export class DataExportService {
    */
   private prepareProductionExport(productions: ExportProduction[]): any[] {
     return productions.map(prod => ({
-      'Production (kg)': prod.productionInKg,
-      "Prix d'achat": prod.purchasePrice,
-      'A payer': prod.mustBePaid ? 'Oui' : 'Non',
+      'Nom planteur': prod.plantation?.planterName ?? '',
+      'Nom plantation': prod.plantation?.name ?? '',
+      'Superficie (ha)': prod.plantation?.farmedArea ?? '',
+      'Production (kg)': this.formatNumber(prod.productionInKg),
       'Date de production': prod.year
         ? new Date(prod.year).toLocaleDateString('fr-FR', {
           year: 'numeric',
@@ -660,9 +665,12 @@ export class DataExportService {
           day: '2-digit'
         })
         : '',
-      'Nom plantation': prod.plantation?.name ?? '',
-      'Superficie (ha)': prod.plantation?.farmedArea ?? '',
-      'Nom planteur': prod.plantation?.planterName ?? '',
+      "Prix d'achat": `${this.formatNumber(prod.purchasePrice)} F CFA`,
+      "Kit": prod.plantation?.kit.kitProducts.map(k => k.product.name).join(', \n'),
+      'A payer': prod.mustBePaid ? 'Oui' : 'Non',
+      'Montant a payer': prod.mustBePaid && prod.plantation?.kit
+        ? `${this.formatNumber(prod.purchasePrice - prod.plantation.kit.totalCost)} F CFA`
+        : ''
     }));
   }
 
@@ -680,16 +688,18 @@ export class DataExportService {
 
       return {
         'Nom': p.name,
-        'Description': p.description ?? '',
+        'Secteur': p.sector ?? '',
         'Latitude': p.gpsLocation.latitude ?? '',
         'Longitude': p.gpsLocation.longitude ?? '',
         'Superficie (ha)': p.farmedArea ?? '',
-        'Production totale (kg)': totalProduction,
+        'Production totale (kg)': this.formatNumber(totalProduction),
+        'Status': p.status ?? '',
         'Nom planteur': p.planter
           ? `${p.planter.firstname} ${p.planter.lastname}`
           : 'Inconnu',
         'Nom kit': p.kit?.name ?? '',
-        'Prix du kit': p.kit?.totalCost ?? '',
+        'Constitution kit': p.kit.kitProducts.map(k => k.product.name).join(', \n'),
+        'Prix du kit': p.kit?.totalCost ? `${this.formatNumber(p.kit?.totalCost)} F CFA` : '',
       };
     });
   }
@@ -819,5 +829,10 @@ export class DataExportService {
     ]
 
     return genderOptions.find(option => option.value === gender)?.label;
+  }
+
+  formatNumber(valeur: number): string {
+    return new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+      .format(valeur).replaceAll('\u202F', ' ');
   }
 }

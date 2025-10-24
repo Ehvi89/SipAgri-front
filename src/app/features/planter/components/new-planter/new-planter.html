@@ -40,6 +40,15 @@
           <mat-datepicker #picker></mat-datepicker>
           <mat-error *ngIf="planterForm.get('birthday')!.hasError('required')">Ce champ est requis</mat-error>
         </mat-form-field>
+
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Numéro de téléphone</mat-label>
+          <input matInput type="tel" formControlName="phoneNumber" maxlength="10" minlength="10"/>
+          @if (planterForm.get('phoneNumber')!.hasError('minLength') ||
+          planterForm.get('phoneNumber')!.hasError('maxLength')){
+            <mat-error>La taille doit être de 10 chiffres</mat-error>
+          }
+        </mat-form-field>
       </div>
 
       <div class="row">
@@ -57,11 +66,31 @@
       <div class="row">
         <mat-form-field class="field" appearance="outline">
           <mat-label>Village</mat-label>
-          <mat-select formControlName="village" required>
-            <mat-option *ngFor="let village of villages" [value]="village">{{ village }}</mat-option>
-          </mat-select>
+          <input
+            type="text"
+            matInput
+            formControlName="village"
+            [matAutocomplete]="auto"
+            (input)="onVillageInput($event)"
+            placeholder="Commencez à taper le nom du village..."
+            required
+          >
+          <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayVillage">
+            <mat-option
+              *ngFor="let village of filteredVillages$ | async"
+              [value]="village">
+              {{ village.address?.village ?? village.address?.city ?? village.address?.town }}
+            </mat-option>
+            <mat-option
+              *ngIf="(filteredVillages$ | async)?.length === 0 && planterForm.get('village')?.value?.length > 2"
+              disabled>
+              Aucun village trouvé
+            </mat-option>
+          </mat-autocomplete>
+          <mat-progress-spinner suffix *ngIf="geoLoading$ | async" diameter="20"></mat-progress-spinner>
           <mat-error *ngIf="planterForm.get('village')!.hasError('required')">Ce champ est requis</mat-error>
         </mat-form-field>
+
         <mat-form-field class="field" appearance="outline">
           <mat-label>Nombre d'enfants</mat-label>
           <input matInput type="number" formControlName="childrenNumber" min="0" required/>

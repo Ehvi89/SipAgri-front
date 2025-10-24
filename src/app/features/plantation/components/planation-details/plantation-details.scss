@@ -16,6 +16,20 @@
         @extend .flex;
         @extend .flex--column
       }
+
+      .badge {
+        @extend .padding--md;
+        @extend .radius-sm;
+
+        &.active {
+          background-color: var(--color-primary);
+          color: white;
+        }
+        &.inactive {
+          background-color: #ccc;
+          color: #666;
+        }
+      }
     }
 
     .list-content {

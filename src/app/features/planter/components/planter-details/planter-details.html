@@ -208,21 +208,27 @@
               <mat-error>Ce champ est requis</mat-error>
             }
           </mat-form-field>
-
           <mat-form-field class="field" appearance="outline">
-            <mat-label>Encadreur</mat-label>
-            <mat-select formControlName="supervisor" required>
-              @for (supervisor of (supervisors$ | async); track supervisor.id) {
-                <mat-option [value]="supervisor">{{ supervisor.firstname }} {{ supervisor.lastname }}</mat-option>
-              }
-            </mat-select>
-            @if (planterForm.get('supervisor')?.hasError('required')){
-              <mat-error>
-                Ce champ est requis
-              </mat-error>
+            <mat-label>Numéro de téléphone</mat-label>
+            <input matInput type="tel" formControlName="phoneNumber"/>
+            @if (planterForm.get('phoneNumber')!.hasError('minLength') ||
+            planterForm.get('phoneNumber')!.hasError('maxLength')){
             }
           </mat-form-field>
         </div>
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Encadreur</mat-label>
+          <mat-select formControlName="supervisor" required>
+            @for (supervisor of (supervisors$ | async); track supervisor.id) {
+              <mat-option [value]="supervisor">{{ supervisor.firstname }} {{ supervisor.lastname }}</mat-option>
+            }
+          </mat-select>
+          @if (planterForm.get('supervisor')?.hasError('required')){
+            <mat-error>
+              Ce champ est requis
+            </mat-error>
+          }
+        </mat-form-field>
       </form>
     </mat-dialog-content>
 

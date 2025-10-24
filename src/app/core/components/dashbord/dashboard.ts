@@ -1,6 +1,5 @@
 import {Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy, ChangeDetectorRef} from '@angular/core';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
-
 import { DashboardService } from '../../services/dashboard-service';
 import {forkJoin, Observable} from 'rxjs';
 
@@ -41,18 +40,21 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   private pieChart?: Chart;
   private lineChart?: Chart;
 
+  // Flags pour savoir si les graphiques sont initialisés
+  private chartsInitialized = false;
+  private viewInitialized = false;
+
   resumes$!: Observable<Resume[]>;
-  productionByPeriod: ChartData[] = [];
+  productionBySector: ChartData[] = []; // ✨ MODIFIÉ : Production par secteur au lieu grâce à période
   productionByPlantation: ChartData[] = [];
   productionTrend: ProductionTrendData[] = [];
 
-  selectedPeriodFilter: string = 'month';
-  periodFilters = [
-    { value: 'week', label: 'Par semaine' },
-    { value: 'month', label: 'Par mois' },
-    { value: 'quarter', label: 'Par trimestre' },
-    { value: 'year', label: 'Par année' }
-  ];
+  // ✨ NOUVEAU : Années disponibles et filtre sélectionné
+  availableYears: number[] = [];
+  selectedYearFilter: number = 0;
+
+  // Flags pour le chargement
+  isLoadingData = true;
 
   constructor(
     private readonly dashboardService: DashboardService,
@@ -64,39 +66,72 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    // Initialiser les graphiques après que la vue soit prête
+    this.viewInitialized = true;
+
+    // Attendre un tick pour s'assurer que les canvas sont dans le DOM
     setTimeout(() => {
-      this.initializeCharts();
-    }, 100);
+      // Initialiser les graphiques vides
+      this.initializeEmptyCharts();
+
+      // Si les données sont déjà chargées, les afficher
+      if (!this.isLoadingData) {
+        this.updateAllCharts();
+      }
+    }, 0);
   }
 
   ngOnDestroy(): void {
-    // Nettoyer les graphiques
     this.destroyCharts();
   }
 
   private loadDashboardData(): void {
+    this.isLoadingData = true;
+
     // Charger les statistiques de résumé
     this.resumes$ = this.dashboardService.getResumesData();
 
     // Charger toutes les données en parallèle
-    forkJoin([
-      this.dashboardService.getProductionByPeriod(this.selectedPeriodFilter),
-      this.dashboardService.getProductionByPlantation(),
-      this.dashboardService.getProductionTrend()
-    ]).subscribe({
-      next: ([periodData, plantationData, trendData]) => {
-        this.productionByPeriod = periodData;
-        this.productionByPlantation = plantationData;
-        this.productionTrend = trendData;
+    forkJoin({
+      years: this.dashboardService.getAvailableYears(), // ✨ NOUVEAU
+      sectorData: this.dashboardService.getProductionBySector(), // ✨ MODIFIÉ
+      plantationData: this.dashboardService.getProductionByPlantation(),
+      trendData: this.dashboardService.getProductionTrend() // ✨ MODIFIÉ : Plus de paramètre months
+    }).subscribe({
+      next: (data) => {
+        this.availableYears = data.years; // ✨ NOUVEAU
+        this.productionBySector = data.sectorData; // ✨ MODIFIÉ
+        this.productionByPlantation = data.plantationData;
+        this.productionTrend = data.trendData;
+        this.isLoadingData = false;
 
-        this.updateAllCharts();
+        // Si la vue est prête, mettre à jour les graphiques
+        if (this.viewInitialized && this.chartsInitialized) {
+          this.updateAllCharts();
+        }
+
         this.cdr.detectChanges();
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des données:', error);
+        console.error('❌ Erreur lors du chargement des données:', error);
+        this.isLoadingData = false;
       }
     });
+  }
+
+  private initializeEmptyCharts(): void {
+    if (this.chartsInitialized) {
+      return;
+    }
+
+    try {
+      this.createBarChart();
+      this.createPieChart();
+      this.createLineChart();
+
+      this.chartsInitialized = true;
+    } catch (error) {
+      console.error('❌ Erreur lors de l\'initialisation des graphiques:', error);
+    }
   }
 
   private updateAllCharts(): void {
@@ -105,29 +140,41 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
     this.updateLineChart();
   }
 
-  onPeriodFilterChange(): void {
-    this.dashboardService.getProductionByPeriod(this.selectedPeriodFilter).subscribe({
+  /**
+   * ✨ NOUVEAU : Gestion du changement de filtre année
+   */
+  onYearFilterChange(): void {
+
+    this.dashboardService.getProductionBySector(this.selectedYearFilter === 0 ? undefined : this.selectedYearFilter).subscribe({
       next: (data) => {
-        this.productionByPeriod = data;
+        this.productionBySector = data;
         this.updateBarChart();
       },
       error: (error) => {
-        console.error('Erreur lors du chargement de la production:', error);
+        console.error('❌ Erreur lors du chargement de la production par secteur:', error);
       }
     });
   }
 
-  private initializeCharts(): void {
-    this.createBarChart();
-    this.createPieChart();
-    this.createLineChart();
+  /**
+   * ✨ NOUVEAU : Réinitialiser le filtre année
+   */
+  resetYearFilter(): void {
+    this.selectedYearFilter = 0;
+    this.onYearFilterChange();
   }
 
   private createBarChart(): void {
-    if (!this.barCanvas) return;
+    if (!this.barCanvas?.nativeElement) {
+      console.error('❌ Canvas barChart introuvable');
+      return;
+    }
 
     const ctx = this.barCanvas.nativeElement.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.error('❌ Impossible d\'obtenir le contexte 2D pour barChart');
+      return;
+    }
 
     const config: ChartConfiguration<'bar'> = {
       type: 'bar',
@@ -141,7 +188,9 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
             '#f59e0b',
             '#ef4444',
             '#8b5cf6',
-            '#06b6d4'
+            '#06b6d4',
+            '#ec4899',
+            '#14b8a6'
           ],
           borderColor: '#ffffff',
           borderWidth: 2,
@@ -198,10 +247,16 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private createPieChart(): void {
-    if (!this.pieCanvas) return;
+    if (!this.pieCanvas?.nativeElement) {
+      console.error('❌ Canvas pieChart introuvable');
+      return;
+    }
 
     const ctx = this.pieCanvas.nativeElement.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.error('❌ Impossible d\'obtenir le contexte 2D pour pieChart');
+      return;
+    }
 
     const config: ChartConfiguration<'doughnut'> = {
       type: 'doughnut',
@@ -248,7 +303,7 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
                 const label = context.label || '';
                 const value = context.parsed;
                 const total = context.dataset.data.reduce((a: any, b: any) => a + b, 0);
-                const percentage = ((value / total) * 100).toFixed(1);
+                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
                 return `${label}: ${value.toFixed(2)} kg (${percentage}%)`;
               }
             }
@@ -262,10 +317,16 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private createLineChart(): void {
-    if (!this.lineCanvas) return;
+    if (!this.lineCanvas?.nativeElement) {
+      console.error('❌ Canvas lineChart introuvable');
+      return;
+    }
 
     const ctx = this.lineCanvas.nativeElement.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.error('❌ Impossible d\'obtenir le contexte 2D pour lineChart');
+      return;
+    }
 
     const config: ChartConfiguration<'line'> = {
       type: 'line',
@@ -340,38 +401,66 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private updateBarChart(): void {
-    if (!this.barChart || this.productionByPeriod.length === 0) return;
+    if (!this.barChart) {
+      console.warn('⚠️ barChart pas encore initialisé');
+      return;
+    }
 
-    this.barChart.data.labels = this.productionByPeriod.map(item => item.name);
-    this.barChart.data.datasets[0].data = this.productionByPeriod.map(item => item.value);
-    this.barChart.update('none');
+    if (this.productionBySector.length === 0) {
+      console.log('⚠️ Pas de données pour barChart');
+      return;
+    }
+
+    this.barChart.data.labels = this.productionBySector.map(item => item.name);
+    this.barChart.data.datasets[0].data = this.productionBySector.map(item => item.value);
+    this.barChart.update('active');
   }
 
   private updatePieChart(): void {
-    if (!this.pieChart || this.productionByPlantation.length === 0) return;
+    if (!this.pieChart) {
+      console.warn('⚠️ pieChart pas encore initialisé');
+      return;
+    }
+
+    if (this.productionByPlantation.length === 0) {
+      console.log('⚠️ Pas de données pour pieChart');
+      return;
+    }
 
     this.pieChart.data.labels = this.productionByPlantation.map(item => item.name);
     this.pieChart.data.datasets[0].data = this.productionByPlantation.map(item => item.value);
-    this.pieChart.update('none');
+    this.pieChart.update('active');
   }
 
   private updateLineChart(): void {
-    if (!this.lineChart || this.productionTrend.length === 0) return;
+    if (!this.lineChart) {
+      console.warn('⚠️ lineChart pas encore initialisé');
+      return;
+    }
+
+    if (this.productionTrend.length === 0) {
+      console.log('⚠️ Pas de données pour lineChart');
+      return;
+    }
 
     this.lineChart.data.labels = this.productionTrend.map(item => item.period);
     this.lineChart.data.datasets[0].data = this.productionTrend.map(item => item.value);
-    this.lineChart.update('none');
+    this.lineChart.update('active');
   }
 
   private destroyCharts(): void {
     if (this.barChart) {
       this.barChart.destroy();
+      this.barChart = undefined;
     }
     if (this.pieChart) {
       this.pieChart.destroy();
+      this.pieChart = undefined;
     }
     if (this.lineChart) {
       this.lineChart.destroy();
+      this.lineChart = undefined;
     }
+    this.chartsInitialized = false;
   }
 }

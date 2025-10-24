@@ -93,7 +93,8 @@ export class PlanterDetails implements OnInit {
       maritalStatus: [this.planter?.maritalStatus, Validators.required],
       childrenNumber: [this.planter?.childrenNumber, [Validators.required, Validators.min(0)]],
       village: [this.planter?.village, Validators.required],
-      supervisor: [this.planter.supervisor, Validators.required]
+      supervisor: [this.planter.supervisor, Validators.required],
+      phoneNumber: [this.planter.phoneNumber, [Validators.minLength(10), Validators.maxLength(10)]],
     });
   }
 

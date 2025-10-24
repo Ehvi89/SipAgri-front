@@ -3,18 +3,30 @@
 
   <div class="content">
     <div class="header row">
-      <div class="title">
-        <span class="text--lg text--bold">{{ (plantation$ | async)?.name }}</span>
-        <span *ngIf="planter$ | async">
-          Planteur: {{(planter$ | async)?.firstname}} {{ (planter$ | async)?.lastname }} •
-          superficie: {{ (plantation$ | async)?.farmedArea }} ha
-        </span>
+      <div class="flex gap--md">
+        <div class="title">
+          <span class="text--lg text--bold">{{ (plantation$ | async)?.name }}</span>
+          <span *ngIf="planter$ | async">
+            Planteur: {{ (planter$ | async)?.firstname }} {{ (planter$ | async)?.lastname }} •
+            superficie: {{ (plantation$ | async)?.farmedArea }} ha
+          </span>
+        </div>
+        <div class="badge" [ngClass]="(plantation$ | async)?.status?.toLowerCase()">
+          <span class="status">{{ (plantation$ | async)?.status }}</span>
+        </div>
       </div>
 
-      <button [routerLink]="['/productions/add']" [queryParams]="{ plantation: (plantation$ | async)?.id }" class="btn btn--primary">
-        <mat-icon>add</mat-icon>
-        <span>Ajouter une production</span>
-      </button>
+      @if ((plantation$ | async)?.status === PlantationStatus.ACTIVE) {
+        <button [routerLink]="['/productions/add']" [queryParams]="{ plantation: (plantation$ | async)?.id }" class="btn btn--primary">
+          <mat-icon>add</mat-icon>
+          <span>Ajouter une production</span>
+        </button>
+      } @else if ((plantation$ | async)?.status === PlantationStatus.INACTIVE) {
+        <button [routerLink]="['/plantations/add']" [queryParams]="{ plantation: (plantation$ | async)?.id }" class="btn btn--primary">
+          <mat-icon>campaign</mat-icon>
+          <span>Nouvelle campagne</span>
+        </button>
+      }
     </div>
 
     <div class="list">

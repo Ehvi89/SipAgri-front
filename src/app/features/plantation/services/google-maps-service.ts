@@ -154,4 +154,8 @@ export class GoogleMapsService {
     this.mapZoom = 15;
     this.selectedMarkerOptions = { title };
   }
+
+  updateMapCenter(param: { lat: number; lng: number }) {
+    this._mapCenter.next(param);
+  }
 }
