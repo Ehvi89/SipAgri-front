@@ -5,7 +5,9 @@ import {ProductionService} from '../../services/production-service';
 import {PlantationService} from '../../../plantation/services/plantation-service';
 import {Plantation} from '../../../../core/models/plantation-model';
 import {NotificationService} from '../../../../core/services/notification-service';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
+import {map} from 'rxjs/operators';
+import {PlantationStatus} from '../../../../core/enums/plantation-status-enum';
 
 @Component({
   selector: 'app-add-production',
@@ -26,11 +28,14 @@ export class AddProduction implements OnInit {
               private readonly plantationService: PlantationService,
               private readonly notifService: NotificationService,
               private readonly formBuilder: FormBuilder,
-              private readonly route: ActivatedRoute,) {}
+              private readonly route: ActivatedRoute,
+              private readonly router: Router) {}
 
   ngOnInit() {
     this.loading$ = this.productionService.loading$;
-    this.plantations$ = this.plantationService.getAll();
+    this.plantations$ = this.plantationService.getAll().pipe(
+      map(plantations => plantations.filter(plantation => plantation.status === PlantationStatus.ACTIVE))
+    );
 
     this.prodCtrl = this.formBuilder.control(0, Validators.required);
     this.plantationCtrl = this.formBuilder.control(null, Validators.required);
@@ -54,6 +59,8 @@ export class AddProduction implements OnInit {
     this.productionService.create(this.prodForm.value).subscribe({
       next: () => {
         this.notifService.showSuccess("Production ajoutée avec succès");
+        console.log(this.plantationCtrl.value)
+        this.router.navigate(['/plantations/details'], {queryParams: {plantation: this.plantationCtrl.value}}).then(() => null);
         this.restForm();
       },
       error: (error) => this.notifService.showError(error.message),
@@ -78,12 +85,14 @@ export class AddProduction implements OnInit {
     this.prodForm.markAsUntouched();
 
     // Nettoyer les erreurs de chaque control
-    Object.keys(this.prodForm.controls).forEach(key => {
+    for (const key in this.prodForm.controls) {
       const control = this.prodForm.get(key);
-      control?.setErrors(null);
-      control?.markAsUntouched();
-      control?.markAsPristine();
-    });
+      if (control) {
+        control.setErrors(null);
+        control.markAsUntouched();
+        control.markAsPristine();
+      }
+    }
 
     // Vérifier si on a un plantationId dans l'URL pour le restaurer
     this.route.queryParams.subscribe(params => {

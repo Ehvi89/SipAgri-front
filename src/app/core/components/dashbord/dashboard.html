@@ -2,6 +2,7 @@
   <app-header placeholder="" [breadcrumb]="true" [export]="true"></app-header>
 
   <div class="content">
+    <!-- ✅ Résumé des statistiques (avec la nouvelle carte "Valeur des kits") -->
     <div class="overview-card">
       @for (resume of resumes$ | async; track resume.name) {
         <div class="stat">
@@ -12,6 +13,7 @@
       }
     </div>
 
+    <!-- Boutons d'actions -->
     <div class="actions-buttons">
       <button routerLink="/planters/new" class="action-button">
         <mat-icon class="button-icon">person_add</mat-icon>
@@ -29,22 +31,31 @@
 
     <div class="graphics">
       <div class="grid">
+        <!-- ✨ MODIFIÉ : Production par secteur avec filtre année -->
         <div class="card">
           <div class="card-header">
-            <span class="card-title">Production par période</span>
-            <mat-form-field appearance="outline" class="filter-select">
-              <mat-select [(value)]="selectedPeriodFilter" (selectionChange)="onPeriodFilterChange()">
-                @for (filter of periodFilters; track filter.value) {
-                  <mat-option [value]="filter.value">{{ filter.label }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
+            <span class="card-title">Production par secteur</span>
+            <div class="filter-group">
+              <mat-form-field appearance="outline" class="filter-select">
+                <mat-label>Année</mat-label>
+                <mat-select [(value)]="selectedYearFilter" (selectionChange)="onYearFilterChange()">
+                  <mat-option [value]="0">Toutes les années</mat-option>
+                  @for (year of availableYears; track year) {
+                    <mat-option [value]="year">{{ year }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              @if (selectedYearFilter) {
+                <button mat-icon-button (click)="resetYearFilter()" class="reset-button" title="Réinitialiser">
+                  <mat-icon>close</mat-icon>
+                </button>
+              }
+            </div>
           </div>
           <div class="chart">
-            <!-- Canvas toujours présent -->
-            <canvas #barCanvas [style.display]="productionByPeriod && productionByPeriod.length > 0 ? 'block' : 'none'"></canvas>
+            <canvas #barCanvas [style.display]="productionBySector && productionBySector.length > 0 ? 'block' : 'none'"></canvas>
 
-            @if (!productionByPeriod || productionByPeriod.length === 0) {
+            @if (!productionBySector || productionBySector.length === 0) {
               <div class="chart-loading">
                 <mat-spinner diameter="24"></mat-spinner>
                 <span>Chargement des données...</span>
@@ -53,12 +64,12 @@
           </div>
         </div>
 
+        <!-- Production par plantation (inchangé) -->
         <div class="card">
           <div class="card-header">
             <span class="card-title">Production par plantation</span>
           </div>
           <div class="chart">
-            <!-- Canvas toujours présent -->
             <canvas #pieCanvas [style.display]="productionByPlantation.length > 0 ? 'block' : 'none'"></canvas>
 
             @if (productionByPlantation.length === 0) {
@@ -72,13 +83,13 @@
       </div>
 
       <div class="col">
+        <!-- ✨ MODIFIÉ : Tendance de production par année (au lieu de 12 derniers mois) -->
         <div class="card">
           <div class="card-header">
             <span class="card-title">Tendance de production</span>
-            <div class="card-subtitle">Évolution sur les 12 derniers mois</div>
+            <div class="card-subtitle">Évolution par année</div>
           </div>
           <div class="chart">
-            <!-- Canvas toujours présent -->
             <canvas #lineCanvas [style.display]="productionTrend.length > 0 ? 'block' : 'none'"></canvas>
 
             @if (productionTrend.length === 0) {

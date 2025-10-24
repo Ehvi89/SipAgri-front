@@ -8,6 +8,7 @@ import { NotificationService } from '../../../../core/services/notification-serv
 import { ActivatedRoute } from '@angular/router';
 import { Planter } from '../../../../core/models/planter-model';
 import { PlanterService } from '../../../planter/services/planter-service';
+import {PlantationStatus} from '../../../../core/enums/plantation-status-enum';
 
 @Component({
   selector: 'app-plantation-details',
@@ -123,4 +124,6 @@ export class PlantationDetails implements OnInit {
       this.planter$ = this.planter.asObservable();
     });
   }
+
+  protected readonly PlantationStatus = PlantationStatus;
 }

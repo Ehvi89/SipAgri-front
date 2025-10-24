@@ -15,6 +15,9 @@
                 @for (plantation of plantations$ | async; track plantation.id) {
                   <mat-option [value]="plantation.id">{{plantation.name}}</mat-option>
                 }
+                @if ((plantations$ | async)?.length === 0) {
+                  <mat-option [value]="null" disabled>Aucune plantation active</mat-option>
+                }
               </mat-select>
               <mat-error>Veuillez choisir la plantation</mat-error>
             </mat-form-field>

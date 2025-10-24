@@ -44,6 +44,7 @@
               <div class="column">Village</div>
               <div class="column">Superficie</div>
               <div class="column">Planteur</div>
+              <div class="column center">Statut</div>
               <div class="column center">Actions</div>
             </div>
 
@@ -78,6 +79,9 @@
                       } @else {
                         <span class="loading">Chargement...</span>
                       }
+                    </div>
+                    <div class="column center">
+                      <span class="status">{{ plantation.status }}</span>
                     </div>
                     <div class="column actions">
                       <button mat-icon-button [routerLink]="['details']"

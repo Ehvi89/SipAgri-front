@@ -58,7 +58,7 @@
 
             .table-header {
               @extend .grid;
-              grid-template-columns: 1.3fr .7fr 1fr 100px;
+              grid-template-columns: 1.3fr .7fr 1fr .5fr 100px;
               background-color: var(--color-secondary);
               @extend .padding--md;
               @extend .text--bold;
@@ -73,7 +73,7 @@
 
               .table-row {
                 @extend .grid;
-                grid-template-columns: 1.3fr .7fr 1fr auto;
+                grid-template-columns: 1.3fr .7fr 1fr .5fr auto;
                 padding: .5rem 1rem;
                 border-bottom: 1px solid var(--color-border);
                 cursor: pointer;
