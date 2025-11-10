@@ -12,6 +12,7 @@ import * as XLSX from 'xlsx'
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import {Kit} from '../models/kit-model';
+import {PaymentMethod} from '../enums/payment-method-enum';
 
 
 /**
@@ -78,6 +79,7 @@ export interface ExportProduction extends Production {
     name: string;
     farmedArea: number;
     planterName: string;
+    paymentMethod: PaymentMethod;
     kit: Kit
   };
 }
@@ -250,6 +252,7 @@ export class DataExportService {
           name: plantation.name,
           farmedArea: plantation.farmedArea,
           planterName: planter ? `${planter.firstname} ${planter.lastname}` : 'Inconnu',
+          paymentMethod: planter?.paymentMethod!,
           kit: plantation.kit
         }
       }));
@@ -294,6 +297,7 @@ export class DataExportService {
           name: plantation.name,
           farmedArea: plantation.farmedArea,
           planterName: `${planter.firstname} ${planter.lastname}`,
+          paymentMethod: planter.paymentMethod,
           kit: plantation.kit
         } : undefined
       };
@@ -572,6 +576,7 @@ export class DataExportService {
         name: plantation.name,
         farmedArea: plantation.farmedArea,
         planterName: `${planter.firstname} ${planter.lastname}`,
+        paymentMethod: planter.paymentMethod,
         kit: plantation.kit
       }
     }));
@@ -670,7 +675,8 @@ export class DataExportService {
       'A payer': prod.mustBePaid ? 'Oui' : 'Non',
       'Montant a payer': prod.mustBePaid && prod.plantation?.kit
         ? `${this.formatNumber(prod.purchasePrice - prod.plantation.kit.totalCost)} F CFA`
-        : ''
+        : '',
+      'Methode de paiement': this.getPaymentMethod(prod.plantation!.paymentMethod)
     }));
   }
 
@@ -829,6 +835,18 @@ export class DataExportService {
     ]
 
     return genderOptions.find(option => option.value === gender)?.label;
+  }
+
+  private getPaymentMethod(method: PaymentMethod) {
+    const paymentMethodOptions = [
+      {value: PaymentMethod.CHEQUE, label: 'Chèque'},
+      {value: PaymentMethod.WAVE, label: 'Wave'},
+      {value: PaymentMethod.ORANGE_MONEY, label: 'Orange Money'},
+      {value: PaymentMethod.MOOV_MONEY, label: 'Moov Money'},
+      {value: PaymentMethod.MTN_MONEY, label: 'MTN Money'}
+    ];
+
+    return paymentMethodOptions.find(option => option.value === method)?.label;
   }
 
   formatNumber(valeur: number): string {

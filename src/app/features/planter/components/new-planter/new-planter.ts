@@ -10,6 +10,7 @@ import { SupervisorService } from '../../../setting/modules/supervisor/services/
 import { Gender } from "../../../../core/enums/gender-enum";
 import { AuthService } from "../../../auth/services/auth-service";
 import { GeocodingService } from '../../../../core/services/geocoding-service';
+import {PaymentMethod} from '../../../../core/enums/payment-method-enum';
 
 // Interface pour les résultats Nominatim
 interface NominatimResult {
@@ -49,6 +50,15 @@ export class NewPlanter implements OnInit {
     { value: MaritalStatus.DIVORCED, label: 'Divorcé(e)' },
     { value: MaritalStatus.WIDOWED, label: 'Veuf/Veuve' }
   ];
+
+  paymentMethodOptions = [
+    { value: PaymentMethod.CHEQUE, label: 'Chèque' },
+    { value: PaymentMethod.WAVE, label: 'Wave' },
+    { value: PaymentMethod.ORANGE_MONEY, label: 'Orange Money' },
+    { value: PaymentMethod.MOOV_MONEY, label: 'Moov Money' },
+    { value: PaymentMethod.MTN_MONEY, label: 'MTN Money' }
+  ];
+
   gender = Gender;
 
   constructor(
@@ -84,6 +94,7 @@ export class NewPlanter implements OnInit {
       village: ['', Validators.required],
       supervisor: ['', Validators.required],
       phoneNumber: ['', [Validators.minLength(10), Validators.maxLength(10)]],
+      paymentMethod: ['', Validators.required],
     });
   }
 

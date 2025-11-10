@@ -2,6 +2,7 @@ import {Supervisor} from './supervisor-model';
 import {Gender} from '../enums/gender-enum';
 import {MaritalStatus} from '../enums/marital-status-enum';
 import {Plantation} from './plantation-model';
+import {PaymentMethod} from '../enums/payment-method-enum';
 
 export interface Planter {
   id?: number;
@@ -14,5 +15,6 @@ export interface Planter {
   childrenNumber: number,
   village: string,
   supervisor: Supervisor,
-  plantations?: Plantation[]
+  plantations?: Plantation[],
+  paymentMethod: PaymentMethod,
 }

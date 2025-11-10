@@ -100,13 +100,26 @@
       </div>
       <div class="row">
         <mat-form-field class="field" appearance="outline">
-          <mat-label>Encadreur</mat-label>
-          <mat-select formControlName="supervisor" required>
-            <mat-option *ngFor="let supervisor of (supervisors$ | async)" [value]="supervisor">
-              {{ supervisor.firstname }} {{ supervisor.lastname }}
-            </mat-option>
+          <mat-label>Préférence de mode de paiement</mat-label>
+          <mat-select formControlName="paymentMethod" required>
+            @for (paymentMethod of paymentMethodOptions; track paymentMethod.value) {
+              <mat-option [value]="paymentMethod.value">{{paymentMethod.label}}</mat-option>
+            }
           </mat-select>
           <mat-error *ngIf="planterForm.get('supervisor')!.hasError('required')">Ce champ est requis</mat-error>
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Encadreur</mat-label>
+          <mat-select formControlName="supervisor" required>
+            @for (supervisor of (supervisors$ | async); track supervisor.id) {
+              <mat-option [value]="supervisor">{{ supervisor.firstname }} {{ supervisor.lastname }}</mat-option>
+            }
+          </mat-select>
+          @if (planterForm.get('supervisor')?.hasError('required')){
+            <mat-error>Ce champ est requis</mat-error>
+          })
         </mat-form-field>
       </div>
 
@@ -115,8 +128,10 @@
           <mat-icon *ngIf="!(loading$ | async)" matIconPrefix>person_add</mat-icon>
           <mat-progress-spinner matPrefix *ngIf="loading$ | async" diameter="20"
                                 mode="indeterminate"></mat-progress-spinner>
-          <span *ngIf="!(loading$ | async)">Créer le planteur</span>
-          <span *ngIf="loading$ | async">Création en cours...</span>
+          <span>
+            @if (!(loading$ | async)){Créer le planteur}
+            @else if (loading$ | async){Création en cours...}
+          </span>
         </button>
       </div>
     </form>
