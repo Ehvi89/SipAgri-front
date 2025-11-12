@@ -163,7 +163,7 @@ export class NewPlanter implements OnInit {
       // Formater les données du village avant envoi
       const formData = {
         ...this.planterForm.value,
-        village: this.formatVillageData(this.planterForm.value.village)
+        village: this.formatVillageData(this.planterForm.value.village).display_name
       };
 
       this.planterService.create(formData).subscribe({
