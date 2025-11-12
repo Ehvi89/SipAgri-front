@@ -41,6 +41,7 @@ export class AddPlantation implements OnInit, OnDestroy {
   editMode: boolean = false;
   plantationId: number | null = null;
   planterId: number | null = null;
+  loadingProduct: boolean = false;
 
 
   //FormGroup & FormControl
@@ -119,16 +120,20 @@ export class AddPlantation implements OnInit, OnDestroy {
    * Charge les produits disponibles
    */
   private loadProducts(): void {
+    this.loadingProduct = true;
     this.productService.getAll()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (products) => {
           this.availableProducts = products;
           this.filteredProducts = products;
+          this.loadingProduct = false;
+          this.cdr.detectChanges();
         },
         error: (error) => {
           console.error('Erreur lors du chargement des produits:', error);
           this.notifService.showError('Erreur lors du chargement des produits');
+          this.loadingProduct = false;
         }
       });
   }

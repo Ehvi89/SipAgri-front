@@ -154,25 +154,27 @@
 
             <!-- Liste des produits disponibles -->
             <div class="products-list">
-              @if (filteredProducts.length === 0) {
-                <div class="no-products">
-                  <mat-icon>warning</mat-icon>
-                  <span>Aucun produit trouvé</span>
-                </div>
-              }
-
-              @for (product of filteredProducts; track product.id) {
-                <div
-                  class="product-card"
-                  [class.selected]="selectedProduct?.id === product.id"
-                  (click)="selectProduct(product)"
-                  (keydown)="selectProduct(product)">
-                  <div class="product-info">
-                    <span class="product-name">{{ product.name }}</span>
-                    <span class="product-price">{{ formatPrice(product.price) }}</span>
+              @if (loadingProduct) {<mat-progress-spinner diameter="40" mode="indeterminate" style="margin: auto;"></mat-progress-spinner>} @else {
+                @if (filteredProducts.length === 0) {
+                  <div class="no-products">
+                    <mat-icon>warning</mat-icon>
+                    <span>Aucun produit trouvé</span>
                   </div>
-                  <p class="product-description">{{ product.description }}</p>
-                </div>
+                }
+
+                @for (product of filteredProducts; track product.id) {
+                  <div
+                    class="product-card"
+                    [class.selected]="selectedProduct?.id === product.id"
+                    (click)="selectProduct(product)"
+                    (keydown)="selectProduct(product)">
+                    <div class="product-info">
+                      <span class="product-name">{{ product.name }}</span>
+                      <span class="product-price">{{ formatPrice(product.price) }}</span>
+                    </div>
+                    <p class="product-description">{{ product.description }}</p>
+                  </div>
+                }
               }
             </div>
 
