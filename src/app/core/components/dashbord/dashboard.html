@@ -55,10 +55,14 @@
           <div class="chart">
             <canvas #barCanvas [style.display]="productionBySector && productionBySector.length > 0 ? 'block' : 'none'"></canvas>
 
-            @if (!productionBySector || productionBySector.length === 0) {
+            @if (!productionBySector) {
               <div class="chart-loading">
                 <mat-spinner diameter="24"></mat-spinner>
                 <span>Chargement des données...</span>
+              </div>
+            } @else if (productionBySector.length === 0) {
+              <div class="chart-loading">
+                <span>Aucune données</span>
               </div>
             }
           </div>
@@ -72,10 +76,15 @@
           <div class="chart">
             <canvas #pieCanvas [style.display]="productionByPlantation.length > 0 ? 'block' : 'none'"></canvas>
 
-            @if (productionByPlantation.length === 0) {
+            @if (!productionByPlantation) {
               <div class="chart-loading">
                 <mat-spinner diameter="24"></mat-spinner>
                 <span>Chargement des données...</span>
+              </div>
+            }
+            @else if (productionByPlantation.length === 0) {
+              <div class="chart-loading">
+                <span>Aucune données</span>
               </div>
             }
           </div>
@@ -92,10 +101,15 @@
           <div class="chart">
             <canvas #lineCanvas [style.display]="productionTrend.length > 0 ? 'block' : 'none'"></canvas>
 
-            @if (productionTrend.length === 0) {
+            @if (!productionTrend) {
               <div class="chart-loading">
                 <mat-spinner diameter="24"></mat-spinner>
                 <span>Chargement des données...</span>
+              </div>
+            }
+            @else if (productionTrend.length === 0) {
+              <div class="chart-loading">
+                <span>Aucune données</span>
               </div>
             }
           </div>
