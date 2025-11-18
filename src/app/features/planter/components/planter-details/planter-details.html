@@ -199,14 +199,29 @@
         <div class="row">
           <mat-form-field class="field" appearance="outline">
             <mat-label>Village</mat-label>
-            <mat-select formControlName="village" required>
-              @for (village of villages; track village) {
-                <mat-option [value]="village">{{ village }}</mat-option>
-              }
-            </mat-select>
-            @if (planterForm.get('village')?.hasError('required')){
-              <mat-error>Ce champ est requis</mat-error>
-            }
+            <input
+              type="text"
+              matInput
+              formControlName="village"
+              [matAutocomplete]="auto"
+              (input)="onVillageInput($event)"
+              placeholder="Commencez à taper le nom du village..."
+              required
+            >
+            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayVillage">
+              <mat-option
+                *ngFor="let village of filteredVillages$ | async"
+                [value]="village">
+                {{ village.address?.village ?? village.address?.city ?? village.address?.town }}
+              </mat-option>
+              <mat-option
+                *ngIf="(filteredVillages$ | async)?.length === 0 && planterForm.get('village')?.value?.length > 2"
+                disabled>
+                Aucun village trouvé
+              </mat-option>
+            </mat-autocomplete>
+            <mat-progress-spinner suffix *ngIf="geoLoading$ | async" diameter="20"></mat-progress-spinner>
+            <mat-error *ngIf="planterForm.get('village')!.hasError('required')">Ce champ est requis</mat-error>
           </mat-form-field>
           <mat-form-field class="field" appearance="outline">
             <mat-label>Numéro de téléphone</mat-label>
@@ -216,6 +231,19 @@
             }
           </mat-form-field>
         </div>
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Encadreur</mat-label>
+          <mat-select formControlName="paymentMethod" required>
+            @for (paymentMethod of paymentMethodOptions; track paymentMethod.value) {
+              <mat-option [value]="paymentMethod.value">{{ paymentMethod.label }}</mat-option>
+            }
+          </mat-select>
+          @if (planterForm.get('supervisor')?.hasError('required')){
+            <mat-error>
+              Ce champ est requis
+            </mat-error>
+          }
+        </mat-form-field>
         <mat-form-field class="field" appearance="outline">
           <mat-label>Encadreur</mat-label>
           <mat-select formControlName="supervisor" required>

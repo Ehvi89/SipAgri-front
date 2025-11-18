@@ -41,7 +41,7 @@
     @extend .radius-md;
     @extend .text--xl;
 
-    flex: .75;
+    flex: .5;
     justify-content: flex-end;
     align-items: center;
     padding: 0.5rem 0.75rem;
@@ -68,6 +68,13 @@
 
     span {
       @extend .text--base;
+    }
+
+    @media screen and (max-width: 1355px) {
+      flex: .75
+    }
+    @media screen and (max-width: 1111px) {
+      flex: 1
     }
   }
 }

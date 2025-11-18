@@ -12,23 +12,6 @@ import { AuthService } from "../../../auth/services/auth-service";
 import { GeocodingService } from '../../../../core/services/geocoding-service';
 import {PaymentMethod} from '../../../../core/enums/payment-method-enum';
 
-// Interface pour les résultats Nominatim
-interface NominatimResult {
-  display_name: string;
-  lat: string;
-  lon: string;
-  type: string;
-  class: string;
-  address?: {
-    village?: string;
-    town?: string;
-    city?: string;
-    municipality?: string;
-    county?: string;
-    state?: string;
-    country?: string;
-  };
-}
 
 @Component({
   selector: 'app-new-planter',
@@ -72,7 +55,6 @@ export class NewPlanter implements OnInit {
   ngOnInit(): void {
     this.loading$ = this.planterService.loading$;
     this.geoLoading$ = this.geocodingService.geoLoading;
-    this.initForm();
     this.setupVillageAutocomplete();
 
     const currentUser = AuthService.getCurrentUser();
@@ -81,9 +63,10 @@ export class NewPlanter implements OnInit {
     } else {
       this.supervisors$ = of([currentUser]);
     }
+    this.initForm(currentUser);
   }
 
-  private initForm(): void {
+  private initForm(currentUser: Supervisor): void {
     this.planterForm = this.formBuilder.group({
       firstname: ['', [Validators.required, Validators.minLength(2)]],
       lastname: ['', [Validators.required, Validators.minLength(2)]],
@@ -92,10 +75,13 @@ export class NewPlanter implements OnInit {
       maritalStatus: ['', Validators.required],
       childrenNumber: [0, [Validators.required, Validators.min(0)]],
       village: ['', Validators.required],
-      supervisor: ['', Validators.required],
+      supervisor: [currentUser.profile === 'SUPERVISOR' ? currentUser : '', Validators.required],
       phoneNumber: ['', [Validators.minLength(10), Validators.maxLength(10)]],
       paymentMethod: ['', Validators.required],
     });
+    if(currentUser.profile === 'SUPERVISOR') {
+      this.planterForm.get('supervisor')?.disable()
+    }
   }
 
   private setupVillageAutocomplete(): void {
@@ -163,7 +149,8 @@ export class NewPlanter implements OnInit {
       // Formater les données du village avant envoi
       const formData = {
         ...this.planterForm.value,
-        village: this.formatVillageData(this.planterForm.value.village).display_name
+        village: this.formatVillageData(this.planterForm.value.village).display_name,
+        supervisor: this.planterForm.get('supervisor')?.value
       };
 
       this.planterService.create(formData).subscribe({
@@ -196,6 +183,7 @@ export class NewPlanter implements OnInit {
   }
 
   private resetForm(): void {
+    const currentUser = AuthService.getCurrentUser();
     this.planterForm.reset({
       firstname: '',
       lastname: '',
@@ -204,7 +192,7 @@ export class NewPlanter implements OnInit {
       maritalStatus: '',
       childrenNumber: 0,
       village: '',
-      supervisor: ''
+      supervisor: currentUser.profile === 'SUPERVISOR' ? currentUser : ''
     });
 
     this.planterForm.markAsPristine();
