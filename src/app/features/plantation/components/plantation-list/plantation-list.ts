@@ -9,6 +9,7 @@ import { PlanterService } from '../../../planter/services/planter-service';
 import { Planter } from '../../../../core/models/planter-model';
 import { GoogleMapsService } from '../../services/google-maps-service';
 import { Router } from '@angular/router';
+import {PlantationStatus} from '../../../../core/enums/plantation-status-enum';
 
 /**
  * Represents an extended plantation interface that extends the basic functionality
@@ -54,6 +55,7 @@ export class PlantationList implements OnInit, OnDestroy {
 
   listSizeCtrl = new FormControl(10);
   villageFilter = new FormControl('');
+  statusFilter = new FormControl('');
 
   selectedPlantation: ExtendedPlantation | null = null;
   isGoogleMapsReady = false;
@@ -63,6 +65,10 @@ export class PlantationList implements OnInit, OnDestroy {
   selectedMarkerOptions!: google.maps.marker.AdvancedMarkerElementOptions;
 
   villages: { id: undefined|number, value: string }[]= [];
+  statusOptions = [
+    { value: PlantationStatus.INACTIVE, label: 'Inactif' },
+    { value: PlantationStatus.ACTIVE, label: 'Actif' }
+  ];
 
   private readonly destroy$ = new Subject<void>();
 
@@ -176,7 +182,13 @@ export class PlantationList implements OnInit, OnDestroy {
 
     this.villageFilter.valueChanges.pipe(
       startWith(''),
-      tap(value => this.plantationService.search(value!, 0, 10, true))
+      tap(value => this.plantationService.search(value!, 0, this.listSizeCtrl.value!, 'village'))
+    ).subscribe();
+
+    this.statusFilter.valueChanges.pipe(
+      startWith(''),
+      tap(value => console.log('Status filter changed:', value)),
+      tap(value => this.plantationService.search(value!, 0, this.listSizeCtrl.value!, 'status'))
     ).subscribe();
 
     this.searchSubject.asObservable().pipe(

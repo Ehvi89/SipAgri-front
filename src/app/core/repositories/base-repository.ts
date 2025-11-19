@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import {PaginationResponse} from '../models/pagination-response-model';
 import {Injectable} from '@angular/core';
 import {environment} from '../../../environments/environment';
+import { AuthService } from "../../features/auth/services/auth-service";
 
 /**
  * BaseRepository is an abstract class that provides common CRUD operations for interacting
@@ -56,14 +57,18 @@ export abstract class BaseRepository<T> {
    * @param {string} search - The search query.
    * @param {number} [page] - The page number for pagination (optional).
    * @param {number} [size] - The number of items per page (optional).
-   * @param {boolean} [village] - A flag indicating whether to filter by village (optional).
+   * @param {string} [criteria] - A flag indicating whether to filter by criteria (optional).
    * @return {Observable<PaginationResponse<T>>} An observable of the paginated response.
    */
-  search(search: string, page?: number, size?:number, village?:boolean): Observable<PaginationResponse<T>> {
+  search(search: string, page?: number, size?:number, criteria?:string): Observable<PaginationResponse<T>> {
     const params: any = {};
     if (page !== undefined) params.page = page;
     if (size !== undefined) params.size = size;
-    if (village !== undefined) params.village = village;
+    if (criteria !== undefined) params.criteria = criteria;
+    const currentUser = AuthService.getCurrentUser();
+    if (currentUser.profile === "SUPERVISOR") {
+      params.supervisorId = currentUser.id;
+    }
     params.search = search;
 
     return this.http.get<PaginationResponse<T>>(

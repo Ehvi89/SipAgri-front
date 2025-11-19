@@ -43,7 +43,7 @@
         @extend .flex--between;
         @extend .flex--center;
 
-        mat-form-field, .spacer {
+        mat-form-field, .filters, .spacer {
           flex: 1;
         }
       }

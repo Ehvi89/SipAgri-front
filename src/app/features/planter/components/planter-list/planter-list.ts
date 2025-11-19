@@ -39,7 +39,7 @@ export class PlanterList implements OnInit {
     this.plantersPaged$ = this.planterService.pagedData$;
 
     this.listFiltersCtrl.valueChanges.pipe(
-      tap(value => this.planterService.search(value!, 0, this.listSizeCtrl.value!, true))
+      tap(value => this.planterService.search(value!, 0, this.listSizeCtrl.value!, 'village'))
     ).subscribe()
   }
 
