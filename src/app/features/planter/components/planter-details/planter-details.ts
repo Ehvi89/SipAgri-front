@@ -7,6 +7,7 @@ import {NotificationService} from '../../../../core/services/notification-servic
 import {ActivatedRoute, Router} from '@angular/router';
 import {DialogService} from '../../../../share/services/dialog-service';
 import {MaritalStatus} from '../../../../core/enums/marital-status-enum';
+import {SupervisorProfile} from '../../../../core/enums/supervisor-profile';
 import {Gender} from '../../../../core/enums/gender-enum';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Supervisor} from '../../../../core/models/supervisor-model';
@@ -129,6 +130,7 @@ export class PlanterDetails implements OnInit {
    * @type {Gender}
    */
   gender = Gender;
+  currentUser = AuthService.getCurrentUser();
 
   /**
    * Initializes a new instance of the class.

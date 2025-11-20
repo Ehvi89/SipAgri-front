@@ -1,5 +1,5 @@
 <div class="production-list-container">
-  <app-header placeholder="Rechercher par production"></app-header>
+  <app-header (textChange)="onSearch($event)" placeholder="Rechercher par production"></app-header>
 
   <div class="content">
     <div class="page-header">

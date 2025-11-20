@@ -22,10 +22,12 @@
               <mat-icon matIconPrefix>edit</mat-icon>
               <span>Modifier</span>
             </button>
-            <button class="delete" (click)="deletePlanter()">
-              <mat-icon matIconPrefix>delete</mat-icon>
-              <span>Supprimer</span>
-            </button>
+            @if (currentUser.profile === 'ADMINISTRATOR' || currentUser.profile === 'SUPER_ADMIN') {
+              <button class="delete" (click)="deletePlanter()">
+                <mat-icon matIconPrefix>delete</mat-icon>
+                <span>Supprimer</span>
+              </button>
+            }
           </div>
         </div>
 

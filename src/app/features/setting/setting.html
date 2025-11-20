@@ -1,7 +1,7 @@
 <div class="setting-container">
   <app-header placeholder="" [breadcrumb]="true"></app-header>
   <div class="content">
-    @if (supervisor.profile === 'ADMINISTRATOR') {
+    @if (supervisor.profile === 'ADMINISTRATOR' || supervisor.profile === "SUPER_ADMIN") {
       <div class="chip">
         @for (chip of menus; track chip) {
           <button [routerLink]="chip.link"

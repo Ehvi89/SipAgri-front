@@ -84,7 +84,12 @@ export abstract class BaseRepository<T> {
    * @return {Observable<T[]>} An observable emitting an array of items of type T.
    */
   getAll(): Observable<T[]> {
-    return this.http.get<T[]>(`${this.apiUrl}/${this.endpoint}/all`);
+    const currentUser = AuthService.getCurrentUser();
+    const params: any = {};
+    if (currentUser.profile === "SUPERVISOR") {
+      params.supervisorId = currentUser.id;
+    }
+    return this.http.get<T[]>(`${this.apiUrl}/${this.endpoint}/all`, { params });
   }
 
   /**

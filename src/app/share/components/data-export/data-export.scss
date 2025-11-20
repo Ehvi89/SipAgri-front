@@ -77,8 +77,9 @@
 
 .format-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+  &.two-col { grid-template-columns: repeat(2, 1fr); }
+  &.four-col { grid-template-columns: repeat(4, 1fr); }
 }
 
 .format-btn {

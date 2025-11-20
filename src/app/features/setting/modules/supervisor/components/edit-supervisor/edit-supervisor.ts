@@ -16,7 +16,7 @@ import { NotificationService } from "../../../../../../core/services/notificatio
 export class EditSupervisor implements OnInit{
   loading$!: Observable<boolean>;
 
-  private destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
 
   // Form control
   profileCtrl!: FormControl<SupervisorProfile | null>;
@@ -28,26 +28,25 @@ export class EditSupervisor implements OnInit{
   previousProfile: SupervisorProfile | null = null;
 
   // Enum et données
-  SupervisorProfile = SupervisorProfile;
-  profiles = Object.values(SupervisorProfile);
+  allowedProfiles: SupervisorProfile[] = [
+    SupervisorProfile.ADMINISTRATOR,
+    SupervisorProfile.SUPERVISOR
+  ];
+
+  profiles = this.allowedProfiles;
 
   constructor(
-    private supervisorService: SupervisorService,
-    private formBuilder: FormBuilder,
-    private router: Router,
-    private route: ActivatedRoute,
-    private notifService: NotificationService
+    private readonly supervisorService: SupervisorService,
+    private readonly formBuilder: FormBuilder,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly notifService: NotificationService
   ) {}
 
   ngOnInit(): void {
     this.loading$ = this.supervisorService.loading$;
     this.initializeForm();
     this.loadSupervisor();
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   /**
@@ -70,11 +69,11 @@ export class EditSupervisor implements OnInit{
     const id = this.route.snapshot.paramMap.get('id');
 
     if (!id) {
-      this.router.navigate(['/settings/supervisors']);
+      this.router.navigate(['/settings/supervisors']).then();
       return;
     }
 
-    this.supervisorId = parseInt(id);
+    this.supervisorId = Number.parseInt(id);
 
     this.supervisorService.getById(this.supervisorId)
       .pipe(takeUntil(this.destroy$))
@@ -133,7 +132,7 @@ export class EditSupervisor implements OnInit{
    * Annule et retourne à la liste
    */
   cancel(): void {
-    this.router.navigate(['/settings/supervisors']);
+    this.router.navigate(['/settings/supervisors']).then();
   }
 
   /**
@@ -148,7 +147,7 @@ export class EditSupervisor implements OnInit{
    * Obtient le libellé du profil
    */
   getProfileLabel(profile: SupervisorProfile): string {
-    const labels: Record<SupervisorProfile, string> = {
+    const labels: Partial<Record<SupervisorProfile, string>> = {
       [SupervisorProfile.ADMINISTRATOR]: 'Administrateur',
       [SupervisorProfile.SUPERVISOR]: 'Superviseur',
     };
@@ -159,7 +158,7 @@ export class EditSupervisor implements OnInit{
    * Obtient l'icône du profil
    */
   getProfileIcon(profile: SupervisorProfile): string {
-    const icons: Record<SupervisorProfile, string> = {
+    const icons: Partial<Record<SupervisorProfile, string>> = {
       [SupervisorProfile.ADMINISTRATOR]: 'shield',
       [SupervisorProfile.SUPERVISOR]: 'supervised_user_circle',
     };
@@ -170,7 +169,7 @@ export class EditSupervisor implements OnInit{
    * Obtient la description du profil
    */
   getProfileDescription(profile: SupervisorProfile): string {
-    const descriptions: Record<SupervisorProfile, string> = {
+    const descriptions: Partial<Record<SupervisorProfile, string>> = {
       [SupervisorProfile.ADMINISTRATOR]: 'Accès complet à toutes les fonctionnalités du système. Peut gérer tous les superviseurs et paramètres.',
       [SupervisorProfile.SUPERVISOR]: 'Supervision et suivi des activités quotidiennes. Accès limité aux fonctions de base.',
     };
@@ -181,7 +180,7 @@ export class EditSupervisor implements OnInit{
    * Obtient la couleur du profil
    */
   getProfileColor(profile: SupervisorProfile): string {
-    const colors: Record<SupervisorProfile, string> = {
+    const colors: Partial<Record<SupervisorProfile, string>> = {
       [SupervisorProfile.ADMINISTRATOR]: '#f39c12',
       [SupervisorProfile.SUPERVISOR]: '#2f8f4e',
     };
@@ -192,7 +191,7 @@ export class EditSupervisor implements OnInit{
    * Obtient les permissions du profil
    */
   getProfilePermissions(profile: SupervisorProfile): string[] {
-    const permissions: Record<SupervisorProfile, string[]> = {
+    const permissions: Partial<Record<SupervisorProfile, string[]>> = {
       [SupervisorProfile.ADMINISTRATOR]: [
         'Gestion complète des utilisateurs',
         'Configuration système',
@@ -217,20 +216,11 @@ export class EditSupervisor implements OnInit{
     if (!this.previousProfile || !this.profileCtrl.value) return false;
 
     const hierarchy = {
+      [SupervisorProfile.SUPER_ADMIN]: 4,
       [SupervisorProfile.ADMINISTRATOR]: 4,
       [SupervisorProfile.SUPERVISOR]: 2,
     };
 
     return hierarchy[this.profileCtrl.value] < hierarchy[this.previousProfile];
-  }
-
-  /**
-   * Getter pour les erreurs de validation
-   */
-  get profileError(): string {
-    if (this.profileCtrl.hasError('required')) {
-      return 'Le profil est requis';
-    }
-    return '';
   }
 }

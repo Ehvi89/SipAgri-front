@@ -45,7 +45,7 @@
           @if (loading$ | async) { <mat-spinner diameter="50"></mat-spinner> }
           @else if (searchSubject.getValue()) {
             @for (planter of (planters$ | async); track planter.id) {
-              <div (click)="viewProfile(planter)" class="planter flex--between">
+              <div (click)="viewProfile(planter)" (keydown)="viewProfile(planter)" class="planter flex--between">
                 <div class="infos">
                   <span class="personal">{{ planter.firstname }} {{ planter.lastname }}</span>
                   <span class="plantation">{{ planter.village }} • {{ planter.plantations?.length || 0 }} plantation(s)</span>
@@ -61,7 +61,7 @@
             }
           } @else {
             @for (planter of (plantersPaged$ | async)?.data; track planter.id) {
-              <div (click)="viewProfile(planter)" class="planter flex--between">
+              <div (click)="viewProfile(planter)" (keydown)="viewProfile(planter)" class="planter flex--between">
                 <div class="infos">
                   <span class="personal">{{ planter.firstname }} {{ planter.lastname }}</span>
                   <span class="plantation">{{ planter.village }} • {{ planter.plantations?.length || 0 }} plantation(s)</span>

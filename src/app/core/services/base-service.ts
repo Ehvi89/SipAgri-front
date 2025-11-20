@@ -53,7 +53,7 @@ export abstract class BaseService<T> {
    */
   getAllPaged(page?: number, size?: number): Observable<PaginationResponse<T>> {
     this.setLoading(true);const currentSupervisor = AuthService.getCurrentUser();
-    if (currentSupervisor.profile === "ADMINISTRATOR") {
+    if (currentSupervisor.profile === "ADMINISTRATOR" || currentSupervisor.profile === "SUPER_ADMIN") {
       return this.repository.getAllPaged(page, size).pipe(
         tap(data => this._pagedData.next(data)), // mise à jour du cache
         finalize(() => this.setLoading(false)),

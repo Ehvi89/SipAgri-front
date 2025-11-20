@@ -252,12 +252,12 @@ export class AddSupervisor implements OnInit {
       this.supervisorForm.markAsUntouched();
 
       // Nettoyer les erreurs de chaque control
-      Object.keys(this.supervisorForm.controls).forEach(key => {
+      for (let key of Object.keys(this.supervisorForm.controls)) {
         const control = this.supervisorForm.get(key);
         control?.setErrors(null);
         control?.markAsUntouched();
         control?.markAsPristine();
-      });
+      }
     }
   }
 
@@ -265,7 +265,7 @@ export class AddSupervisor implements OnInit {
    * Obtient le libellé du profil
    */
   getProfileLabel(profile: SupervisorProfile): string {
-    const labels: Record<SupervisorProfile, string> = {
+    const labels: Partial<Record<SupervisorProfile, string>> = {
       [SupervisorProfile.ADMINISTRATOR]: 'Administrateur',
       [SupervisorProfile.SUPERVISOR]: 'Superviseur',
     };
@@ -276,7 +276,7 @@ export class AddSupervisor implements OnInit {
    * Obtient l'icône du profil
    */
   getProfileIcon(profile: SupervisorProfile): string {
-    const icons: Record<SupervisorProfile, string> = {
+    const icons: Partial<Record<SupervisorProfile, string>> = {
       [SupervisorProfile.ADMINISTRATOR]: 'shield',
       [SupervisorProfile.SUPERVISOR]: 'supervised_user_circle',
     };
@@ -287,7 +287,7 @@ export class AddSupervisor implements OnInit {
    * Obtient la description du profil
    */
   getProfileDescription(profile: SupervisorProfile): string {
-    const descriptions: Record<SupervisorProfile, string> = {
+    const descriptions: Partial<Record<SupervisorProfile, string>> = {
       [SupervisorProfile.ADMINISTRATOR]: 'Accès complet à toutes les fonctionnalités',
       [SupervisorProfile.SUPERVISOR]: 'Supervision et suivi des activités',
     };

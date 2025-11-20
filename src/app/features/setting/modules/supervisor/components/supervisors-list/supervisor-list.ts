@@ -17,20 +17,19 @@ export class SupervisorList implements OnInit {
   loading$!: Observable<boolean>;
   supervisors$!: Observable<PaginationResponse<Supervisor> | null>;
 
-  private destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
 
   // Filtres
   searchTerm!: FormControl;
   selectedProfile!: FormControl<SupervisorProfile | 'ALL' | null>;
 
   // Enum pour le template
-  SupervisorProfile = SupervisorProfile;
   profiles = Object.values(SupervisorProfile);
 
   constructor(
-    private supervisorService: SupervisorService,
-    private router: Router,
-    private formBuilder: FormBuilder,
+    private readonly supervisorService: SupervisorService,
+    private readonly router: Router,
+    private readonly formBuilder: FormBuilder,
   ) {}
 
   ngOnInit(): void {
@@ -39,11 +38,6 @@ export class SupervisorList implements OnInit {
     this.selectedProfile = this.formBuilder.control('ALL', Validators.required);
     this.searchTerm = this.formBuilder.control('');
     this.supervisors$ = this.supervisorService.pagedData$;
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   /**
@@ -145,7 +139,7 @@ export class SupervisorList implements OnInit {
    * Obtient le libellé du profil
    */
   getProfileLabel(profile: SupervisorProfile): string {
-    const labels: Record<SupervisorProfile, string> = {
+    const labels: Partial<Record<SupervisorProfile, string>> = {
       [SupervisorProfile.ADMINISTRATOR]: 'Administrateur',
       [SupervisorProfile.SUPERVISOR]: 'Superviseur',
     };
@@ -156,7 +150,7 @@ export class SupervisorList implements OnInit {
    * Obtient la classe CSS du badge de profil
    */
   getProfileClass(profile: SupervisorProfile): string {
-    const classes: Record<SupervisorProfile, string> = {
+    const classes: Partial<Record<SupervisorProfile, string>> = {
       [SupervisorProfile.ADMINISTRATOR]: 'admin',
       [SupervisorProfile.SUPERVISOR]: 'supervisor',
     };
@@ -167,7 +161,7 @@ export class SupervisorList implements OnInit {
    * Obtient l'icône du profil
    */
   getProfileIcon(profile: SupervisorProfile): string {
-    const icons: Record<SupervisorProfile, string> = {
+    const icons: Partial<Record<SupervisorProfile, string>> = {
       [SupervisorProfile.ADMINISTRATOR]: 'shield',
       [SupervisorProfile.SUPERVISOR]: 'supervised_user_circle',
     };
