@@ -6,6 +6,7 @@ import {PaymentMethod} from '../enums/payment-method-enum';
 
 export interface Planter {
   id?: number;
+  uidPlanter: string;
   firstname: string,
   lastname: string,
   birthday: Date,

@@ -1,6 +1,7 @@
 import {ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
-import {BehaviorSubject, combineLatest, map, Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {Production} from '../../../../core/models/production-model';
+import {AuthService} from '../../../auth/services/auth-service';
 import {PaginationResponse} from '../../../../core/models/pagination-response-model';
 import {ProductionService} from '../../services/production-service';
 import {PlantationService} from '../../../plantation/services/plantation-service';
@@ -25,8 +26,6 @@ export class ProductionList implements OnInit {
   // variables
   loading$!: Observable<boolean>;
   productionsPaged$!: Observable<PaginationResponse<Production>>;
-  productions$!: Observable<Production[]>;
-  search$ = new BehaviorSubject<string>('');
 
   plantationsMap$ = new BehaviorSubject<Map<number, Plantation>>(new Map());
   plantersMap$ = new BehaviorSubject<Map<number, Planter>>(new Map());
@@ -36,14 +35,14 @@ export class ProductionList implements OnInit {
   plantations$!: Observable<Plantation[]>;
 
   // constructor
-  constructor(private productionService: ProductionService,
-              private plantationService: PlantationService,
-              private planterService: PlanterService,
-              private notificationService: NotificationService,
-              private cdr: ChangeDetectorRef,
-              private dialogService: DialogService,
-              private formBuilder: FormBuilder,
-              private dialog: MatDialog,) {}
+  constructor(private readonly productionService: ProductionService,
+              private readonly plantationService: PlantationService,
+              private readonly planterService: PlanterService,
+              private readonly notificationService: NotificationService,
+              private readonly cdr: ChangeDetectorRef,
+              private readonly dialogService: DialogService,
+              private readonly formBuilder: FormBuilder,
+              private readonly dialog: MatDialog,) {}
 
   ngOnInit() {
     this.initializeData();
@@ -54,21 +53,11 @@ export class ProductionList implements OnInit {
     this.loading$ = this.productionService.loading$;
     this.productionsPaged$ = this.productionService.getAllPaged();
 
-    this.productions$ = combineLatest([
-      this.productionService.getAll(),
-      this.search$.asObservable()
-    ]).pipe(
-      map(([production, search]) => {
-        return production.filter(production => {
-          return !search && production.productionInKg.toString().toLowerCase().includes(search.toLowerCase());
-        })
-      })
-    )
   }
   private initializeMap() {
     this.productionsPaged$.subscribe(page => {
       if (page?.data) {
-        page.data.forEach(production => {
+        for (let production of page.data) {
           if (!this.plantationsMap$.value.has(production.plantationId)) {
             this.plantationService.getById(production.plantationId).subscribe(plantation => {
               const updated = new Map(this.plantationsMap$.value);
@@ -84,7 +73,7 @@ export class ProductionList implements OnInit {
               }
             });
           }
-        });
+        }
       }
     });
   }
@@ -96,6 +85,11 @@ export class ProductionList implements OnInit {
       productionInKg: this.formBuilder.control(production.productionInKg, [Validators.required]),
       plantationId: this.formBuilder.control(production.plantationId, [Validators.required]),
     })
+
+    const currentUser = AuthService.getCurrentUser();
+    if(currentUser.profile === 'SUPERVISOR') {
+      this.prodForm.get('plantationId')?.disable();
+    }
   }
 
   // delete production
@@ -139,5 +133,9 @@ export class ProductionList implements OnInit {
         });
       }
     });
+  }
+
+  onSearch(text: any): void {
+    this.productionService.search(text);
   }
 }

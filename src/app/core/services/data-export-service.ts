@@ -637,6 +637,7 @@ export class DataExportService {
    */
   private preparePlanterExport(planters: ExportPlanter[]): any[] {
     return planters.map(planter => ({
+      'Identifiant': `${planter.uidPlanter}`,
       'Nom': `${planter.firstname} ${planter.lastname}`,
       'Genre': this.getGender(planter.gender),
       'Statut matrimonial': this.getMaritalStatus(planter.maritalStatus),

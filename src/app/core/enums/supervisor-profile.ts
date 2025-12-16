@@ -1,4 +1,5 @@
 export enum SupervisorProfile {
   ADMINISTRATOR = "ADMINISTRATOR",
+  SUPER_ADMIN = "SUPER_ADMIN",
   SUPERVISOR = "SUPERVISOR"
 }

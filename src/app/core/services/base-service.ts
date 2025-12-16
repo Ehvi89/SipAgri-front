@@ -30,7 +30,7 @@ export abstract class BaseService<T> {
   private readonly _pagedData = new BehaviorSubject<PaginationResponse<T> | null>(null);
   public readonly pagedData$: Observable<PaginationResponse<T> | null> = this._pagedData.asObservable();
   private readonly errorService: ErrorService = new ErrorService();
-  private readonly searchSubject = new Subject<{ search: string; page?: number; size?: number, village?:boolean }>();
+  private readonly searchSubject = new Subject<{ search: string; page?: number; size?: number, criteria?:string }>();
 
   protected constructor(protected repository: BaseRepository<T>) {
     this.setupSearchPipeline();
@@ -53,7 +53,7 @@ export abstract class BaseService<T> {
    */
   getAllPaged(page?: number, size?: number): Observable<PaginationResponse<T>> {
     this.setLoading(true);const currentSupervisor = AuthService.getCurrentUser();
-    if (currentSupervisor.profile === "ADMINISTRATOR") {
+    if (currentSupervisor.profile === "ADMINISTRATOR" || currentSupervisor.profile === "SUPER_ADMIN") {
       return this.repository.getAllPaged(page, size).pipe(
         tap(data => this._pagedData.next(data)), // mise à jour du cache
         finalize(() => this.setLoading(false)),
@@ -96,11 +96,11 @@ export abstract class BaseService<T> {
         prev.search === curr.search &&
         prev.page === curr.page &&
         prev.size === curr.size &&
-        prev.village === curr.village
+        prev.criteria === curr.criteria
       ),
       switchMap(params => {
         this.setLoading(true);
-        return this.repository.search(params.search, params.page, params.size, params.village).pipe(
+        return this.repository.search(params.search, params.page, params.size, params.criteria).pipe(
           tap(data => {
             this._pagedData.next(data);
           }),
@@ -112,16 +112,17 @@ export abstract class BaseService<T> {
   }
 
   /**
-   * Performs a search operation and updates the searchSubject with the provided parameters.
+   * Executes a search operation with the specified parameters.
    *
-   * @param {string} search - The search query string used to filter results.
-   * @param {number} [page] - The optional parameter specifying the page number for paginated results.
-   * @param {number} [size] - The optional parameter specifying the number of results per page.
-   * @param {boolean} [village] - The optional parameter to include village-specific results.
-   * @return {void} This method does not return any value.
+   * @param {string} search - The search term to look for.
+   * @param {number} [page] - The optional page number for the search results.
+   * @param {number} [size] - The optional number of results per page.
+   * @param {string} [criteria] - An optional criteria to refine the search results.
+   * @return {void} This method does not return a value.
    */
-  search(search: string, page?: number, size?: number, village?:boolean): void {
-    this.searchSubject.next({ search, page, size, village });
+  search(search: string, page?: number, size?: number, criteria?: string): void {
+    console.log("searching for", search, "and criteria", criteria);
+    this.searchSubject.next({ search, page, size, criteria });
   }
 
   /**

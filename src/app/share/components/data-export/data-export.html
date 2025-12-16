@@ -41,38 +41,16 @@
       <!-- Sélection du format d'export -->
       <div class="section">
         <label class="section-label">Format d'export</label>
-        <div class="format-grid">
-          <button
-            class="format-btn"
-            [class.active]="exportFormat === 'csv'"
-            (click)="selectExportFormat('csv')">
-            <div class="btn-title">CSV</div>
-            <div class="btn-extension">.csv</div>
-          </button>
-
-          <button
-            class="format-btn"
-            [class.active]="exportFormat === 'json'"
-            (click)="selectExportFormat('json')">
-            <div class="btn-title">JSON</div>
-            <div class="btn-extension">.json</div>
-          </button>
-
-          <button
-            class="format-btn"
-            [class.active]="exportFormat === 'pdf'"
-            (click)="selectExportFormat('pdf')">
-            <div class="btn-title">PDF</div>
-            <div class="btn-extension">.pdf</div>
-          </button>
-
-          <button
-            class="format-btn"
-            [class.active]="exportFormat === 'excel'"
-            (click)="selectExportFormat('excel')">
-            <div class="btn-title">Excel</div>
-            <div class="btn-extension">.xlsx</div>
-          </button>
+        <div class="format-grid" [ngClass]="{ 'two-col': exportFormats.length == 2, 'four-col': exportFormats.length == 4 }">
+          @for (format of exportFormats; track format.value) {
+            <button
+              class="format-btn"
+              [class.active]="exportFormat === format.value"
+              (click)="selectExportFormat(format.value)">
+              <div class="btn-title">{{ format.label }}</div>
+              <div class="btn-extension">{{ format.extension }}</div>
+            </button>
+          }
         </div>
       </div>
 

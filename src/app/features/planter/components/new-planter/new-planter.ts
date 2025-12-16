@@ -58,7 +58,7 @@ export class NewPlanter implements OnInit {
     this.setupVillageAutocomplete();
 
     const currentUser = AuthService.getCurrentUser();
-    if (currentUser.profile === 'ADMINISTRATOR') {
+    if (currentUser.profile === 'ADMINISTRATOR' || currentUser.profile === 'SUPER_ADMIN') {
       this.supervisors$ = this.supervisorService.getAll();
     } else {
       this.supervisors$ = of([currentUser]);
